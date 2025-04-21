@@ -1,12 +1,25 @@
-import { Box, Heading, Text } from "@chakra-ui/react";
+import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import Sidebar from "./components/Sidebar";
+import BuscarUsuarios from "./pages/BuscarUsuarios";
+import ChequearHiveSBI from "./pages/ChequearHiveSBI";
+import UltimosAgregados from "./pages/UltimosAgregados";
+
+//TODO keep coding
+// refs:
+//  - https://api.hivesbi.com/v1/members/theghost1980/
 
 const App = () => (
-  <Box p={8}>
-    <Heading mb={4}>¡Hola, Chakra UI!</Heading>
-    <Text>
-      Este es un ejemplo básico usando Chakra UI con React y TypeScript.
-    </Text>
-  </Box>
+  <ChakraProvider value={defaultSystem}>
+    <Router>
+      <Sidebar />
+      <Routes>
+        <Route path="/buscar-usuarios" element={<BuscarUsuarios />} />
+        <Route path="/chequear-hive-sbi" element={<ChequearHiveSBI />} />
+        <Route path="/ultimos-agregados" element={<UltimosAgregados />} />
+      </Routes>
+    </Router>
+  </ChakraProvider>
 );
 
 export default App;
