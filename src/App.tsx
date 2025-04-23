@@ -9,6 +9,9 @@ import UltimosAgregados from "./pages/UltimosAgregados";
 // refs:
 //  - https://api.hivesbi.com/v1/members/theghost1980/
 
+//TODO to prevent abuse and misuse:
+//  add login by Keychain + backend json same as index admins
+
 const App = () => (
   <div>
     <Router>

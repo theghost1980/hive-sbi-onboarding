@@ -8,15 +8,16 @@ import "./BackendStatusBar.css";
 
 type Status = "checking" | "online" | "offline";
 
+export const beBaseUrl = "http://localhost:3000";
+
 export const BackendStatusBar = () => {
   const [status, setStatus] = useState<Status>("checking");
   const [backendUrl, setBackendUrl] = useState<string>("");
 
   useEffect(() => {
     const checkBackend = async () => {
-      const baseUrl = "http://localhost:3000";
-      const url = `${baseUrl}/api/testCon`; // URL del backend
-      setBackendUrl(baseUrl); // Guardamos la URL
+      const url = `${beBaseUrl}/api/testCon`; // URL del backend
+      setBackendUrl(beBaseUrl); // Guardamos la URL
 
       try {
         const res = await fetch(url);

@@ -1,0 +1,18 @@
+.onboard-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.onboard-container h2 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.onboard-container p {
+  font-size: 1.1rem;
+  color: #555;
+}

@@ -1,5 +1,3 @@
-// Sidebar.tsx
-
 import { NavLink } from "react-router-dom";
 import { BackendStatusBar } from "./BackendStatusBar";
 import "./Sidebar.css";
