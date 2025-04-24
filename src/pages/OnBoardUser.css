@@ -1,0 +1,47 @@
+/* Añadir estos estilos a tu archivo OnBoardUser.css */
+
+/* Estilo para el contenedor del estado de membresía dentro del resultado de usuario */
+.user-result .membership-status {
+  display: flex;
+  flex-direction: column; /* Apila los elementos verticalmente */
+  align-items: center; /* Centra horizontalmente */
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px dashed #ccc; /* Línea separadora */
+}
+
+/* Estilo para el párrafo que muestra el estado de membresía (ej: "Checking membership...") */
+.user-result .membership-status p {
+  margin: 5px 0; /* Espacio arriba y abajo del texto */
+}
+
+/* Estilo para el contenedor del icono de membresía */
+.user-result .membership-status-icon {
+  font-size: 2em; /* Tamaño del icono */
+  font-weight: bold;
+  margin-bottom: 5px; /* Espacio debajo del icono */
+}
+
+/* Estilo específico para el icono cuando SÍ es miembro (✓) */
+.user-result .membership-status-icon.is-member-icon {
+  color: #28a745; /* Verde */
+}
+
+/* Estilo específico para el icono cuando NO es miembro (✗) */
+.user-result .membership-status-icon.not-member-icon {
+  color: #ffc107; /* Naranja/Amarillo */
+}
+
+/* Estilo para el mensaje de error específico de la verificación de membresía */
+.user-result .membership-error {
+  color: #dc3545; /* Rojo */
+  font-weight: bold;
+  margin-top: 15px;
+  text-align: center;
+}
+
+/* Ajustar el margen superior del botón de Onboard para que tenga espacio con el texto/icono de no miembro */
+.user-result .onboard-button {
+  margin-top: 15px;
+  /* Mantén los otros estilos del botón onboard aquí */
+}

@@ -84,6 +84,7 @@ const UserItem: React.FC<UserItemProps> = ({ account, linkPeakdPrefix }) => {
                 isOpen={isModalOpen}
                 onRequestClose={closeModal}
                 username={account.name}
+                onboarderUsername={account.name}
               />
             </>
           ) : (

@@ -4,11 +4,12 @@ import {
   FaExclamationTriangle,
   FaSpinner,
 } from "react-icons/fa";
+import { config } from "../config/config";
 import "./BackendStatusBar.css";
 
 type Status = "checking" | "online" | "offline";
 
-export const beBaseUrl = "http://localhost:3000";
+export const beBaseUrl = config.backend.remote;
 
 export const BackendStatusBar = () => {
   const [status, setStatus] = useState<Status>("checking");
@@ -16,7 +17,7 @@ export const BackendStatusBar = () => {
 
   useEffect(() => {
     const checkBackend = async () => {
-      const url = `${beBaseUrl}/api/testCon`; // URL del backend
+      const url = `${beBaseUrl}/`; // URL del backend
       setBackendUrl(beBaseUrl); // Guardamos la URL
 
       try {

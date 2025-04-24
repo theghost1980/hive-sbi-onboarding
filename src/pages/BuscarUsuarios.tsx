@@ -3,6 +3,7 @@ import { FaAccessibleIcon, FaAngry, FaBaby } from "react-icons/fa";
 import { beBaseUrl } from "../components/BackendStatusBar";
 import CustomSelect from "../components/CustomSelect";
 import UserItem from "../components/UserItem";
+import { JWT_TOKEN_STORAGE_KEY } from "../context/AuthContext";
 import { Option } from "../types/selectors.type";
 import "./BuscarUsuarios.css";
 
@@ -49,9 +50,15 @@ const BuscarUsuarios = () => {
   useEffect(() => {
     const fetchAccounts = async () => {
       if (!selectedValue.trim().length) return;
+      const token = localStorage.getItem(JWT_TOKEN_STORAGE_KEY);
       setLoading(true);
       try {
-        const response = await fetch(`${beBaseUrl}/api/${selectedValue}`);
+        const response = await fetch(`${beBaseUrl}/api/${selectedValue}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
         if (!response.ok) {
           throw new Error("Error al obtener los datos");
         }
