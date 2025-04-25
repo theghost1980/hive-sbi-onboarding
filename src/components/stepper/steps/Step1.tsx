@@ -1,8 +1,17 @@
 import React from "react";
+import { HttpError, postRequest } from "../../../classes/http.class";
+import { JWT_TOKEN_STORAGE_KEY } from "../../../context/AuthContext";
+import { BackendOnboardingInfo } from "../../../pages/OnboardUser";
+import { beBaseUrl } from "../../BackendStatusBar";
 
 interface Step1Props {
-  onNext: () => void;
-  onReset: () => void;
+  stepData: any;
+  existingOnboardInfo?: BackendOnboardingInfo | null;
+  onStepDataChange: (data: Partial<any>) => void;
+  onProcessError: (message: string) => void;
+  onNextStep: () => void;
+  onPrevStep: () => void;
+  onComplete: () => void;
   username: string;
   onboarderUsername: string;
   isKeychainAvailable: boolean;
@@ -13,8 +22,8 @@ interface Step1Props {
 }
 
 const Step1: React.FC<Step1Props> = ({
-  onNext,
-  onReset,
+  onNextStep,
+  onPrevStep,
   username,
   onboarderUsername,
   isKeychainAvailable,
@@ -23,49 +32,91 @@ const Step1: React.FC<Step1Props> = ({
   onTransactionError,
   onCancel,
 }) => {
-  const handlePayWithKeychain = () => {
+  const handlePayWithKeychain = async () => {
     if (!isKeychainAvailable) {
       if (onTransactionError) {
         onTransactionError("Hive Keychain is not installed or available.");
       }
       return;
     }
+    const token = localStorage.getItem(JWT_TOKEN_STORAGE_KEY);
 
     if (onTransactionInitiated) {
       onTransactionInitiated();
     }
 
-    if (typeof window.hive_keychain !== "undefined") {
-      //@ts-ignore
-      window.hive_keychain.requestTransfer(
-        onboarderUsername,
-        "steembasicincome",
-        "1.000",
-        `@${username}`,
-        "HIVE",
-        async (response: any) => {
-          console.log("Keychain Transfer Response:", response);
-
-          if (response.success) {
-            if (onTransactionComplete) {
-              onTransactionComplete(response);
-            }
-            onNext();
-          } else {
-            if (onTransactionError) {
-              onTransactionError(
-                response.message ||
-                  "Keychain transaction failed or was cancelled."
-              );
-            }
-          }
+    //TODO REM testing just to send to BE
+    if (onTransactionComplete && token) {
+      try {
+        const result = await postRequest(
+          beBaseUrl,
+          "/crud/add",
+          {
+            onboarder: onboarderUsername,
+            onboarded: username,
+            amount: "1 HIVE",
+            memo: `@${username}`,
+          },
+          token
+        );
+        console.log("Petición exitosa:", result);
+        // Hacer algo con los datos 'result'
+      } catch (error: any) {
+        console.error("Ocurrió un error al hacer la petición:", error);
+        // Aquí puedes manejar los diferentes tipos de error
+        if (error instanceof HttpError) {
+          console.error(
+            "Error HTTP:",
+            error.response.status,
+            error.response.statusText
+          );
+          console.error("Cuerpo del error del servidor:", error.body);
+          // Ej: if (error.response.status === 401) { // Redirigir a login }
+          // Ej: if (error.body && error.body.message) { // Mostrar mensaje de error específico del backend }
+        } else {
+          // Esto es probablemente un error de red u otro error de fetch
+          console.error("Error de red o desconocido:", error.message);
+          // Ej: Mostrar un mensaje genérico de error de conexión
         }
-      );
-    } else {
-      if (onTransactionError) {
-        onTransactionError("Hive Keychain API is not available.");
       }
+      // onTransactionComplete(response);
     }
+    onNextStep();
+    //end testing
+
+    //TODO below uncomment and find where to add the be addition
+    // if (typeof window.hive_keychain !== "undefined") {
+    //   //@ts-ignore
+    //   window.hive_keychain.requestTransfer(
+    //     onboarderUsername,
+    //     "steembasicincome",
+    //     "1.000",
+    //     `@${username}`,
+    //     "HIVE",
+    //     async (response: any) => {
+    //       console.log("Keychain Transfer Response:", response);
+
+    //       if (response.success) {
+    //         if (onTransactionComplete) {
+    //           onTransactionComplete(response);
+    //         }
+    //         onNext();
+    //       } else {
+    //         if (onTransactionError) {
+    //           onTransactionError(
+    //             response.message ||
+    //               "Keychain transaction failed or was cancelled."
+    //           );
+    //         }
+    //       }
+    //     },
+    //     true
+    //   );
+    // } else {
+    //   if (onTransactionError) {
+    //     onTransactionError("Hive Keychain API is not available.");
+    //   }
+    // }
   };
 
   return (

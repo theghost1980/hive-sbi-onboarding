@@ -2,9 +2,29 @@ import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
 import { KeychainUtils } from "../utils/keychain.utils";
 import "./OnboardModal.css";
-import Stepper from "./stepper/Stepper";
+import Stepper from "./stepper/Stepper"; // Asegúrate de que Stepper acepta 'initialStep', 'stepData', 'existingOnboardInfo', y callbacks
 
-import Step1 from "./stepper/steps/Step1";
+// Importa los componentes de todos tus pasos
+import Step1 from "./stepper/steps/Step1"; // Paso para seleccionar post / stake
+// TODO: Crea e importa los otros pasos
+// import Step2Comment from "./stepper/steps/Step2Comment"; // Paso para comentario
+// import Step3Summary from "./stepper/steps/Step3Summary"; // Paso de resumen/finalización
+
+// Asume que BackendOnboardingInfo está exportada
+import { BackendOnboardingInfo } from "../pages/OnboardUser";
+import Step2 from "./stepper/steps/Step2";
+
+// Tipos para datos compartidos entre pasos
+interface StepData {
+  selectedPost?: Post; // Del Step 1
+  transactionResponse?: any; // Del Step 1 (resultado stake)
+  generatedComment?: string; // Del Step 2 (comentario generado)
+  editedComment?: string; // Del Step 2 (comentario editado por usuario)
+  commentResponse?: any; // Del Step 2 (resultado transacción comentario)
+  onboardingSummary?: any; // Del Step 3
+  // Añade aquí cualquier otro dato que necesites compartir entre pasos
+  // Ej: initialAmount, initialMemo si Step1 o Step2 los necesitan como datos de entrada para el flujo normal
+}
 
 export interface Post {
   title: string;
@@ -18,9 +38,11 @@ export interface Post {
 interface OnboardModalProps {
   isOpen: boolean;
   onRequestClose: () => void;
-  username: string;
-  onboarderUsername: string;
-  initialSelectedPost?: Post;
+  username: string; // Usuario a apadrinar/editar
+  onboarderUsername: string; // Usuario que apadrina (loggeado)
+  startStep?: number; // Paso inicial (1-indexed, default 1)
+  // initialSelectedPost?: Post; // Eliminamos esta prop para simplificar y usar 'startStep'
+  existingOnboardInfo?: BackendOnboardingInfo | null; // Datos para el modo edición (si startStep > 1)
 }
 
 const OnboardModal: React.FC<OnboardModalProps> = ({
@@ -28,59 +50,81 @@ const OnboardModal: React.FC<OnboardModalProps> = ({
   onRequestClose,
   username,
   onboarderUsername,
-  initialSelectedPost,
+  startStep = 1, // Valor por defecto 1 si no se pasa
+  existingOnboardInfo, // Datos para el modo edición
 }) => {
+  // Estado para guardar datos recolectados a través de los pasos
+  const [stepData, setStepData] = useState<StepData>({}); // Inicialmente vacío
+
+  // Estados para la carga de posts (SOLO necesario si startStep es 1)
   const [posts, setPosts] = useState<Post[]>([]);
   const [loadingPosts, setLoadingPosts] = useState<boolean>(false);
   const [errorFetchingPosts, setErrorFetchingPosts] = useState<string | null>(
     null
   );
 
-  const [selectedPost, setSelectedPost] = useState<Post | null>(
-    initialSelectedPost || null
-  );
-  const [transactionResponse, setTransactionResponse] = useState<any>(null);
-  const [generatedComment, setGeneratedComment] = useState<string>("");
-  const [editedComment, setEditedComment] = useState<string>("");
-  const [commentResponse, setCommentResponse] = useState<any>(null);
-  const [onboardingSummary, setOnboardingSummary] = useState<any>(null);
-
+  // Estado para errores generales del proceso (mostrar encima del Stepper)
   const [processError, setProcessError] = useState<string | null>(null);
 
-  const [showSteps, setShowSteps] = useState(
-    initialSelectedPost ? true : false
-  );
-
+  // Estado para disponibilidad de Keychain (necesario para pasos con transacciones)
   const [isKeychainAvailable, setIsKeychainAvailable] = useState(false);
 
+  // --- Efecto para inicializar datos si iniciamos en modo edición (startStep > 1) ---
+  useEffect(() => {
+    if (isOpen && startStep > 1 && existingOnboardInfo) {
+      // Si el modal se abre en un paso > 1 Y tenemos info existente,
+      // inicializamos 'stepData' con esa info.
+      // Esto asume que BackendOnboardingInfo tiene campos que coinciden o se mapean a StepData
+      // Por ejemplo, si Step2 necesita el memo y amount existentes:
+      setStepData((prev) => ({
+        ...prev,
+        // Aquí mapearías los datos de existingOnboardInfo a StepData según lo necesiten tus pasos
+        // Ejemplo:
+        // initialMemo: existingOnboardInfo.memo,
+        // initialAmount: existingOnboardInfo.amount,
+        // etc.
+        // Si el paso 2 necesita el post al que comentar en modo edición,
+        // necesitarías obtenerlo o pasarlo también (no está en BackendOnboardingInfo)
+        // o asumir que el paso 2 solo necesita author/permlink del existingOnboardInfo
+        // para construir el comentario.
+        commentParentAuthor: existingOnboardInfo.onboarded, // El usuario a comentar (onboarded)
+        commentParentPermlink: "initial-post-permlink-here", // <-- NECESITAS EL PERMLINK DEL POST INICIAL si no está en backendInfo!
+        // Si no tienes el permlink del post inicial en BackendOnboardingInfo,
+        // el modo "editar comentario" basado solo en backendInfo es complicado.
+        // O bien el paso 2 puede funcionar solo con author/permlink del backendInfo (si es posible),
+        // o necesitas guardar el permlink del post en BackendOnboardingInfo al crear el registro.
+      }));
+      // Opcional: Si iniciar en un paso > 1 implica que ciertos pasos anteriores están "completados"
+      // y tienen datos, podrías setear esos datos iniciales aquí también si no se derivan de existingOnboardInfo.
+    }
+    // Resetear stepData si el modal se cierra (isOpen cambia a false)
+    if (!isOpen) {
+      setStepData({}); // Limpia los datos recolectados
+      setPosts([]);
+      setLoadingPosts(false);
+      setErrorFetchingPosts(null);
+      setProcessError(null);
+      // startStep se reseteará en el componente padre (OnboardUser) handleCloseModal
+    }
+  }, [isOpen, startStep, existingOnboardInfo]); // Dependencias: re-ejecutar si estas props cambian
+
+  // Efecto para verificar disponibilidad de Keychain
   useEffect(() => {
     if (isOpen && typeof window !== "undefined") {
       setIsKeychainAvailable(KeychainUtils.isKeychainInstalled(window));
     }
-    if (!isOpen) {
-      setSelectedPost(initialSelectedPost || null);
-      setTransactionResponse(null);
-      setGeneratedComment("");
-      setEditedComment("");
-      setCommentResponse(null);
-      setOnboardingSummary(null);
-      setProcessError(null);
-      setShowSteps(initialSelectedPost ? true : false);
-      if (!initialSelectedPost) {
-        setPosts([]);
-        setLoadingPosts(false);
-        setErrorFetchingPosts(null);
-      }
-    }
-  }, [isOpen, initialSelectedPost]);
+  }, [isOpen]);
 
+  // Efecto para cargar posts (SOLO si iniciamos en paso 1)
   useEffect(() => {
-    if (isOpen && username && !initialSelectedPost && !showSteps) {
+    // Carga posts SOLO si el modal está abierto, tenemos username, Y el paso inicial es 1
+    if (isOpen && username && startStep === 1) {
       setLoadingPosts(true);
       setErrorFetchingPosts(null);
 
+      // TODO: Reemplazar este fetch directo con tu función apiRequest/get
       fetch("https://api.hive.blog", {
-        method: "POST",
+        method: "POST", // bridge.get_account_posts usa POST
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           jsonrpc: "2.0",
@@ -89,7 +133,14 @@ const OnboardModal: React.FC<OnboardModalProps> = ({
           id: 1,
         }),
       })
-        .then((res) => res.json())
+        .then((res) => {
+          // Manejo básico de respuesta no ok para fetch directo
+          if (!res.ok) {
+            // Podrías lanzar un HttpError si creas uno para fetch directo también
+            throw new Error(`HTTP error fetching posts: ${res.status}`);
+          }
+          return res.json();
+        })
         .then((data) => {
           if (data.result && data.result.length > 0) {
             const postsData = data.result.map((post: any) => ({
@@ -102,7 +153,7 @@ const OnboardModal: React.FC<OnboardModalProps> = ({
             }));
             setPosts(postsData);
           } else {
-            setPosts([]);
+            setPosts([]); // No posts found
           }
         })
         .catch((err) => {
@@ -110,8 +161,11 @@ const OnboardModal: React.FC<OnboardModalProps> = ({
           setErrorFetchingPosts("Error al obtener publicaciones.");
         })
         .finally(() => setLoadingPosts(false));
+
+      // TODO: Considerar AbortController para cancelar la petición si el modal se cierra
     }
-  }, [isOpen, username, initialSelectedPost, showSteps]);
+    // No hay un 'else if (!isOpen)' aquí porque ese caso ya lo maneja el useEffect de inicialización
+  }, [isOpen, username, startStep]); // Dependencias
 
   const extractFirstImage = (body: string): string | null => {
     const imgRegex = /!\[.*?\]\((.*?)\)/;
@@ -123,167 +177,248 @@ const OnboardModal: React.FC<OnboardModalProps> = ({
     return null;
   };
 
-  const handlePostSelected = (post: Post) => {
-    setSelectedPost(post);
-    setShowSteps(true);
-    setProcessError(null);
+  // --- Callbacks para que los pasos interactúen con el modal ---
+
+  // Callback para que un paso actualice los datos compartidos (stepData)
+  const handleStepDataChange = (newData: Partial<StepData>) => {
+    setStepData((prev) => ({ ...prev, ...newData }));
+    // Opcional: Si actualizar stepData debe mover automáticamente al siguiente paso,
+    // aquí podría haber lógica para decirle al Stepper que avance.
+    // Pero es más común que el paso individual llame a un 'onNext' callback que le pase el Stepper.
   };
 
-  const handleCancelFlow = () => {
-    setSelectedPost(initialSelectedPost || null);
-    setTransactionResponse(null);
-    setGeneratedComment("");
-    setEditedComment("");
-    setCommentResponse(null);
-    setOnboardingSummary(null);
-    setProcessError(null);
-    setShowSteps(initialSelectedPost ? true : false);
-    if (!initialSelectedPost) {
-      setPosts([]);
-      setLoadingPosts(false);
-      setErrorFetchingPosts(null);
-    }
-
-    onRequestClose();
-  };
-
-  const handleTransactionInitiated = () => {
-    console.log("Modal: Transaction initiated from Step1");
-  };
-
-  const handleTransactionComplete = (response: any) => {
-    console.log("Modal: Transaction complete from Step1!", response);
-    setTransactionResponse(response);
-    setProcessError(null);
-  };
-
-  const handleTransactionError = (message: string) => {
-    console.error("Modal: Transaction error from Step1:", message);
+  // Callback para que los pasos reporten un error general del proceso
+  const handleProcessError = (message: string) => {
     setProcessError(message);
   };
 
-  const onboardSteps = [Step1];
+  // Callback para manejar la selección de un post en el Paso 1
+  const handlePostSelected = (post: Post) => {
+    // Cuando se selecciona un post, guardamos la info en stepData
+    handleStepDataChange({ selectedPost: post });
+    // Esto debería hacer que el Stepper avance al paso 2.
+    // Asumimos que el Stepper tiene un mecanismo (ej: un botón "Siguiente" en el Step1
+    // que llama a un callback onNextStep que el Stepper le pasa).
+  };
+
+  // Callback para cancelar el flujo y cerrar el modal
+  const handleCancelFlow = () => {
+    // El reset de estado se hace en el useEffect cuando isOpen cambia a false
+    onRequestClose(); // Llama a la función que el padre le pasó para cerrar el modal
+  };
+
+  // --- Definición de los pasos del Stepper ---
+  // Este array DEBE contener TODOS los componentes de los pasos
+  // y las props que el Stepper DEBE pasarles.
+  const onboardSteps = [
+    {
+      // Paso 1: Seleccionar Post / Stake
+      component: Step1,
+      props: {
+        // Props específicas para Step1
+        posts: posts, // Lista de posts cargados
+        loadingPosts: loadingPosts, // Estado de carga de posts
+        errorFetchingPosts: errorFetchingPosts, // Error de carga de posts
+        onPostSelected: handlePostSelected, // Callback cuando se selecciona un post
+
+        // Props generales que Step1 pueda necesitar
+        username: username,
+        onboarderUsername: onboarderUsername,
+        isKeychainAvailable: isKeychainAvailable,
+        // ... otras props que Step1 necesite
+
+        // Callbacks para Step1 para reportar estado de transacción si la maneja directamente
+        onTransactionInitiated: () => console.log("Step1 Transaction Init"), // Placeholder
+        onTransactionComplete: (response: any) =>
+          handleStepDataChange({ transactionResponse: response }), // Guarda la respuesta
+        onTransactionError: handleProcessError, // Reporta error general
+
+        // Si Step1 necesita el selectedPost o transactionResponse, los recibiría via stepData del Stepper
+        // selectedPost: stepData.selectedPost, // <- Estos vendrían vía Stepper.props
+        // transactionResponse: stepData.transactionResponse,
+      },
+    },
+
+    {
+      component: Step2,
+      props: {
+        // Props específicas para Step2Comment
+        // Pasa los datos del post seleccionado y la info existente para edición
+        selectedPost: stepData.selectedPost, // Post seleccionado en Step1
+        existingOnboardInfo: existingOnboardInfo, // Info si estamos en modo edición
+
+        // Props generales que Step2Comment pueda necesitar
+        username: username,
+        onboarderUsername: onboarderUsername,
+        isKeychainAvailable: isKeychainAvailable,
+        // ... otras props
+
+        // Callbacks para Step2Comment para reportar estado de comentario/transacción
+        onCommentGenerated: (comment: string) =>
+          handleStepDataChange({ generatedComment: comment }),
+        onCommentEdited: (comment: string) =>
+          handleStepDataChange({ editedComment: comment }),
+        onCommentPosted: (response: any) =>
+          handleStepDataChange({ commentResponse: response }),
+
+        onTransactionInitiated: () => console.log("Step2 Transaction Init"), // Placeholder
+        onTransactionComplete: (response: any) =>
+          handleStepDataChange({ commentResponse: response }), // Guarda la respuesta
+        onTransactionError: handleProcessError, // Reporta error general
+
+        // Callbacks para navegar al siguiente/anterior paso (el Stepper los pasaría a cada Step)
+        // onNextStep: () => void,
+        // onPrevStep: () => void,
+      },
+    },
+
+    // TODO: Añadir el Paso 3 (Resumen)
+    /*
+        {
+            component: Step3Summary, // Crea este componente
+            props: {
+                // Props específicas para Step3Summary (probablemente necesita todos los datos recolectados)
+                stepData: stepData, // Le pasamos todos los datos
+
+                // Props generales
+                username: username,
+                onboarderUsername: onboarderUsername,
+
+                // Callback para finalizar el flujo (probablemente cierra el modal)
+                onComplete: handleCancelFlow, // O una función diferente si hay lógica de post-finalización
+            }
+        },
+        */
+  ];
+
+  // --- Renderizado del Modal ---
+
+  // Condición para mostrar la lista de posts (SOLO si startStep es 1 y aún no se ha seleccionado post en este flujo)
+  const showPostSelectionList = startStep === 1 && !stepData.selectedPost;
+
+  // Condición para mostrar el Stepper (si startStep > 1, O si startStep es 1 Y ya se seleccionó post)
+  const showStepperFlow =
+    startStep > 1 ||
+    (startStep === 1 &&
+      stepData.selectedPost !== undefined &&
+      stepData.selectedPost !== null);
 
   return (
     <Modal
       isOpen={isOpen}
-      onRequestClose={handleCancelFlow}
+      onRequestClose={handleCancelFlow} // Usamos el manejador que resetea y cierra
       contentLabel="Onboard HSBI Modal"
       className="onboard-modal"
       overlayClassName="onboard-modal-overlay"
       ariaHideApp={false}
     >
-      <h2>Onboard HSBI</h2>
-      <p>
-        Usuario a apadrinar: <strong>@{username}</strong>
-      </p>
+      {/* --- Barra de Encabezado Fija --- */}
+      <div className="modal-header-bar">
+        <h2>Onboard HSBI</h2>
+        <p>
+          Usuario: <strong>@{username}</strong> (Onboarder: @{onboarderUsername}
+          )
+        </p>
+      </div>
+      {/* -------------------------------- */}
 
-      {processError && <p className="process-error-message">{processError}</p>}
+      {/* --- Cuerpo del Contenido (Desplazable) --- */}
+      <div className="modal-content-body">
+        {processError && (
+          <p className="process-error-message">{processError}</p>
+        )}
 
-      {!showSteps && (
-        <>
-          {!isKeychainAvailable && !loadingPosts && !errorFetchingPosts && (
-            <p className="keychain-required-message">
-              Hive Keychain es requerido para apadrinar usuarios. Por favor,
-              asegúrese de que está instalado y accesible.
-            </p>
-          )}
+        {showPostSelectionList && (
+          <>
+            {!isKeychainAvailable && !loadingPosts && !errorFetchingPosts && (
+              <p className="keychain-required-message">
+                Hive Keychain es requerido para apadrinar usuarios. Por favor,
+                asegúrese de que está instalado.
+              </p>
+            )}
+            {loadingPosts && <p>Cargando publicaciones...</p>}
+            {errorFetchingPosts && <p>{errorFetchingPosts}</p>}
 
-          {loadingPosts && <p>Cargando publicaciones...</p>}
+            {!loadingPosts && !errorFetchingPosts && posts.length > 0 && (
+              <ul className="post-list">
+                {posts.map((post, index) => (
+                  <li key={post.permlink || index} className="post-item">
+                    {/* --- ÁREA DEL THUMBNAIL --- */}
+                    <div className="post-thumbnail">
+                      {post.imageUrl ? (
+                        <img
+                          src={post.imageUrl}
+                          alt={`Thumbnail for ${post.title}`}
+                        />
+                      ) : (
+                        <div className="no-image">No image</div>
+                      )}
+                    </div>
 
-          {errorFetchingPosts && <p>{errorFetchingPosts}</p>}
-
-          {!loadingPosts && !errorFetchingPosts && posts.length > 0 && (
-            <ul className="post-list">
-              {posts.map((post, index) => (
-                <li key={post.permlink || index} className="post-item">
-                  <div className="post-thumbnail">
-                    {post.imageUrl ? (
-                      <img src={post.imageUrl} alt="Post thumbnail" />
-                    ) : (
-                      <div className="no-image">No image</div>
-                    )}
-                  </div>
-                  <div className="post-content">
-                    <a
-                      href={`https://peakd.com${post.url}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <h3>{post.title}</h3>
-                    </a>
-                    <p>{post.body.substring(0, 100)}...</p>
-                    <div className="post-buttons">
-                      <button
-                        onClick={() => handlePostSelected(post)}
-                        className="onboard-here-button"
-                        disabled={!isKeychainAvailable}
-                        title={
-                          !isKeychainAvailable ? "Requires Hive Keychain" : ""
-                        }
-                      >
-                        On-board here
-                      </button>
+                    <div className="post-content">
                       <a
                         href={`https://peakd.com${post.url}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="onboard-peakd-button"
                       >
-                        View on PeakD
+                        <h3>{post.title}</h3>
                       </a>
+                      <p>por @{post.author}</p>
                     </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {!loadingPosts &&
-            !errorFetchingPosts &&
-            posts.length === 0 &&
-            !isKeychainAvailable && (
-              <p>
-                No hay publicaciones recientes para @{username}, y Keychain es
-                requerido para apadrinar.
-              </p>
+                    <button
+                      onClick={() => handlePostSelected(post)}
+                      className="onboard-here-button"
+                      disabled={!isKeychainAvailable}
+                      title={
+                        !isKeychainAvailable ? "Requires Hive Keychain" : ""
+                      }
+                    >
+                      On-board here
+                    </button>
+                  </li>
+                ))}
+              </ul>
             )}
-
-          {!loadingPosts &&
-            !errorFetchingPosts &&
-            posts.length === 0 &&
-            isKeychainAvailable && (
+            {!loadingPosts && !errorFetchingPosts && posts.length === 0 && (
               <p>No hay publicaciones recientes para @{username}.</p>
             )}
-        </>
-      )}
+          </>
+        )}
 
-      {showSteps && selectedPost && (
-        <div className="my-flow-area">
-          <Stepper
-            steps={onboardSteps}
-            username={username}
-            onboarderUsername={onboarderUsername}
-            isKeychainAvailable={isKeychainAvailable}
-            onCancel={handleCancelFlow}
-            onTransactionInitiated={handleTransactionInitiated}
-            onTransactionComplete={handleTransactionComplete}
-            onTransactionError={handleTransactionError}
-            selectedPost={selectedPost}
-            transactionResponse={transactionResponse}
-          />
-        </div>
-      )}
+        {/* Vista del Stepper */}
+        {showStepperFlow && (
+          <div className="my-flow-area">
+            <Stepper
+              steps={onboardSteps}
+              initialStep={startStep - 1}
+              stepData={stepData}
+              existingOnboardInfo={existingOnboardInfo}
+              onStepDataChange={handleStepDataChange}
+              onProcessError={handleProcessError} // Pasar el manejador de error
+              onCancel={handleCancelFlow}
+              username={username}
+              onboarderUsername={onboarderUsername}
+              isKeychainAvailable={isKeychainAvailable}
+              // Pasar callbacks específicos de transacción (Stepper los pasará a Step1)
+              onTransactionInitiated={() =>
+                console.log("Modal: Step1 Transaction Init")
+              }
+              onTransactionComplete={(response: any) =>
+                handleStepDataChange({ transactionResponse: response })
+              }
+              onTransactionError={handleProcessError} // Step1 reporta error general
+            />
+          </div>
+        )}
+      </div>
+      {/* ------------------------------------ */}
 
-      {showSteps && !selectedPost && (
-        <p className="process-error-message">
-          Error interno: No post seleccionado para iniciar el flujo.
-        </p>
-      )}
-
+      {/* --- Botón Cerrar (Fuera del cuerpo desplazable pero dentro del modal) --- */}
+      {/* Si el modal es flex-direction column, este botón se posicionará al final */}
       <button onClick={handleCancelFlow} className="close-button">
         Cerrar
       </button>
+      {/* ----------------------------------------------------------------------- */}
     </Modal>
   );
 };

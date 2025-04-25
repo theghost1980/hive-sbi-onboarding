@@ -9,7 +9,7 @@ import "./BackendStatusBar.css";
 
 type Status = "checking" | "online" | "offline";
 
-export const beBaseUrl = config.backend.remote;
+export const beBaseUrl = config.backend.local;
 
 export const BackendStatusBar = () => {
   const [status, setStatus] = useState<Status>("checking");

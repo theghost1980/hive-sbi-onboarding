@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { config } from "../config/config";
+import { beBaseUrl } from "../components/BackendStatusBar";
 import { useAuth } from "../context/AuthContext";
 import { KeychainUtils } from "../utils/keychain.utils";
 import "./LoginPage.css";
@@ -58,14 +58,11 @@ const LoginPage: React.FC = () => {
     setMessage("");
 
     try {
-      const challengeResponse = await fetch(
-        `${config.backend.remote}/auth/challenge`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username }),
-        }
-      ).then((res) => {
+      const challengeResponse = await fetch(`${beBaseUrl}/auth/challenge`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username }),
+      }).then((res) => {
         if (!res.ok)
           throw new Error(
             `Failed to get challenge from backend (Status: ${res.status})`
@@ -87,14 +84,11 @@ const LoginPage: React.FC = () => {
               const signature = response.result;
 
               try {
-                const verifyResponse = await fetch(
-                  `${config.backend.remote}/auth/verify`,
-                  {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ username, signature }),
-                  }
-                ).then((res) => {
+                const verifyResponse = await fetch(`${beBaseUrl}/auth/verify`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ username, signature }),
+                }).then((res) => {
                   if (!res.ok) {
                     if (res.status === 401)
                       throw new Error(

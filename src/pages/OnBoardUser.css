@@ -1,35 +1,170 @@
-/* Añadir estos estilos a tu archivo OnBoardUser.css */
+/* src/components/OnBoardUser.css */
 
-/* Estilo para el contenedor del estado de membresía dentro del resultado de usuario */
-.user-result .membership-status {
-  display: flex;
-  flex-direction: column; /* Apila los elementos verticalmente */
-  align-items: center; /* Centra horizontalmente */
-  margin-top: 15px;
-  padding-top: 15px;
-  border-top: 1px dashed #ccc; /* Línea separadora */
+.onboard-user-container {
+  max-width: 600px;
+  margin: 40px auto; /* Centra el contenedor y añade margen */
+  padding: 20px;
+  background-color: #f9f9f9; /* Fondo suave */
+  border-radius: 8px; /* Bordes redondeados */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+  font-family: sans-serif; /* Fuente legible */
 }
 
-/* Estilo para el párrafo que muestra el estado de membresía (ej: "Checking membership...") */
+.onboard-user-container h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.user-search-form {
+  display: flex;
+  gap: 10px; /* Espacio entre input y botón */
+  margin-bottom: 20px;
+}
+
+.search-input {
+  flex-grow: 1; /* Permite que el input ocupe el espacio restante */
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1em;
+}
+
+/* Estilos base para todos los botones */
+.search-button,
+.onboard-button,
+.edit-onboard-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Transición suave al pasar el ratón */
+}
+
+/* Estilo específico para el botón principal de búsqueda */
+.search-button {
+  background-color: #007bff; /* Azul primario */
+  color: white;
+}
+
+.search-button:hover:not(:disabled) {
+  background-color: #0056b3; /* Azul más oscuro al pasar el ratón */
+}
+
+/* Estilo para botones deshabilitados */
+.search-button:disabled,
+.onboard-button:disabled,
+.edit-onboard-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Mensajes de estado y error de búsqueda */
+.search-status {
+  color: #555;
+  text-align: center;
+  font-style: italic;
+  margin-top: 10px;
+}
+
+.search-error {
+  color: #dc3545; /* Rojo */
+  font-weight: bold;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* Estilo para el contenedor del resultado de usuario */
+.user-result {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #eee; /* Borde sutil */
+  border-radius: 4px;
+  background-color: #fff; /* Fondo blanco para el resultado */
+}
+
+.user-result > p strong {
+  /* Estilo para el nombre de usuario encontrado */
+  color: #0056b3; /* Un color que destaque */
+}
+
+/* Contenedor del estado de membresía (dentro de user-result) */
+/* Eliminamos el border-top de tu CSS original aquí para usarlo en .backend-onboard-info si es necesario */
+.user-result .membership-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 15px; /* Margen entre "User found" y estado de membresía */
+  padding-top: 0; /* Ya no necesita padding-top si el border-top no está aquí */
+  /* border-top: 1px dashed #ccc; */ /* Eliminado de aquí */
+}
+
+/* Contenedor para la información del backend si existe (el que tiene la fecha y el botón Edit) */
+.backend-onboard-info {
+  width: 100%; /* Ocupa todo el ancho disponible */
+  margin-top: 15px; /* Espacio arriba */
+  padding-top: 15px; /* Espacio antes de la línea */
+  border-top: 1px dashed #ccc; /* Línea separadora como en tu original */
+  text-align: center; /* Centra el texto dentro */
+}
+
+.backend-onboard-info p {
+  margin: 5px 0; /* Espacio vertical para los párrafos */
+  color: #555;
+  font-size: 0.9em;
+}
+
+.backend-onboard-info strong {
+  color: #007bff; /* Color para el onboarder */
+}
+
+.missing-comment-section {
+  /* Contenedor para el mensaje y botón "Edit Comment" */
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #eee; /* Línea separadora sutil */
+  width: 100%;
+  text-align: center;
+}
+.missing-comment-section p {
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #dc3545; /* Rojo para resaltar la falta */
+}
+
+/* Estilo para el párrafo de texto dentro del estado de membresía */
 .user-result .membership-status p {
-  margin: 5px 0; /* Espacio arriba y abajo del texto */
+  margin: 5px 0;
+  font-size: 1em;
+  color: #333;
 }
 
 /* Estilo para el contenedor del icono de membresía */
 .user-result .membership-status-icon {
-  font-size: 2em; /* Tamaño del icono */
+  font-size: 2.5em; /* Icono un poco más grande */
   font-weight: bold;
-  margin-bottom: 5px; /* Espacio debajo del icono */
+  margin-bottom: 8px; /* Más espacio debajo del icono */
 }
 
-/* Estilo específico para el icono cuando SÍ es miembro (✓) */
-.user-result .membership-status-icon.is-member-icon {
+/* Estilo específico para el icono y texto cuando SÍ es miembro */
+.user-result .membership-status.member .membership-status-icon.is-member-icon {
   color: #28a745; /* Verde */
 }
+.user-result .membership-status.member p {
+  color: #28a745; /* Texto verde */
+  font-weight: bold;
+}
 
-/* Estilo específico para el icono cuando NO es miembro (✗) */
-.user-result .membership-status-icon.not-member-icon {
-  color: #ffc107; /* Naranja/Amarillo */
+/* Estilo específico para el icono y texto cuando NO es miembro */
+.user-result
+  .membership-status.not-member
+  .membership-status-icon.not-member-icon {
+  color: #ffc107; /* Naranja */
+}
+.user-result .membership-status.not-member p {
+  color: #ffc107; /* Texto naranja */
+  font-weight: bold;
 }
 
 /* Estilo para el mensaje de error específico de la verificación de membresía */
@@ -40,8 +175,34 @@
   text-align: center;
 }
 
-/* Ajustar el margen superior del botón de Onboard para que tenga espacio con el texto/icono de no miembro */
-.user-result .onboard-button {
-  margin-top: 15px;
-  /* Mantén los otros estilos del botón onboard aquí */
+/* Estilo específico para el botón de Onboard (el primario para no miembros) */
+.onboard-button {
+  background-color: #28a745; /* Verde */
+  color: white;
+  margin-top: 15px; /* Espacio arriba */
+}
+.onboard-button:hover:not(:disabled) {
+  background-color: #218838; /* Verde más oscuro */
+}
+
+/* Estilo específico para el botón de Editar Comentario (el secundario) */
+.edit-onboard-button {
+  background-color: #ffc107; /* Naranja/Amarillo */
+  color: #333; /* Texto oscuro */
+  margin-top: 15px; /* Espacio arriba */
+  border: 1px solid #ffb000; /* Borde para distinguir más */
+}
+.edit-onboard-button:hover:not(:disabled) {
+  background-color: #e0a800; /* Naranja más oscuro */
+  border-color: #d39e00;
+}
+
+/* Estilo para el enlace del comment_permlink */
+.comment-permlink-link {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: normal; /* Anular font-weight bold si se aplica al p */
+}
+.comment-permlink-link:hover {
+  text-decoration: underline;
 }

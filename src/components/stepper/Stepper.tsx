@@ -1,29 +1,31 @@
-import React, { useState } from "react";
-import { Post } from "../OnboardModal";
+import React, { useEffect, useState } from "react";
 
-interface StepNavigationProps {
-  onNext: () => void;
-  onReset: () => void;
-  username: string;
-  onboarderUsername: string;
-  isKeychainAvailable: boolean;
-  selectedPost: Post;
-  onCancel: () => void;
-  onTransactionInitiated?: () => void;
-  onTransactionComplete?: (response: any) => void;
-  onTransactionError?: (message: string) => void;
+// Define la estructura de un paso
+interface StepDefinition {
+  component: React.ComponentType<any>;
+  props: any; // Props específicas que el Modal define para este paso
 }
 
-type StepComponent = React.FC<StepNavigationProps>;
-
+// Define las props que el Stepper recibe del Modal
 interface StepperProps {
-  steps: StepComponent[];
+  steps: StepDefinition[]; // Array con TODOS los pasos
+
+  // Control del flujo
+  initialStep?: number; // Índice del paso inicial (base 0), default 0
+
+  // Datos y callbacks compartidos (pasados a TODOS los pasos)
+  stepData: any;
+  existingOnboardInfo?: any;
+  onStepDataChange: (data: any) => void; // Para que pasos actualicen stepData en Modal
+  onProcessError: (message: string) => void; // Para que pasos reporten error general al Modal
+  onCancel: () => void; // Para cancelar/cerrar el modal
+
+  // Props generales pasadas a TODOS los pasos (del Modal)
   username: string;
   onboarderUsername: string;
   isKeychainAvailable: boolean;
-  selectedPost: Post;
-  transactionResponse: any;
-  onCancel: () => void;
+
+  // Callbacks específicos de transacción que el Modal quiere manejar (pasados a Step1)
   onTransactionInitiated?: () => void;
   onTransactionComplete?: (response: any) => void;
   onTransactionError?: (message: string) => void;
@@ -31,72 +33,118 @@ interface StepperProps {
 
 const Stepper: React.FC<StepperProps> = ({
   steps,
+  initialStep = 0, // Default 0
+  stepData,
+  existingOnboardInfo,
+  onStepDataChange,
+  onProcessError,
+  onCancel,
   username,
   onboarderUsername,
   isKeychainAvailable,
-  selectedPost,
-  onCancel,
+  onTransactionInitiated,
   onTransactionComplete,
   onTransactionError,
-  onTransactionInitiated,
 }) => {
-  // Estado para controlar cuál es el índice del paso actual que se muestra.
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  // Estado interno para el paso actual (base 0)
+  const [currentStep, setCurrentStep] = useState(initialStep);
 
-  // Función para pasar al siguiente paso.
-  const nextStep = () => {
-    setCurrentStepIndex((prevIndex) => {
-      // Avanza solo si no estamos en el último paso
-      if (prevIndex < steps.length - 1) {
-        return prevIndex + 1;
-      }
-      // Si ya estamos en el último paso, nos quedamos ahí o podríamos llamar a una función de 'onComplete'.
-      console.log("Reached last step"); // Placeholder
-      return prevIndex; // Permanece en el último paso
-    });
+  // Resetear el paso si initialStep cambia (aunque con el Modal actual, solo cambia al abrir)
+  useEffect(() => {
+    setCurrentStep(initialStep);
+  }, [initialStep]);
+
+  // --- Manejadores de Navegación (llamados por los componentes de paso) ---
+  const handleNextStep = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep((prev) => prev + 1);
+      // onProcessError(null); // Limpia error general al avanzar (opcional)
+    }
   };
 
-  // Función para resetear el Stepper al primer paso.
-  const reset = () => {
-    setCurrentStepIndex(0);
-    // Si manejas datos compartidos, aquí podrías resetearlos también.
+  const handlePrevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep((prev) => prev - 1);
+      // onProcessError(null); // Limpia error general al retroceder (opcional)
+    }
   };
 
-  // Función para volver al paso anterior (opcional)
-  // const prevStep = () => {
-  //   setCurrentStepIndex(prevIndex => {
-  //      if (prevIndex > 0) {
-  //          return prevIndex - 1;
-  //      }
-  //      return prevIndex;
-  //   });
-  // };
+  const handleComplete = () => {
+    // Llamado por el *último paso* cuando termina el flujo
+    onCancel(); // En este diseño simple, completar significa cerrar el modal
+  };
 
-  // Obtiene el componente de paso actual del array basado en el índice.
-  const CurrentStepComponent = steps[currentStepIndex];
+  // --- Renderizar el paso actual ---
+  const currentStepDefinition = steps[currentStep];
 
-  // Renderiza el componente del paso actual, pasándole las funciones de navegación como props.
-  // También puedes pasar 'initialData' o cualquier otro dato compartido.
+  if (!currentStepDefinition) {
+    console.error(`Stepper: Step index ${currentStep} out of bounds.`);
+    return (
+      <p style={{ color: "red" }}>
+        Error interno del Stepper: Paso no encontrado.
+      </p>
+    );
+  }
+
+  const CurrentStepComponent = currentStepDefinition.component;
+  const currentStepProps = currentStepDefinition.props || {};
+
+  // --- Indicador Visual Básico ---
+  const StepIndicator = () => (
+    <div
+      style={{
+        textAlign: "center",
+        margin: "10px 0",
+        fontSize: "0.9em",
+        color: "#555",
+      }}
+    >
+      Paso {currentStep + 1} de {steps.length}
+    </div>
+  );
+
   return (
     <div className="stepper-container">
-      {/* Renderiza el componente del paso actual */}
+      <StepIndicator />
+
       <CurrentStepComponent
-        onNext={nextStep}
-        onReset={reset}
+        // Props específicas para este paso
+        {...currentStepProps}
+        // Datos compartidos y callbacks generales (del Modal)
+        stepData={stepData}
+        existingOnboardInfo={existingOnboardInfo}
+        onStepDataChange={onStepDataChange}
+        onProcessError={onProcessError} // Aseguramos que use el manejador interno del Stepper
+        onCancel={onCancel}
+        // Props generales de contexto (del Modal)
         username={username}
         onboarderUsername={onboarderUsername}
         isKeychainAvailable={isKeychainAvailable}
-        onCancel={onCancel}
+        // Callbacks de navegación que el Stepper pasa AL paso actual
+        onNextStep={handleNextStep}
+        onPrevStep={handlePrevStep}
+        onComplete={handleComplete}
+        // Callbacks específicos de transacción pasados a Step1 (si lo recibe como props)
         onTransactionInitiated={onTransactionInitiated}
         onTransactionComplete={onTransactionComplete}
         onTransactionError={onTransactionError}
-        selectedPost={selectedPost}
       />
-      {/*
-        Los botones "Siguiente", "Volver", etc. generalmente se colocan DENTRO
-        de cada componente de paso, ya que la lógica de cuándo mostrarlos (ej: no "Siguiente" en el último paso)
-        y qué habilitar/deshabilitar es específica de cada paso.
-      */}
+
+      <div
+        style={{
+          marginTop: "20px",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        {currentStep > 0 && <button onClick={handlePrevStep}>Anterior</button>}
+        {currentStep < steps.length - 1 && (
+          <button onClick={handleNextStep}>Siguiente</button>
+        )}
+        {currentStep === steps.length - 1 && // Si estás en el último paso
+          // El último paso probablemente tiene su propio botón que llama a onComplete
+          null}
+      </div>
     </div>
   );
 };

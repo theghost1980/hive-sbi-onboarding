@@ -1,11 +1,24 @@
 import React, { useState } from "react";
 import { HiveApi } from "../api/HIveApi";
+import { getOnboarded } from "../api/OnboardingApi";
 import OnboardModal from "../components/OnboardModal";
-import { useAuth } from "../context/AuthContext";
+import { config } from "../config/config";
+import { JWT_TOKEN_STORAGE_KEY, useAuth } from "../context/AuthContext";
+import { formatTimestampManual } from "../utils/format,utils"; // Assuming this utility exists
 import "./OnBoardUser.css";
 
 interface HiveAccount {
   name: string;
+}
+
+export interface BackendOnboardingInfo {
+  id: number;
+  onboarder: string;
+  onboarded: string;
+  amount: string;
+  memo: string;
+  comment_permlink?: string;
+  timestamp: number;
 }
 
 const OnBoardUser: React.FC = () => {
@@ -14,79 +27,96 @@ const OnBoardUser: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [foundUser, setFoundUser] = useState<HiveAccount | null>(null);
 
-  // *** Nuevos estados para la verificación de membresía ***
   const [isCheckingMembership, setIsCheckingMembership] = useState(false);
-  // null: no verificado, true: es miembro, false: no es miembro (API retornó 404)
   const [isMember, setIsMember] = useState<boolean | null>(null);
-  // Mensaje de error si falla la verificación de membresía
   const [membershipCheckError, setMembershipCheckError] = useState<
     string | null
   >(null);
+  const [backendOnboardingInfo, setBackendOnboardingInfo] =
+    useState<BackendOnboardingInfo | null>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedUserToOnboard, setSelectedUserToOnboard] = useState<
-    string | null
-  >(null);
+  const [modalUser, setModalUser] = useState<string | null>(null);
+  const [modalStartStep, setModalStartStep] = useState<number>(1);
 
   const { user: onboarder } = useAuth();
   const onboarderUsername = onboarder?.username || "unknown";
 
-  // *** Función para verificar si un usuario es miembro de HSBI ***
   const checkMembership = async (username: string) => {
     setIsCheckingMembership(true);
-    setIsMember(null); // Resetear estado de membresía
-    setMembershipCheckError(null); // Limpiar error anterior de membresía
+    setIsMember(null);
+    setMembershipCheckError(null);
+    setBackendOnboardingInfo(null);
 
     try {
-      // API de HSBI v1 para miembros. Retorna 404 si no existe.
-      const response = await fetch(
-        `https://api.hivesbi.com/v1/members/${username}/`
-      );
+      const hsbiApiResponse = await fetch(`${config.hsbi.api_url}${username}/`);
 
-      if (response.ok) {
-        // Si la respuesta es 2xx (ej: 200), el usuario es miembro.
+      if (hsbiApiResponse.ok) {
         setIsMember(true);
-        setMembershipCheckError(null);
         console.log(`User @${username} IS a member of HSBI.`);
-      } else if (response.status === 404) {
-        // Si la respuesta es 404, el usuario NO es miembro.
-        setIsMember(false);
-        setMembershipCheckError(null);
-        console.log(`User @${username} IS NOT a member of HSBI (Status 404).`);
+      } else if (hsbiApiResponse.status === 404) {
+        console.log(
+          `User @${username} not found in HSBI API. Checking backend records...`
+        );
+        try {
+          const token = localStorage.getItem(JWT_TOKEN_STORAGE_KEY);
+          const backendRecords = await getOnboarded(username, token!);
+
+          if (backendRecords && backendRecords.length > 0) {
+            setIsMember(true); // Member from our perspective
+            setBackendOnboardingInfo(backendRecords[0]);
+            console.log(`User @${username} found in backend records.`);
+          } else {
+            setIsMember(false); // Not member anywhere
+            console.log(
+              `User @${username} NOT found in backend records either. Can be onboarded.`
+            );
+          }
+        } catch (backendError: any) {
+          setIsMember(null); // Status unknown due to backend error
+          setMembershipCheckError(
+            `Backend check failed: ${
+              backendError.message || "Unknown backend error"
+            }`
+          );
+          console.error(
+            `Error checking backend for @${username}:`,
+            backendError
+          );
+        }
       } else {
-        // Otros códigos de estado de error de la API de HSBI.
-        setIsMember(null); // No pudimos determinar la membresía
+        setIsMember(null); // Status unknown due to HSBI API error
         setMembershipCheckError(
-          `HSBI API error checking membership (Status: ${response.status})`
+          `HSBI API error: ${hsbiApiResponse.status} ${hsbiApiResponse.statusText}`
         );
         console.error(
-          `HSBI API error checking membership for @${username}. Status: ${response.status}`
+          `HSBI API error for @${username}. Status: ${hsbiApiResponse.status}`
         );
       }
-    } catch (error: any) {
-      // Errores de red, etc.
-      setIsMember(null); // No pudimos determinar la membresía
+    } catch (networkError: any) {
+      setIsMember(null); // Status unknown due to network error
       setMembershipCheckError(
-        `Network error checking membership: ${error.message || "Unknown error"}`
+        `Network error checking HSBI status: ${
+          networkError.message || "Unknown network error"
+        }`
       );
       console.error(
-        `Network error checking membership for @${username}:`,
-        error
+        `Network error checking HSBI API for @${username}:`,
+        networkError
       );
     } finally {
-      setIsCheckingMembership(false); // Finalizar estado de carga de membresía
+      setIsCheckingMembership(false);
     }
   };
 
-  // *** Función principal para manejar la búsqueda ***
   const handleSearch = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    // Limpiar estados al iniciar una nueva búsqueda
     setFoundUser(null);
     setError(null);
-    setIsMember(null); // Resetear estado de membresía
-    setMembershipCheckError(null); // Limpiar error de membresía
+    setIsMember(null);
+    setMembershipCheckError(null);
+    setBackendOnboardingInfo(null);
 
     const trimmedUsername = usernameInput.trim().toLowerCase();
     if (!trimmedUsername) {
@@ -94,50 +124,46 @@ const OnBoardUser: React.FC = () => {
       return;
     }
 
-    setIsLoading(true); // Iniciar carga de búsqueda principal
+    setIsLoading(true);
 
     try {
-      // 1. Buscar usuario en Hive
       const accounts = await HiveApi.getAccount(trimmedUsername);
 
       if (accounts && accounts.length > 0) {
         const account = accounts[0];
-        const userData: HiveAccount = {
-          name: account.name,
-        };
+        const userData: HiveAccount = { name: account.name };
         setFoundUser(userData);
-        setError(null); // No error principal
-
-        // *** 2. Si se encuentra el usuario, verificar membresía ***
-        await checkMembership(userData.name); // Esperar a que termine la verificación de membresía
+        setError(null);
+        await checkMembership(userData.name);
       } else {
-        // Usuario no encontrado en Hive
         setError(`User "@${trimmedUsername}" not found on Hive.`);
         setFoundUser(null);
-        setIsMember(null); // Asegurarse de que el estado de membresía no quede residual
+        setIsMember(null);
+        setBackendOnboardingInfo(null);
       }
     } catch (err: any) {
-      // Manejar errores de la búsqueda principal
       console.error("Error fetching account:", err);
       setError(
         `Error searching for user: ${err.message || "An API error occurred"}`
       );
       setFoundUser(null);
-      setIsMember(null); // Asegurarse de que el estado de membresía no quede residual
+      setIsMember(null);
+      setBackendOnboardingInfo(null);
     } finally {
-      setIsLoading(false); // Finalizar carga de búsqueda principal
-      // isCheckingMembership se gestiona dentro de checkMembership
+      setIsLoading(false);
     }
   };
 
-  const handleOpenModal = (usernameToOnboard: string) => {
-    setSelectedUserToOnboard(usernameToOnboard);
+  const openOnboardModal = (usernameToUse: string, startStep: number) => {
+    setModalUser(usernameToUse);
+    setModalStartStep(startStep);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setSelectedUserToOnboard(null);
+    setModalUser(null);
+    setModalStartStep(1);
   };
 
   return (
@@ -150,11 +176,9 @@ const OnBoardUser: React.FC = () => {
           placeholder="Enter Hive username"
           value={usernameInput}
           onChange={(e) => setUsernameInput(e.target.value)}
-          // Deshabilitar durante cualquiera de las cargas
           disabled={isLoading || isCheckingMembership}
           className="search-input"
         />
-        {/* Cambiar texto y deshabilitar durante ambas cargas */}
         <button
           type="submit"
           disabled={isLoading || isCheckingMembership || !usernameInput.trim()}
@@ -168,36 +192,77 @@ const OnBoardUser: React.FC = () => {
         </button>
       </form>
 
-      {/* Mostrar estado de búsqueda principal y errores */}
       {isLoading && <p className="search-status">Searching Hive...</p>}
       {error && <p className="search-error">Error: {error}</p>}
 
-      {/* *** Mostrar resultado de usuario y estado de membresía *** */}
       {foundUser && (
         <div className="user-result">
           <p>
             User found: <strong>@{foundUser.name}</strong>
           </p>
 
-          {/* Mostrar estado de verificación de membresía */}
           {isCheckingMembership ? (
             <p className="membership-status">Checking membership...</p>
-          ) : isMember === null && membershipCheckError ? (
+          ) : membershipCheckError ? (
             <p className="membership-error">
               Membership check failed: {membershipCheckError}
             </p>
           ) : isMember === true ? (
-            <div className="membership-status">
+            <div className="membership-status member">
+              {" "}
+              {/* Added 'member' class for specific styling */}
               <span className="membership-status-icon is-member-icon">✓</span>
               <p>Already a member of HSBI.</p>
+              {backendOnboardingInfo && (
+                <div className="backend-onboard-info">
+                  {" "}
+                  {/* Added class for this section */}
+                  <p>
+                    Onboarded by:{" "}
+                    <strong>{backendOnboardingInfo.onboarder}</strong> on{" "}
+                    {/* Assuming formatTimestampManual expects ms */}
+                    {formatTimestampManual(backendOnboardingInfo.timestamp)}
+                  </p>
+                  {!backendOnboardingInfo.comment_permlink && (
+                    <div className="missing-comment-section">
+                      {" "}
+                      {/* Added class */}
+                      <p>
+                        Onboard Comment is missing. Click below to edit and post
+                        it.
+                      </p>
+                      <button
+                        onClick={() => openOnboardModal(foundUser.name, 2)} // Step 2 for editing comment
+                        className="edit-onboard-button"
+                      >
+                        Edit Comment
+                      </button>
+                    </div>
+                  )}
+                  {backendOnboardingInfo.comment_permlink && (
+                    <p>
+                      Comment posted:{" "}
+                      <a
+                        href={`https://hive.blog/@${backendOnboardingInfo.onboarder}/${backendOnboardingInfo.comment_permlink}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="comment-permlink-link"
+                      >
+                        {backendOnboardingInfo.comment_permlink}
+                      </a>
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           ) : isMember === false ? (
-            <div className="membership-status">
+            <div className="membership-status not-member">
+              {" "}
+              {/* Added 'not-member' class */}
               <span className="membership-status-icon not-member-icon">✗</span>
               <p>Not yet a member of HSBI.</p>
-
               <button
-                onClick={() => handleOpenModal(foundUser.name)}
+                onClick={() => openOnboardModal(foundUser.name, 1)} // Step 1 for new onboarding
                 className="onboard-button"
               >
                 Onboard @{foundUser.name}
@@ -207,12 +272,14 @@ const OnBoardUser: React.FC = () => {
         </div>
       )}
 
-      {isModalOpen && selectedUserToOnboard && (
+      {isModalOpen && modalUser && (
         <OnboardModal
           isOpen={isModalOpen}
           onRequestClose={handleCloseModal}
-          username={selectedUserToOnboard} // Pasamos el usuario encontrado al modal
-          onboarderUsername={onboarderUsername} // Pasamos el usuario que apadrina (loggeado)
+          username={modalUser}
+          onboarderUsername={onboarderUsername}
+          startStep={modalStartStep}
+          existingOnboardInfo={backendOnboardingInfo}
         />
       )}
     </div>
