@@ -1,8 +1,9 @@
+import { KeychainHelper, KeychainHelperUtils } from "keychain-helper";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { beBaseUrl } from "../components/BackendStatusBar";
+import { getChallenge, verifyUser } from "../api/AuthApi";
 import { useAuth } from "../context/AuthContext";
-import { KeychainUtils } from "../utils/keychain.utils";
+import { LocalStorageUtils } from "../utils/localstorage.utils";
 import "./LoginPage.css";
 
 const LoginPage: React.FC = () => {
@@ -17,28 +18,23 @@ const LoginPage: React.FC = () => {
   const [isKeychainExtensionInstalled, setIsKeychainExtensionInstalled] =
     useState(false);
 
+  const [savedUsernames, setSavedUsernames] = useState<string[]>([]);
+  const [showSavedUsernames, setShowSavedUsernames] = useState(false);
+
   useEffect(() => {
-    const checkWithDelay = () => {
-      if (typeof window !== "undefined") {
-        const installed = KeychainUtils.isKeychainInstalled(window);
-        setIsKeychainExtensionInstalled(installed);
-
-        if (installed) {
-          setKeychainStatusText("Hive Keychain está instalado.");
-        } else {
-          setKeychainStatusText("Hive Keychain NO está instalado.");
-        }
+    KeychainHelperUtils.isKeychainInstalled(window, (isInstalled) => {
+      if (isInstalled) {
+        setIsKeychainExtensionInstalled(isInstalled);
+        setKeychainStatusText("Hive Keychain está instalado.");
       } else {
-        setKeychainStatusText("No en entorno de navegador.");
-        setIsKeychainExtensionInstalled(false);
+        setKeychainStatusText("Hive Keychain NO está instalado.");
       }
-    };
+    });
+  }, []);
 
-    const timer = setTimeout(checkWithDelay, 120);
-
-    return () => {
-      clearTimeout(timer);
-    };
+  useEffect(() => {
+    const loadedUsernames = LocalStorageUtils.getSavedUsernames();
+    setSavedUsernames(loadedUsernames);
   }, []);
 
   const handleLoginWithKeychain = async () => {
@@ -56,99 +52,65 @@ const LoginPage: React.FC = () => {
 
     setIsLoading(true);
     setMessage("");
+    setShowSavedUsernames(false);
 
     try {
-      const challengeResponse = await fetch(`${beBaseUrl}/auth/challenge`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username }),
-      }).then((res) => {
-        if (!res.ok)
-          throw new Error(
-            `Failed to get challenge from backend (Status: ${res.status})`
-          );
-        return res.json();
-      });
-      const challenge = challengeResponse.challenge;
-
-      if (typeof window.hive_keychain !== "undefined") {
-        //@ts-ignore
-        window.hive_keychain.requestSignBuffer(
-          username,
-          challenge,
-          "Posting",
-          async (response: any) => {
-            setIsLoading(false);
-
-            if (response.success) {
-              const signature = response.result;
-
-              try {
-                const verifyResponse = await fetch(`${beBaseUrl}/auth/verify`, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ username, signature }),
-                }).then((res) => {
-                  if (!res.ok) {
-                    if (res.status === 401)
-                      throw new Error(
-                        "Backend verification failed: Invalid signature or key."
-                      );
-                    if (res.status === 404)
-                      throw new Error(
-                        "Backend verification failed: User not found during verification."
-                      );
-                    throw new Error(
-                      `Backend verification failed with status: ${res.status}`
-                    );
-                  }
-                  return res.json();
-                });
-
-                if (verifyResponse.success && verifyResponse.token) {
-                  const userAuthenticated = {
-                    username: username,
-                    role: "user",
-                  };
-
-                  setAuth(userAuthenticated, verifyResponse.token);
-                  setMessage("Login successful!");
-                  navigate("/");
-                } else {
-                  setMessage(verifyResponse.error || "Verification failed.");
-                }
-              } catch (verifyError: any) {
-                console.error(
-                  "Error during backend verification fetch:",
-                  verifyError
-                );
-                setMessage(
-                  verifyError.message ||
-                    "An error occurred during verification."
-                );
-              }
-            } else {
-              console.warn(
-                "Keychain request failed or was cancelled:",
-                response.message
-              );
-              setMessage(response.message || "Keychain request failed.");
+      const challenge = (await getChallenge(username)).challenge;
+      KeychainHelper.requestSignBuffer(
+        username,
+        challenge,
+        "Posting",
+        async (response) => {
+          if (response.success) {
+            const signature = response.result;
+            if (!signature) {
+              setMessage("Keychain did not return a signature.");
+              return;
             }
+            try {
+              const verifyResponse = await verifyUser(username, signature);
+              if (verifyResponse.success && verifyResponse.token) {
+                const userAuthenticated = {
+                  username: username,
+                  role: "user",
+                };
+                setAuth(userAuthenticated, verifyResponse.token);
+                setMessage("Login successful!");
+                LocalStorageUtils.saveUsername(username);
+                navigate("/");
+              } else {
+                setMessage(verifyResponse.error || "Verification failed.");
+              }
+            } catch (error) {
+              setMessage(
+                (error as Error).message ||
+                  "An error occurred before the login request."
+              );
+              setIsLoading(false);
+            }
+          } else {
+            console.warn(
+              "Keychain request failed or was cancelled:",
+              response.message
+            );
+            setMessage(response.message || "Keychain request failed.");
           }
-        );
-      } else {
-        setMessage(
-          "Keychain not available immediately before signing request."
-        );
-        setIsLoading(false);
-      }
-    } catch (error: any) {
-      console.error("Error before Keychain request:", error);
-      setMessage(
-        error.message || "An error occurred before the login request."
+        }
       );
-      setIsLoading(false);
+    } catch (error) {
+      console.error("getChallenge error: ", { error });
     }
+  };
+
+  const handleSelectSavedUsername = (selectedName: string) => {
+    setUsername(selectedName);
+    setShowSavedUsernames(false);
+  };
+
+  const handleInputBlur = () => {
+    setTimeout(() => {
+      setShowSavedUsernames(false);
+    }, 100);
   };
 
   return (
@@ -183,7 +145,6 @@ const LoginPage: React.FC = () => {
               </span>
             )}
           </div>
-
           {message && (
             <p
               className={`login-message ${
@@ -193,16 +154,37 @@ const LoginPage: React.FC = () => {
               {message}
             </p>
           )}
-
-          <input
-            type="text"
-            placeholder="Hive Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            disabled={isLoading || !isKeychainExtensionInstalled}
-            className="login-input"
-          />
-
+          <div className="username-input-container">
+            {" "}
+            <input
+              type="text"
+              placeholder="Hive Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              onFocus={() =>
+                savedUsernames.length > 0 && setShowSavedUsernames(true)
+              }
+              onBlur={handleInputBlur}
+              disabled={isLoading || !isKeychainExtensionInstalled}
+              className="login-input"
+              autoComplete="off"
+            />
+            {showSavedUsernames && savedUsernames.length > 0 && (
+              <ul className="username-suggestions">
+                {" "}
+                {savedUsernames.map((name) => (
+                  <li
+                    key={name}
+                    className="username-suggestion-item"
+                    onMouseDown={() => handleSelectSavedUsername(name)}
+                  >
+                    {" "}
+                    {name}
+                  </li>
+                ))}{" "}
+              </ul>
+            )}{" "}
+          </div>{" "}
           <button
             onClick={handleLoginWithKeychain}
             disabled={isLoading || !isKeychainExtensionInstalled || !username}
@@ -210,7 +192,6 @@ const LoginPage: React.FC = () => {
           >
             {isLoading ? "Processing..." : "Login with Keychain"}
           </button>
-
           {!isKeychainExtensionInstalled &&
             keychainStatusText !== "Verificando..." && (
               <p className="install-keychain-prompt">

@@ -17,8 +17,8 @@ export const BackendStatusBar = () => {
 
   useEffect(() => {
     const checkBackend = async () => {
-      const url = `${beBaseUrl}/`; // URL del backend
-      setBackendUrl(beBaseUrl); // Guardamos la URL
+      const url = `${beBaseUrl}/`;
+      setBackendUrl(beBaseUrl);
 
       try {
         const res = await fetch(url);
@@ -72,7 +72,17 @@ export const BackendStatusBar = () => {
         <p>{text}</p>
         {icon && React.createElement(icon, { color })}
       </div>
-      <p className={"statusUrl"}>Conectado a: {backendUrl}</p>
+      <p className={"statusUrl"}>
+        Disponible en:
+        <a
+          className="link"
+          href={`${backendUrl}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <h3>{backendUrl}</h3>
+        </a>
+      </p>
     </div>
   );
 };

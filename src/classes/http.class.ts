@@ -37,7 +37,6 @@ export const postRequest = async (
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
-    // Otros headers comunes: 'Accept': 'application/json'
   };
 
   if (token) {

@@ -5,6 +5,7 @@ export const config = {
   },
   hsbi: {
     api_url: "https://api.hivesbi.com/v1/members/",
+    main_account: "steembasicincome",
   },
   templates_comments: [
     {

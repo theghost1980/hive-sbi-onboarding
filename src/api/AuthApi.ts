@@ -1,30 +1,32 @@
-import { HttpError } from "../classes/http.class";
 import { beBaseUrl } from "../components/BackendStatusBar";
-import { get, post } from "./RequestsApi";
+import { HttpError, post } from "./RequestsApi";
 
-//TODO JSDocs for each function/utility at the end of the MVP
+//TODO refactor / DRY
 
-export const addOnboardingEntry = async (
-  onboarderUsername: string,
-  onboardedUsername: string,
-  amount: string,
-  memo: string,
-  token: string
-): Promise<any> => {
+export interface BackendVerifyResponse {
+  success: boolean;
+  token?: string;
+  error?: string;
+}
+
+export interface BackendChallengeResponse {
+  challenge: string;
+}
+
+export const verifyUser = async (
+  username: string,
+  signature: string
+): Promise<BackendVerifyResponse> => {
   const baseUrl = beBaseUrl;
-  const route = "/crud/add";
+  const route = "/auth/verify";
   const bodyData = {
-    onboarder: onboarderUsername,
-    onboarded: onboardedUsername,
-    amount: amount,
-    memo: memo,
+    username,
+    signature,
   };
 
   try {
-    console.log(`Intentando añadir entry para onboarded: ${onboardedUsername}`);
-    const result = await post(baseUrl, route, bodyData, token);
-    console.log("Petición exitosa:", route, result);
-    return result; // Devuelve el resultado exitoso
+    const result = await post(baseUrl, route, bodyData);
+    return result;
   } catch (error: any) {
     console.error("Ocurrió un error al hacer la petición:", route, error);
 
@@ -44,22 +46,18 @@ export const addOnboardingEntry = async (
   }
 };
 
-export const getOnboarded = async (
-  //TODO define later on what to use if only "export const Module = {functions}"???
-  username: string,
-  token: string
-): Promise<any> => {
+export const getChallenge = async (
+  username: string
+): Promise<BackendChallengeResponse> => {
   const baseUrl = beBaseUrl;
-  const route = "/query/onboarded-by-username";
+  const route = "/auth/challenge";
   const bodyData = {
     username,
   };
 
   try {
-    console.log(`Buscando onboarded: ${username}`);
-    const result = await get(baseUrl, route, bodyData, token);
-    console.log("Petición exitosa:", route, result);
-    return result; // Devuelve el resultado exitoso
+    const result = await post(baseUrl, route, bodyData);
+    return result;
   } catch (error: any) {
     console.error("Ocurrió un error al hacer la petición:", route, error);
 

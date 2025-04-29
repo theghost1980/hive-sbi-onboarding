@@ -3,8 +3,6 @@ import { useAuth } from "../context/AuthContext";
 import { BackendStatusBar } from "./BackendStatusBar";
 import "./Sidebar.css";
 
-//ferjoshwolf
-
 const Sidebar = () => {
   const { isAuthenticated, user, logout, isLoadingAuth } = useAuth();
 

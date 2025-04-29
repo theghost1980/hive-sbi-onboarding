@@ -37,6 +37,7 @@ declare global {
  * Verifica si Hive Keychain está instalado.
  */
 function isKeychainInstalled(windowObj: Window): boolean {
+  //TODO add the sleep function, put to sleep 120ms and test if detect.
   return typeof windowObj?.hive_keychain !== "undefined";
 }
 
@@ -61,6 +62,28 @@ const requestBroadcast = (
   }
 };
 
+/**
+ * Ejemplo de un post:
+ *  const commentOptions = {
+      author: author,
+      permlink: permlink,
+      max_accepted_payout: "10000.000 SBD",
+      allow_votes: true,
+      allow_curation_rewards: true,
+      extensions: [],
+      percent_hbd: 63, //TODO later research to see if this is unneccessary or not.
+    };
+ * @param username 
+ * @param title 
+ * @param body 
+ * @param parent_perm 
+ * @param parent_username 
+ * @param json_metadata 
+ * @param permlink 
+ * @param comment_options 
+ * @param callback 
+ * @param rpc 
+ */
 const requestPost = (
   username: string,
   title: string,

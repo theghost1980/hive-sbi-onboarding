@@ -21,15 +21,22 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
     setIsOpen(false);
   };
 
+  const displayContent = selectedOption ? (
+    <>
+      <span className={"icon"}>
+        {selectedOption.icon && <selectedOption.icon />}
+      </span>
+      {selectedOption.label}
+    </>
+  ) : (
+    <span className={"placeholder-text"}>Seleccione una opción</span>
+  );
+
   return (
-    <div className={"container"}>
+    <div className={`container ${isOpen ? "open" : ""}`}>
       <div className={"selected"} onClick={() => setIsOpen(!isOpen)}>
-        {selectedOption && (
-          <>
-            <span className={"icon"}>{<selectedOption.icon />}</span>
-            {selectedOption.label}
-          </>
-        )}
+        {displayContent}
+        <span className={"arrow-icon"}>&#9660;</span>
       </div>
       {isOpen && (
         <ul className={"options"}>
@@ -39,7 +46,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
               className={"option"}
               onClick={() => handleSelect(option)}
             >
-              <span className={"icon"}>{<option.icon />}</span>
+              <span className={"icon"}>{option.icon && <option.icon />}</span>
               {option.label}
             </li>
           ))}

@@ -217,7 +217,7 @@ const Step2: React.FC<Step2Props> = ({
     const author = onboarderUsername; // El que publica el comentario // Generar un permlink único para el comentario
 
     const permlink =
-      "re-" + parentAuthor + "-" + PermlinkUtils.generateRandomString(6); //removing numbers.
+      "re-" + parentAuthor + "-" + PermlinkUtils.generateRandomString(6, true); //removing numbers.
 
     const title = ""; // Título vacío para comentarios
     const body = commentMarkdown; // json_metadata básico
@@ -237,9 +237,14 @@ const Step2: React.FC<Step2Props> = ({
       allow_votes: true,
       allow_curation_rewards: true,
       extensions: [],
-      percent_hbd: 63, //TODO later research to see if this is unneccessary or not.
+      percent_hbd: 100, //TODO test using 100 as it was like 63
     };
 
+    //TODO
+    //  -usar este mismo modulo de keychainUtils para convertirlo a un paquete npm y subirlo y darle publicicdad por HIVE.
+    //  -ojo: probar, que no tenga dependencias y añadir todas las demas requests.
+    //  - simple, sencillo pero robusto
+    //  - hacer ejemplos de codigo y crear un repositorio con indice de ejemplos, pedir ayuda de ideas a la IA
     KeychainUtils.requestPost(
       author, // account (la cuenta que publica, tu onboarderUsername)
       title, // title (vacío para comentario)

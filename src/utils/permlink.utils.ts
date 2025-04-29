@@ -1,4 +1,7 @@
-function generateRandomString(length: number): string {
+function generateRandomString(
+  length: number,
+  includeTimestamp: boolean
+): string {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let result = "";
@@ -6,7 +9,9 @@ function generateRandomString(length: number): string {
   for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
-  return result.toLowerCase();
+  return (
+    result.toLowerCase() + (includeTimestamp ? "-" + Date.now().toString() : "")
+  );
 }
 
 export const PermlinkUtils = {
