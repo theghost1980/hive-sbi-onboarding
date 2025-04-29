@@ -80,7 +80,7 @@ export const BackendStatusBar = () => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <h3>{backendUrl}</h3>
+          {backendUrl}
         </a>
       </p>
     </div>

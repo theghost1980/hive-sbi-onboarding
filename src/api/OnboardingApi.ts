@@ -1,6 +1,6 @@
 import { HttpError } from "../classes/http.class";
 import { beBaseUrl } from "../components/BackendStatusBar";
-import { get, post } from "./RequestsApi";
+import { get, post, put } from "./RequestsApi";
 
 //TODO JSDocs for each function/utility at the end of the MVP
 
@@ -58,6 +58,46 @@ export const getOnboarded = async (
   try {
     console.log(`Buscando onboarded: ${username}`);
     const result = await get(baseUrl, route, bodyData, token);
+    console.log("Petición exitosa:", route, result);
+    return result; // Devuelve el resultado exitoso
+  } catch (error: any) {
+    console.error("Ocurrió un error al hacer la petición:", route, error);
+
+    if (error instanceof HttpError) {
+      console.error(
+        "Error HTTP:",
+        error.response.status,
+        error.response.statusText
+      );
+      console.error("Cuerpo del error del servidor:", error.body);
+      // No manejamos la redirección aquí, solo logueamos.
+      // La acción de redirección (o mostrar un mensaje UI) debe ir en el componente React.
+    } else {
+      console.error("Error de red o desconocido:", error.message);
+    }
+    throw error;
+  }
+};
+
+export const editCommentPermlinkOnboardingEntry = async (
+  onboarder: string,
+  onboarded: string,
+  comment_permlink: string,
+  token: string
+): Promise<any> => {
+  const baseUrl = beBaseUrl;
+  const route = "/crud/edit";
+  const bodyData = {
+    onboarder,
+    onboarded,
+    comment_permlink,
+  };
+
+  try {
+    console.log(
+      `Intentando editar comment_permlink entry para onboarded: ${onboarded} cl:${comment_permlink}`
+    );
+    const result = await put(baseUrl, route, bodyData, token);
     console.log("Petición exitosa:", route, result);
     return result; // Devuelve el resultado exitoso
   } catch (error: any) {

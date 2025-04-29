@@ -4,19 +4,21 @@ import DOMPurify from "dompurify";
 import { marked } from "marked"; // Asegúrate de que marked está instalado
 import React, { useEffect, useState } from "react";
 // Importamos tu KeychainUtils actualizado
-import { KeychainUtils } from "../../../utils/keychain.utils";
 
 // Asegúrate de que estas rutas de importación sean correctas
+import { KeychainHelper } from "keychain-helper";
+import { editCommentPermlinkOnboardingEntry } from "../../../api/OnboardingApi";
 import { HttpError, post } from "../../../api/RequestsApi"; // Para cargar posts, si no usas otra cosa
 import { config } from "../../../config/config";
+import { JWT_TOKEN_STORAGE_KEY } from "../../../context/AuthContext";
 import { BackendOnboardingInfo } from "../../../pages/OnboardUser"; // Tipo de datos backend
 import { PermlinkUtils } from "../../../utils/permlink.utils";
-import { Post } from "../../OnboardModal"; // Tipo de Post
+import { Post, StepData } from "../../OnboardModal"; // Tipo de Post
 import "./Step2.css";
 
 // Interfaz de props actualizada para incluir 'config'
 interface Step2Props {
-  stepData: any; // Datos recolectados de pasos anteriores
+  stepData: StepData; // Datos recolectados de pasos anteriores
   existingOnboardInfo?: BackendOnboardingInfo | null; // Datos para modo edición
 
   onStepDataChange: (data: Partial<any>) => void; // Para actualizar stepData en el Modal
@@ -59,21 +61,25 @@ const Step2: React.FC<Step2Props> = ({
 
   const [isPostingComment, setIsPostingComment] = useState(false);
   const [postCommentSuccess, setPostCommentSuccess] = useState(false);
-  const [postCommentError, setPostCommentError] = useState<string | null>(null); // --------------------------------------------------------------- // Efecto para cargar posts (solo si no hay post seleccionado/predeterminado)
-  useEffect(() => {
-    //   const isPostPredetermined = existingOnboardInfo?.originalPostAuthor; // Asumiendo esta estructura
+  const [postCommentError, setPostCommentError] = useState<string | null>(null);
 
-    // Cargar posts solo si no hay un post ya determinado/seleccionado Y hay un usuario
+  const onboarder = stepData.onboarder
+    ? stepData.onboarder
+    : existingOnboardInfo?.onboarder ?? "ERROR_CHECK";
+  const onboarded = stepData.onboarded
+    ? stepData.onboarded
+    : existingOnboardInfo?.onboarded ?? "ERROR_CHECK";
+
+  useEffect(() => {
     if (!selectedPostForComment && username) {
       setLoadingPosts(true);
-      setErrorFetchingPosts(null); // Usar config para URL de RPC si está disponible, sino fallback
+      setErrorFetchingPosts(null);
       //    onProcessError(null); // Limpiar error general
 
       const hiveRpcUrl = "https://api.hive.blog";
 
       const fetchPosts = async () => {
         try {
-          // Usar tu helper 'post' para llamar al RPC de Hive
           const data = await post(hiveRpcUrl, "", {
             jsonrpc: "2.0",
             method: "bridge.get_account_posts",
@@ -115,6 +121,7 @@ const Step2: React.FC<Step2Props> = ({
   }, [username, selectedPostForComment, existingOnboardInfo, config]); // Efecto para inicializar selectedPostForComment y commentMarkdown
 
   useEffect(() => {
+    console.log({ existingOnboardInfo }); //TODO REM
     let post: Post | null = null;
     let initialText = ""; // Limpiar feedback de transacción al cambiar datos o contexto
 
@@ -123,24 +130,25 @@ const Step2: React.FC<Step2Props> = ({
     setIsPostingComment(false); // Escenario 1: Viene de Step 1 con post seleccionado
 
     if (stepData.selectedPost) {
-      post = stepData.selectedPost; // Usar plantilla de config para nuevo onboarding
+      console.log("step2: ", { stepData }); //TODO REM
+      post = stepData.selectedPost;
       initialText = config.templates_comments[0].content_markdown(
-        username,
-        onboarderUsername
+        onboarded,
+        onboarder
       );
-    } // Escenario 2: Empieza en Step 2 (Editar comentario) // Asumimos que existingOnboardInfo tiene originalPostAuthor/Permlink // Escenario 3: Llega a Step 2 sin post seleccionado o info de edición -> Espera selección de lista
-    //   else if (existingOnboardInfo?.originalPostAuthor && existingOnboardInfo.originalPostPermlink) {
-    //    console.log("Step 2: Initializing for Edit Comment mode.");
-    //    // Construir objeto Post con info del backend
-    //    post = {
-    //      author: existingOnboardInfo.originalPostAuthor,
-    //      permlink: existingOnboardInfo.originalPostPermlink,
-    //      title: 'Publicación Original', // Placeholder, idealmente se obtendría
-    //      body: '...', // Placeholder
-    //      url: `/@${existingOnboardInfo.originalPostAuthor}/${existingOnboardInfo.originalPostPermlink}`,
-    //    };
-    //    initialText = existingOnboardInfo.memo || ''; // Usar memo para editar
-    //   }
+    }
+    // else if (existingOnboardInfo?.originalPostAuthor && existingOnboardInfo.originalPostPermlink) {
+    //  console.log("Step 2: Initializing for Edit Comment mode.");
+    //  // Construir objeto Post con info del backend
+    //  post = {
+    //    author: existingOnboardInfo.originalPostAuthor,
+    //    permlink: existingOnboardInfo.originalPostPermlink,
+    //    title: 'Publicación Original', // Placeholder, idealmente se obtendría
+    //    body: '...', // Placeholder
+    //    url: `/@${existingOnboardInfo.originalPostAuthor}/${existingOnboardInfo.originalPostPermlink}`,
+    //  };
+    //  initialText = existingOnboardInfo.memo || ''; // Usar memo para editar
+    // }
     if (post) {
       setSelectedPostForComment(post);
       setCommentMarkdown(initialText);
@@ -176,7 +184,7 @@ const Step2: React.FC<Step2Props> = ({
   const handlePostSelected = (post: Post) => {
     setSelectedPostForComment(post); // Usar plantilla de config al seleccionar de lista
     setCommentMarkdown(
-      config.templates_comments[0].content_markdown(username, onboarderUsername)
+      config.templates_comments[0].content_markdown(onboarded, onboarder)
     ); // Limpiar feedback de transacción al seleccionar post
     setPostCommentSuccess(false);
     setPostCommentError(null);
@@ -190,6 +198,13 @@ const Step2: React.FC<Step2Props> = ({
   }; // --- Handler para Publicar Comentario (Usando requestPost) ---
 
   const handlePostComment = () => {
+    const token = localStorage.getItem(JWT_TOKEN_STORAGE_KEY);
+    if (!token) {
+      onProcessError(
+        "Por favor, Inicie sesion de nuevo, token expirado, corrupto o vencido."
+      );
+      return;
+    }
     if (!selectedPostForComment) {
       onProcessError(
         "Por favor, selecciona una publicación antes de publicar."
@@ -214,7 +229,7 @@ const Step2: React.FC<Step2Props> = ({
 
     const parentAuthor = selectedPostForComment.author;
     const parentPermlink = selectedPostForComment.permlink;
-    const author = onboarderUsername; // El que publica el comentario // Generar un permlink único para el comentario
+    const authorNewComment = onboarder; // El que publica el comentario // Generar un permlink único para el comentario
 
     const permlink =
       "re-" + parentAuthor + "-" + PermlinkUtils.generateRandomString(6, true); //removing numbers.
@@ -231,7 +246,7 @@ const Step2: React.FC<Step2Props> = ({
     };
 
     const commentOptions = {
-      author: author,
+      author: authorNewComment,
       permlink: permlink,
       max_accepted_payout: "10000.000 SBD",
       allow_votes: true,
@@ -240,40 +255,41 @@ const Step2: React.FC<Step2Props> = ({
       percent_hbd: 100, //TODO test using 100 as it was like 63
     };
 
-    //TODO
-    //  -usar este mismo modulo de keychainUtils para convertirlo a un paquete npm y subirlo y darle publicicdad por HIVE.
-    //  -ojo: probar, que no tenga dependencias y añadir todas las demas requests.
-    //  - simple, sencillo pero robusto
-    //  - hacer ejemplos de codigo y crear un repositorio con indice de ejemplos, pedir ayuda de ideas a la IA
-    KeychainUtils.requestPost(
-      author, // account (la cuenta que publica, tu onboarderUsername)
-      title, // title (vacío para comentario)
-      body, // body (el contenido markdown)
-      parentPermlink, // parent_perm (permlink del post padre)
-      parentAuthor, // parent_account (autor del post padre)
-      JSON.stringify(jsonMetadata), // json_metadata
-      permlink, // permlink (el permlink generado para el comentario)
-      JSON.stringify(commentOptions), // comment_options (objeto de opciones, vacío por defecto)
-      (response: any) => {
-        // Callback al recibir respuesta de Keychain
-        console.log("Keychain requestPost response:", response);
-
-        if (response && response.success) {
+    KeychainHelper.requestPost(
+      authorNewComment,
+      title,
+      body,
+      parentPermlink,
+      parentAuthor,
+      JSON.stringify(jsonMetadata),
+      permlink,
+      JSON.stringify(commentOptions),
+      async (response) => {
+        if (response.success) {
           setPostCommentSuccess(true); // Guardar respuesta y nuevo permlink en stepData
-          onStepDataChange({
-            commentResponse: response,
-            postedCommentPermlink: permlink,
-          });
-
-          // Esperar 3 segundos y avanzar
-          //TODO here, should update onboarding record in BE
-
-          setTimeout(() => {
+          try {
             setIsPostingComment(false);
-            onNextStep(); // Avanzar al siguiente paso (ej: Resumen)
-          }, 3000);
+            const responsePutAPI = await editCommentPermlinkOnboardingEntry(
+              onboarder,
+              onboarded,
+              permlink,
+              token
+            );
+            console.log("editCommentPermlinkOnboardingEntry: ", {
+              responsePutAPI,
+            });
+            onStepDataChange({
+              commentResponse: response,
+              postedCommentPermlink: permlink,
+              editCommentBEresults: responsePutAPI,
+            });
+            onNextStep();
+          } catch (error) {
+            console.error("editCommentPermlinkOnboardingEntry error: ", {
+              error,
+            });
+          }
         } else {
-          // Manejar errores o cancelación por usuario
           console.error("Error posting comment:", response); // Usar response.message o display_msg si están disponibles
           const errorMessage =
             response?.message ||
@@ -285,6 +301,52 @@ const Step2: React.FC<Step2Props> = ({
         }
       }
     );
+
+    //TODO
+    //  -usar este mismo modulo de keychainUtils para convertirlo a un paquete npm y subirlo y darle publicicdad por HIVE.
+    //  -ojo: probar, que no tenga dependencias y añadir todas las demas requests.
+    //  - simple, sencillo pero robusto
+    //  - hacer ejemplos de codigo y crear un repositorio con indice de ejemplos, pedir ayuda de ideas a la IA
+    // KeychainUtils.requestPost(
+    //   authorNewComment, // account (la cuenta que publica, tu onboarderUsername)
+    //   title, // title (vacío para comentario)
+    //   body, // body (el contenido markdown)
+    //   parentPermlink, // parent_perm (permlink del post padre)
+    //   parentAuthor, // parent_account (autor del post padre)
+    //   JSON.stringify(jsonMetadata), // json_metadata
+    //   permlink, // permlink (el permlink generado para el comentario)
+    //   JSON.stringify(commentOptions), // comment_options (objeto de opciones, vacío por defecto)
+    //   (response: any) => {
+    //     // Callback al recibir respuesta de Keychain
+    //     console.log("Keychain requestPost response:", response);
+
+    //     if (response && response.success) {
+    //       setPostCommentSuccess(true); // Guardar respuesta y nuevo permlink en stepData
+    //       onStepDataChange({
+    //         commentResponse: response,
+    //         postedCommentPermlink: permlink,
+    //       });
+
+    //       // Esperar 3 segundos y avanzar
+    //       //TODO here, should update onboarding record in BE
+
+    //       setTimeout(() => {
+    //         setIsPostingComment(false);
+    //         onNextStep(); // Avanzar al siguiente paso (ej: Resumen)
+    //       }, 3000);
+    //     } else {
+    //       // Manejar errores o cancelación por usuario
+    //       console.error("Error posting comment:", response); // Usar response.message o display_msg si están disponibles
+    //       const errorMessage =
+    //         response?.message ||
+    //         response?.display_msg ||
+    //         "Error desconocido al publicar el comentario.";
+    //       setPostCommentError(errorMessage);
+    //       onProcessError(errorMessage); // Reportar error general al modal
+    //       setIsPostingComment(false);
+    //     }
+    //   }
+    // );
   };
 
   const showPostList = !selectedPostForComment;

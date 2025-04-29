@@ -10,13 +10,13 @@ export const config = {
   templates_comments: [
     {
       name: "default_1",
-      content_markdown: (username: string, onboarded_by: string) => `
+      content_markdown: (onboarded: string, onboarder: string) => `
       **🇪🇸 Español**
 
 ---
 
-🎉 ¡Hola @${username} Bienvenido/a a HIVE 🎉  
-Soy ${onboarded_by}, te felicito por tu participación y compromiso con esta increíble comunidad.
+🎉 ¡Hola @${onboarded} Bienvenido/a a HIVE 🎉  
+Soy ${onboarder}, te felicito por tu participación y compromiso con esta increíble comunidad.
 
 Como parte de una iniciativa personal, **te he inscrito en el programa:**  
 
@@ -30,7 +30,7 @@ Como parte de una iniciativa personal, **te he inscrito en el programa:**
 🧩 **Esta iniciativa forma parte de la comunidad [Synergy Builders](https://peakd.com/c/hive-186392/created). Pensamos, desarrollamos software y mejoramos la calidad de la web3.**  
 👉 Si te interesa construir, colaborar o aprender sobre Web3, ¡te invitamos a unirte!
 
-🔍 [Revisa tu información aquí](https://www.hivesbi.com/userinfo/?user=${username})  
+🔍 [Revisa tu información aquí](https://www.hivesbi.com/userinfo/?user=${onboarded})  
 <sup>*(la información se actualiza unas 3 horas después de tu inscripción)*</sup>
 
 ---
@@ -39,8 +39,8 @@ Como parte de una iniciativa personal, **te he inscrito en el programa:**
 
 ---
 
-🎉 Greetings @${username} Welcome to HIVE 🎉  
-I am ${onboarded_by}, Congrats on being part of this amazing community.
+🎉 Greetings @${onboarded} Welcome to HIVE 🎉  
+I am ${onboarder}, Congrats on being part of this amazing community.
 
 As part of a personal initiative, **I’ve added you to the following program:**
 
@@ -54,7 +54,7 @@ As part of a personal initiative, **I’ve added you to the following program:**
 🧩 **This initiative is part of the [Synergy Builders](https://peakd.com/c/hive-186392/created) community. We think, build software, and improve the quality of web3.**  
 👉 If you're into building, collaborating, or learning about Web3 — we’d love to have you on board!
  
-🔍 [Check your info here](https://www.hivesbi.com/userinfo/?user=${username})  
+🔍 [Check your info here](https://www.hivesbi.com/userinfo/?user=${onboarded})  
 <sup>*(info updates around 3 hours after registration)*</sup>
 
 ---

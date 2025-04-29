@@ -2,28 +2,26 @@ import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
 import { KeychainUtils } from "../utils/keychain.utils";
 import "./OnboardModal.css";
-import Stepper from "./stepper/Stepper"; // Asegúrate de que Stepper acepta 'initialStep', 'stepData', 'existingOnboardInfo', y callbacks
+import Stepper from "./stepper/Stepper";
 
 // Importa los componentes de todos tus pasos
-import Step1 from "./stepper/steps/Step1"; // Paso para seleccionar post / stake
-// TODO: Crea e importa los otros pasos
-// import Step2Comment from "./stepper/steps/Step2Comment"; // Paso para comentario
-// import Step3Summary from "./stepper/steps/Step3Summary"; // Paso de resumen/finalización
-
-// Asume que BackendOnboardingInfo está exportada
 import { BackendOnboardingInfo } from "../pages/OnboardUser";
+import Step1 from "./stepper/steps/Step1";
 import Step2 from "./stepper/steps/Step2";
+import Step3 from "./stepper/steps/Step3";
 
 // Tipos para datos compartidos entre pasos
-interface StepData {
+export interface StepData {
   selectedPost?: Post; // Del Step 1
+  onboarder?: string; // Del Step 1
+  onboarded?: string; // Del Step 1
   transactionResponse?: any; // Del Step 1 (resultado stake)
   generatedComment?: string; // Del Step 2 (comentario generado)
+  postedCommentPermlink?: string;
   editedComment?: string; // Del Step 2 (comentario editado por usuario)
   commentResponse?: any; // Del Step 2 (resultado transacción comentario)
-  onboardingSummary?: any; // Del Step 3
-  // Añade aquí cualquier otro dato que necesites compartir entre pasos
-  // Ej: initialAmount, initialMemo si Step1 o Step2 los necesitan como datos de entrada para el flujo normal
+  onboardingSummary?: any;
+  editCommentBEresults?: any;
 }
 
 export interface Post {
@@ -272,23 +270,20 @@ const OnboardModal: React.FC<OnboardModalProps> = ({
       },
     },
 
-    // TODO: Añadir el Paso 3 (Resumen)
-    /*
-        {
-            component: Step3Summary, // Crea este componente
-            props: {
-                // Props específicas para Step3Summary (probablemente necesita todos los datos recolectados)
-                stepData: stepData, // Le pasamos todos los datos
+    {
+      component: Step3, // Crea este componente
+      props: {
+        // Props específicas para Step3Summary (probablemente necesita todos los datos recolectados)
+        stepData: stepData, // Le pasamos todos los datos
 
-                // Props generales
-                username: username,
-                onboarderUsername: onboarderUsername,
+        // Props generales
+        username: username,
+        onboarderUsername: onboarderUsername,
 
-                // Callback para finalizar el flujo (probablemente cierra el modal)
-                onComplete: handleCancelFlow, // O una función diferente si hay lógica de post-finalización
-            }
-        },
-        */
+        // Callback para finalizar el flujo (probablemente cierra el modal)
+        onComplete: handleCancelFlow, // O una función diferente si hay lógica de post-finalización
+      },
+    },
   ];
 
   // --- Renderizado del Modal ---

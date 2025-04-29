@@ -183,12 +183,19 @@ export const get = <
  * @returns Promesa con respuesta JSON.
  * @throws Errores de apiRequest.
  */
-export const post = <TResult = any, TData extends object = object>( // POST usualmente requiere un objeto de datos
+export const post = <TResult = any, TData extends object = object>(
   baseUrl: string,
   route: string,
   data: TData,
   token?: string
 ): Promise<TResult> => apiRequest("POST", baseUrl, route, data, token);
+
+export const put = <TResult = any, TData extends object = object>(
+  baseUrl: string,
+  route: string,
+  data: TData,
+  token?: string
+): Promise<TResult> => apiRequest("PUT", baseUrl, route, data, token);
 
 // Opcional: Añade funciones para otros métodos si las necesitas
 /*

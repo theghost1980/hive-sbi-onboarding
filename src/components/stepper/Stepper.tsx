@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { StepData } from "../OnboardModal";
 
 // Define la estructura de un paso
 interface StepDefinition {
@@ -14,9 +15,9 @@ interface StepperProps {
   initialStep?: number; // Índice del paso inicial (base 0), default 0
 
   // Datos y callbacks compartidos (pasados a TODOS los pasos)
-  stepData: any;
+  stepData: StepData;
   existingOnboardInfo?: any;
-  onStepDataChange: (data: any) => void; // Para que pasos actualicen stepData en Modal
+  onStepDataChange: (data: StepData) => void; // Para que pasos actualicen stepData en Modal
   onProcessError: (message: string) => void; // Para que pasos reporten error general al Modal
   onCancel: () => void; // Para cancelar/cerrar el modal
 

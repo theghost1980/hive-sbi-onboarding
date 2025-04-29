@@ -4,9 +4,10 @@ import { addOnboardingEntry } from "../../../api/OnboardingApi";
 import { config } from "../../../config/config";
 import { JWT_TOKEN_STORAGE_KEY } from "../../../context/AuthContext";
 import { BackendOnboardingInfo } from "../../../pages/OnboardUser";
+import { StepData } from "../../OnboardModal";
 
 interface Step1Props {
-  stepData: any;
+  stepData: StepData;
   existingOnboardInfo?: BackendOnboardingInfo | null;
   onStepDataChange: (data: Partial<any>) => void;
   onProcessError: (message: string) => void;
@@ -32,6 +33,7 @@ const Step1: React.FC<Step1Props> = ({
   onTransactionComplete,
   onTransactionError,
   onCancel,
+  onStepDataChange,
 }) => {
   const handlePayWithKeychain = async () => {
     const hardCodedAmount = "1.000";
@@ -48,45 +50,6 @@ const Step1: React.FC<Step1Props> = ({
       onTransactionInitiated();
     }
 
-    //TODO REM testing just to send to BE
-    // if (onTransactionComplete && token) {
-    //   try {
-    //     const result = await postRequest(
-    //       beBaseUrl,
-    //       "/crud/add",
-    //       {
-    //         onboarder: onboarderUsername,
-    //         onboarded: username,
-    //         amount: "1 HIVE",
-    //         memo: `@${username}`,
-    //       },
-    //       token
-    //     );
-    //     console.log("Petición exitosa:", result);
-    //     // Hacer algo con los datos 'result'
-    //   } catch (error: any) {
-    //     console.error("Ocurrió un error al hacer la petición:", error);
-    //     // Aquí puedes manejar los diferentes tipos de error
-    //     if (error instanceof HttpError) {
-    //       console.error(
-    //         "Error HTTP:",
-    //         error.response.status,
-    //         error.response.statusText
-    //       );
-    //       console.error("Cuerpo del error del servidor:", error.body);
-    //       // Ej: if (error.response.status === 401) { // Redirigir a login }
-    //       // Ej: if (error.body && error.body.message) { // Mostrar mensaje de error específico del backend }
-    //     } else {
-    //       // Esto es probablemente un error de red u otro error de fetch
-    //       console.error("Error de red o desconocido:", error.message);
-    //       // Ej: Mostrar un mensaje genérico de error de conexión
-    //     }
-    //   }
-    //   // onTransactionComplete(response);
-    // }
-    // onNextStep();
-    //end testing
-
     if (onTransactionComplete && token) {
       KeychainHelper.requestTransfer(
         onboarderUsername,
@@ -99,7 +62,7 @@ const Step1: React.FC<Step1Props> = ({
           if (response.success) {
             console.log(
               "Transfer broadcast successful! Tx ID:",
-              response.tx_id
+              response.result.tx_id
             );
             try {
               const responseBE = await addOnboardingEntry(
@@ -115,6 +78,10 @@ const Step1: React.FC<Step1Props> = ({
             } catch (error) {
               console.error("addOnboardingEntry error", { error });
             } finally {
+              onStepDataChange({
+                onboarder: onboarderUsername,
+                onboarded: username,
+              });
               onNextStep();
             }
           } else {
@@ -123,40 +90,6 @@ const Step1: React.FC<Step1Props> = ({
         }
       );
     }
-
-    //TODO below REM after testing
-    // if (typeof window.hive_keychain !== "undefined") {
-    //   //@ts-ignore
-    //   window.hive_keychain.requestTransfer(
-    //     onboarderUsername,
-    //     "steembasicincome",
-    //     "1.000",
-    //     `@${username}`,
-    //     "HIVE",
-    //     async (response: any) => {
-    //       console.log("Keychain Transfer Response:", response);
-
-    //       if (response.success) {
-    //         if (onTransactionComplete) {
-    //           onTransactionComplete(response);
-    //         }
-    //         onNextStep();
-    //       } else {
-    //         if (onTransactionError) {
-    //           onTransactionError(
-    //             response.message ||
-    //               "Keychain transaction failed or was cancelled."
-    //           );
-    //         }
-    //       }
-    //     },
-    //     true
-    //   );
-    // } else {
-    //   if (onTransactionError) {
-    //     onTransactionError("Hive Keychain API is not available.");
-    //   }
-    // }
   };
 
   return (

@@ -3,11 +3,9 @@ import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import BuscarUsuarios from "./pages/BuscarUsuarios";
-import ChequearHiveSBI from "./pages/ChequearHiveSBI";
 import Home from "./pages/Home";
 import LoginPage from "./pages/LoginPage";
 import OnBoardUser from "./pages/OnboardUser";
-import UltimosAgregados from "./pages/UltimosAgregados";
 
 //TODO keep coding
 // refs:
@@ -26,8 +24,9 @@ const App = () => (
             <Route element={<ProtectedRoute />}>
               <Route path="/onboard-user" element={<OnBoardUser />} />
               <Route path="/buscar-usuarios" element={<BuscarUsuarios />} />
-              <Route path="/chequear-hive-sbi" element={<ChequearHiveSBI />} />
-              <Route path="/ultimos-agregados" element={<UltimosAgregados />} />
+              {/* //TODO enable routes below when needed */}
+              {/* <Route path="/chequear-hive-sbi" element={<ChequearHiveSBI />} /> */}
+              {/* <Route path="/ultimos-agregados" element={<UltimosAgregados />} /> */}
             </Route>
           </Routes>
         </Layout>
