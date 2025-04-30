@@ -12,6 +12,7 @@ import { HttpError, post } from "../../../api/RequestsApi"; // Para cargar posts
 import { config } from "../../../config/config";
 import { JWT_TOKEN_STORAGE_KEY } from "../../../context/AuthContext";
 import { BackendOnboardingInfo } from "../../../pages/OnboardUser"; // Tipo de datos backend
+import { ImageUtils } from "../../../utils/image.utils";
 import { PermlinkUtils } from "../../../utils/permlink.utils";
 import { Post, StepData } from "../../OnboardModal"; // Tipo de Post
 import "./Step2.css";
@@ -63,12 +64,8 @@ const Step2: React.FC<Step2Props> = ({
   const [postCommentSuccess, setPostCommentSuccess] = useState(false);
   const [postCommentError, setPostCommentError] = useState<string | null>(null);
 
-  const onboarder = stepData.onboarder
-    ? stepData.onboarder
-    : existingOnboardInfo?.onboarder ?? "ERROR_CHECK";
-  const onboarded = stepData.onboarded
-    ? stepData.onboarded
-    : existingOnboardInfo?.onboarded ?? "ERROR_CHECK";
+  const onboarder = onboarderUsername;
+  const onboarded = username;
 
   useEffect(() => {
     if (!selectedPostForComment && username) {
@@ -96,7 +93,7 @@ const Step2: React.FC<Step2Props> = ({
               url: `/@${post.author}/${post.permlink}`,
               author: post.author,
               permlink: post.permlink,
-              imageUrl: extractFirstImage(post.body),
+              imageUrl: ImageUtils.extractFirstImage(post.body),
             }));
             setPosts(postsData);
           } else {
@@ -171,15 +168,16 @@ const Step2: React.FC<Step2Props> = ({
     }
   }, [commentMarkdown]); // Utilidad para extraer primera imagen
 
-  const extractFirstImage = (body: string): string | null => {
-    const imgRegex = /!\[.*?\]\((.*?)\)/;
-    const match = imgRegex.exec(body);
-    if (match && match[1]) return match[1];
-    const htmlImgRegex = /<img\s+[^>]*src=["']([^"']+)["'][^>]*>/i;
-    const htmlMatch = htmlImgRegex.exec(body);
-    if (htmlMatch && htmlMatch[1]) return htmlMatch[1];
-    return null;
-  }; // Handler para seleccionar post de la lista
+  //TODO cleanup
+  // const extractFirstImage = (body: string): string | null => {
+  //   const imgRegex = /!\[.*?\]\((.*?)\)/;
+  //   const match = imgRegex.exec(body);
+  //   if (match && match[1]) return match[1];
+  //   const htmlImgRegex = /<img\s+[^>]*src=["']([^"']+)["'][^>]*>/i;
+  //   const htmlMatch = htmlImgRegex.exec(body);
+  //   if (htmlMatch && htmlMatch[1]) return htmlMatch[1];
+  //   return null;
+  // };
 
   const handlePostSelected = (post: Post) => {
     setSelectedPostForComment(post); // Usar plantilla de config al seleccionar de lista

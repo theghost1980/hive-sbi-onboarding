@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
 import { BackendOnboardingInfo } from "../pages/OnboardUser";
+import { ImageUtils } from "../utils/image.utils";
 import { KeychainUtils } from "../utils/keychain.utils";
 import "./OnboardModal.css";
 import Stepper from "./stepper/Stepper";
@@ -143,7 +144,7 @@ const OnboardModal: React.FC<OnboardModalProps> = ({
               url: post.url,
               author: post.author,
               permlink: post.permlink,
-              imageUrl: extractFirstImage(post.body),
+              imageUrl: ImageUtils.extractFirstImage(post.body),
             }));
             setPosts(postsData);
           } else {
@@ -161,15 +162,16 @@ const OnboardModal: React.FC<OnboardModalProps> = ({
     // No hay un 'else if (!isOpen)' aquí porque ese caso ya lo maneja el useEffect de inicialización
   }, [isOpen, username, startStep]); // Dependencias
 
-  const extractFirstImage = (body: string): string | null => {
-    const imgRegex = /!\[.*?\]\((.*?)\)/;
-    const match = imgRegex.exec(body);
-    if (match && match[1]) return match[1];
-    const htmlImgRegex = /<img\s+[^>]*src=["']([^"']+)["'][^>]*>/i;
-    const htmlMatch = htmlImgRegex.exec(body);
-    if (htmlMatch && htmlMatch[1]) return htmlMatch[1];
-    return null;
-  };
+  //TODO cleanup
+  // const extractFirstImage = (body: string): string | null => {
+  //   const imgRegex = /!\[.*?\]\((.*?)\)/;
+  //   const match = imgRegex.exec(body);
+  //   if (match && match[1]) return match[1];
+  //   const htmlImgRegex = /<img\s+[^>]*src=["']([^"']+)["'][^>]*>/i;
+  //   const htmlMatch = htmlImgRegex.exec(body);
+  //   if (htmlMatch && htmlMatch[1]) return htmlMatch[1];
+  //   return null;
+  // };
 
   // --- Callbacks para que los pasos interactúen con el modal ---
 

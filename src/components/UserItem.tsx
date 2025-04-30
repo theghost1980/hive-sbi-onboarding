@@ -2,29 +2,74 @@ import React, { useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
+import { getOnboarded } from "../api/OnboardingApi";
+import { config } from "../config/config";
 import { Account } from "../pages/BuscarUsuarios";
 import OnboardModal from "./OnboardModal";
 import "./UserItem.css";
 
 interface UserItemProps {
-  account: Account;
+  onboarder: string | undefined;
+  onboarded: Account;
+  token: string | null;
   linkPeakdPrefix?: string;
 }
 
-const UserItem: React.FC<UserItemProps> = ({ account, linkPeakdPrefix }) => {
+const UserItem: React.FC<UserItemProps> = ({
+  onboarded,
+  onboarder,
+  token,
+  linkPeakdPrefix,
+}) => {
   const [isChecking, setIsChecking] = useState<boolean>(false);
   const [isMember, setIsMember] = useState<boolean | null>(null);
 
   const handleCheckMembership = async () => {
     setIsChecking(true);
     try {
-      const response = await fetch(
-        `https://api.hivesbi.com/v1/members/${account.name}/`
+      // Intenta primero la API de HSBI
+      const hsbiApiResponse = await fetch(
+        `${config.hsbi.api_url}${onboarded.name}/`
       );
-      setIsMember(response.status === 404 ? false : true);
-    } catch (error) {
-      console.error("Error al verificar membresía:", error);
-      setIsMember(false);
+
+      if (hsbiApiResponse.ok) {
+        // Caso 1: Encontrado en la API de HSBI (Status 200)
+        setIsMember(true); // -> ¡Es miembro!
+        console.log(`Usuario @${onboarded.name} ES miembro de HSBI.`);
+      } else if (hsbiApiResponse.status === 404) {
+        // Caso 2: NO encontrado en la API de HSBI (Status 404)
+        console.log(
+          `Usuario @${onboarded.name} no encontrado en la API de HSBI. Verificando registros backend...`
+        );
+        try {
+          // Intenta en tu backend
+          const backendRecords = await getOnboarded(
+            onboarded.name,
+            token || ""
+          );
+
+          if (backendRecords && backendRecords.length > 0) {
+            // Caso 2a: Encontrado en el backend
+            setIsMember(true); // -> ¡Es miembro (vía backend)!
+            console.log(
+              `Usuario @${onboarded.name} encontrado en registros backend.`
+            );
+          } else {
+            // Caso 2b: NO encontrado en el backend
+            setIsMember(false); // -> ¡NO es miembro (ni en HSBI API ni en backend)!
+            console.log(
+              `Usuario @${onboarded.name} NO encontrado en registros backend. Puede ser onboardeado.`
+            );
+          }
+        } catch (backendError: any) {
+          // ... (manejo de errores del backend) setMembershipCheckError, setIsMember(null) ...
+        }
+      } else {
+        // Caso 3: Otro error en la API de HSBI (no 200 ni 404)
+        // ... (manejo de otros errores de HSBI API) setMembershipCheckError, setIsMember(null) ...
+      }
+    } catch (networkError: any) {
+      // ... (manejo de errores de red) setMembershipCheckError, setIsMember(null) ...
     } finally {
       setIsChecking(false);
     }
@@ -41,14 +86,16 @@ const UserItem: React.FC<UserItemProps> = ({ account, linkPeakdPrefix }) => {
   };
 
   const formattedCreatedDate = formatDate(
-    account.created || account.account_created
+    onboarded.created || onboarded.account_created
   );
-  const formattedFirstPostDate = formatDate(account.first_post_date);
+  const formattedFirstPostDate = formatDate(onboarded.first_post_date);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+
+  if (!onboarder) return null;
 
   return (
     <li className="user-item">
@@ -58,12 +105,12 @@ const UserItem: React.FC<UserItemProps> = ({ account, linkPeakdPrefix }) => {
             <NavLink
               target="_blank"
               rel="noopener noreferrer"
-              to={`${linkPeakdPrefix}@${account.name}`}
+              to={`${linkPeakdPrefix}@${onboarded.name}`}
             >
-              @{account.name}
+              @{onboarded.name}
             </NavLink>
           ) : (
-            `@${account.name}`
+            `@${onboarded.name}`
           )}
         </div>
         <div className="user-status">
@@ -83,8 +130,8 @@ const UserItem: React.FC<UserItemProps> = ({ account, linkPeakdPrefix }) => {
               <OnboardModal
                 isOpen={isModalOpen}
                 onRequestClose={closeModal}
-                username={account.name}
-                onboarderUsername={account.name}
+                username={onboarded.name}
+                onboarderUsername={onboarder}
               />
             </>
           ) : (
@@ -111,22 +158,24 @@ const UserItem: React.FC<UserItemProps> = ({ account, linkPeakdPrefix }) => {
             <span className="detail-value">{formattedFirstPostDate}</span>
           </div>
         )}
-        {account.reputation_ui !== undefined && (
+        {onboarded.reputation_ui !== undefined && (
           <div className="user-detail">
             <span className="detail-label">⭐ Reputación:</span>
-            <span className="detail-value">{account.reputation_ui}</span>
+            <span className="detail-value">{onboarded.reputation_ui}</span>
           </div>
         )}
-        {account.total_posts !== undefined && (
+        {onboarded.total_posts !== undefined && (
           <div className="user-detail">
             <span className="detail-label">🧾 Posts:</span>
-            <span className="detail-value">{account.total_posts}</span>
+            <span className="detail-value">{onboarded.total_posts}</span>
           </div>
         )}
-        {account.avg_votes !== undefined && (
+        {onboarded.avg_votes !== undefined && (
           <div className="user-detail">
             <span className="detail-label">📊 Promedio votos:</span>
-            <span className="detail-value">{account.avg_votes.toFixed(2)}</span>
+            <span className="detail-value">
+              {onboarded.avg_votes.toFixed(2)}
+            </span>
           </div>
         )}
       </div>

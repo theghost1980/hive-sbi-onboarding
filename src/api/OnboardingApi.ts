@@ -45,7 +45,6 @@ export const addOnboardingEntry = async (
 };
 
 export const getOnboarded = async (
-  //TODO define later on what to use if only "export const Module = {functions}"???
   username: string,
   token: string
 ): Promise<any> => {

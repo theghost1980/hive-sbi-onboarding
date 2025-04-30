@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { FaAccessibleIcon, FaAngry, FaBaby } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import { beBaseUrl } from "../components/BackendStatusBar";
 import CustomSelect from "../components/CustomSelect";
 import UserItem from "../components/UserItem";
-import { JWT_TOKEN_STORAGE_KEY } from "../context/AuthContext";
+import { JWT_TOKEN_STORAGE_KEY, useAuth } from "../context/AuthContext";
 import { Option } from "../types/selectors.type";
 import "./BuscarUsuarios.css";
 
@@ -39,9 +40,15 @@ const options: Option[] = [
 //TODO pagination server side.
 
 const BuscarUsuarios = () => {
+  const navigate = useNavigate();
   const [selectedValue, setSelectedValue] = useState<string>("");
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [token, setToken] = useState(
+    localStorage.getItem(JWT_TOKEN_STORAGE_KEY)
+  );
+
+  const { user: onboarder, isAuthenticated, logout } = useAuth();
 
   const handleChange = (value: string) => {
     setSelectedValue(value);
@@ -50,7 +57,8 @@ const BuscarUsuarios = () => {
   useEffect(() => {
     const fetchAccounts = async () => {
       if (!selectedValue.trim().length) return;
-      const token = localStorage.getItem(JWT_TOKEN_STORAGE_KEY);
+      //TODO cleanup
+      // const token = localStorage.getItem(JWT_TOKEN_STORAGE_KEY);
       setLoading(true);
       try {
         const response = await fetch(`${beBaseUrl}/api/${selectedValue}`, {
@@ -59,6 +67,13 @@ const BuscarUsuarios = () => {
             "Content-Type": "application/json",
           },
         });
+        if (response.status === 401) {
+          console.log(
+            "Token expirado o inválido al cargar la lista. Redirigiendo a login."
+          );
+          logout();
+          navigate("/login");
+        }
         if (!response.ok) {
           throw new Error("Error al obtener los datos");
         }
@@ -95,8 +110,10 @@ const BuscarUsuarios = () => {
           {accounts.map((account) => (
             <UserItem
               key={account.name}
-              account={account}
+              onboarded={account}
+              onboarder={onboarder?.username}
               linkPeakdPrefix={"https://peakd.com/"}
+              token={token}
             />
           ))}
         </ul>

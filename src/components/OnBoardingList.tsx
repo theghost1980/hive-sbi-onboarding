@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getAllOnboarded } from "../api/OnboardingApi";
 import { JWT_TOKEN_STORAGE_KEY, useAuth } from "../context/AuthContext";
 import { FormatUtils } from "../utils/format.utils";
@@ -18,6 +19,7 @@ interface OnboardingListProps {
 
 function OnboardingList({ setOnboardingList }: OnboardingListProps) {
   const { setAuth, isLoadingAuth, isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const [onboardings, setOnboardings] = useState<OnboardingEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,6 +45,13 @@ function OnboardingList({ setOnboardingList }: OnboardingListProps) {
         setError(
           "Error fetching onboardings: " + (err.message || "Unknown error")
         );
+        if (err.includes("401")) {
+          console.log(
+            "Token expirado o inválido al cargar la lista. Redirigiendo a login."
+          );
+          logout();
+          navigate("/login");
+        }
       } finally {
         setIsLoading(false);
       }

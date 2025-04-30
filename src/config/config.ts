@@ -11,10 +11,6 @@ export const config = {
     {
       name: "default_1",
       content_markdown: (onboarded: string, onboarder: string) => `
-      **🇪🇸 Español**
-
----
-
 🎉 ¡Hola @${onboarded} Bienvenido/a a HIVE 🎉  
 Soy ${onboarder}, te felicito por tu participación y compromiso con esta increíble comunidad.
 
@@ -33,12 +29,8 @@ Como parte de una iniciativa personal, **te he inscrito en el programa:**
 🔍 [Revisa tu información aquí](https://www.hivesbi.com/userinfo/?user=${onboarded})  
 <sup>*(la información se actualiza unas 3 horas después de tu inscripción)*</sup>
 
----
-
-**🇬🇧 English**
-
----
-
+<details>
+<summary>ENGLISH VERSION</summary>
 🎉 Greetings @${onboarded} Welcome to HIVE 🎉  
 I am ${onboarder}, Congrats on being part of this amazing community.
 
@@ -56,15 +48,13 @@ As part of a personal initiative, **I’ve added you to the following program:**
  
 🔍 [Check your info here](https://www.hivesbi.com/userinfo/?user=${onboarded})  
 <sup>*(info updates around 3 hours after registration)*</sup>
-
----
+</details>
 
 ### 🔗 Enlaces útiles / Useful Links:
 
 | 💬 Discord | 🏠 Página principal | 📝 Post de bienvenida | 📘 Documentación |
 |:----------:|:------------------:|:---------------------:|:----------------:|
 | [![discord](https://files.peakd.com/file/peakd-hive/theghost1980/ALDADjWGG2KP5CFbnyArgodA3BmFG5CNkDiszEkbjoK7KbNYpeRpxac1vGMtsUz.png)](https://discord.gg/Ypw9aqJk5A) | [![home](https://files.peakd.com/file/peakd-hive/theghost1980/AKxnGkcA1kWDmjUk4UdpMpfpH4djucBJG2ZWWwy7sw6pYZoyKbP4RbPsTJe9cDG.png)](https://www.hivesbi.com/) | [![post](https://files.peakd.com/file/peakd-hive/theghost1980/AKLv5m2e3KUKzWKXcobmuQLDFgVe7H8ym3AEGCtgxvPYMWhYHQtn7eisPW1PuNF.png)](https://peakd.com/steem/@steembasicincome/welcome-to-steem-basic-income) | [![docs](https://files.peakd.com/file/peakd-hive/theghost1980/AJkV3zgS8NECJRhwJXmN7ctZo5yw7CCYSYicoQyPFB7HYV2bU9iL8LWGqVL5XF2.png)](https://docs.hivesbi.com/) |
-
       `,
     },
   ],
