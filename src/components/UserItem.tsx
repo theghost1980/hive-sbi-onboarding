@@ -2,8 +2,12 @@ import React, { useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
-import { getOnboarded } from "../api/OnboardingApi";
-import { config } from "../config/config";
+import backendApi from "../api/backend";
+import { HSBIApi } from "../api/HSBI";
+import {
+  BE_ONBOARDED_BY_USERNAME_EP,
+  HSBI_API_MEMBERS_EP,
+} from "../config/constants";
 import { Account } from "../pages/BuscarUsuarios";
 import OnboardModal from "./OnboardModal";
 import "./UserItem.css";
@@ -26,50 +30,25 @@ const UserItem: React.FC<UserItemProps> = ({
 
   const handleCheckMembership = async () => {
     setIsChecking(true);
+
     try {
-      // Intenta primero la API de HSBI
-      const hsbiApiResponse = await fetch(
-        `${config.hsbi.api_url}${onboarded.name}/`
+      const responseUsername: any = await HSBIApi.get(
+        `${HSBI_API_MEMBERS_EP}${onboarded.name}/`
       );
-
-      if (hsbiApiResponse.ok) {
-        // Caso 1: Encontrado en la API de HSBI (Status 200)
-        setIsMember(true); // -> ¡Es miembro!
-        console.log(`Usuario @${onboarded.name} ES miembro de HSBI.`);
-      } else if (hsbiApiResponse.status === 404) {
-        // Caso 2: NO encontrado en la API de HSBI (Status 404)
-        console.log(
-          `Usuario @${onboarded.name} no encontrado en la API de HSBI. Verificando registros backend...`
+      if (responseUsername.account) setIsMember(true);
+    } catch (error: any) {
+      if (error.message.includes("404")) {
+        const response: any = await backendApi.get(
+          `${BE_ONBOARDED_BY_USERNAME_EP}/?username=${onboarded.name}`
         );
-        try {
-          // Intenta en tu backend
-          const backendRecords = await getOnboarded(
-            onboarded.name,
-            token || ""
-          );
-
-          if (backendRecords && backendRecords.length > 0) {
-            // Caso 2a: Encontrado en el backend
-            setIsMember(true); // -> ¡Es miembro (vía backend)!
-            console.log(
-              `Usuario @${onboarded.name} encontrado en registros backend.`
-            );
-          } else {
-            // Caso 2b: NO encontrado en el backend
-            setIsMember(false); // -> ¡NO es miembro (ni en HSBI API ni en backend)!
-            console.log(
-              `Usuario @${onboarded.name} NO encontrado en registros backend. Puede ser onboardeado.`
-            );
-          }
-        } catch (backendError: any) {
-          // ... (manejo de errores del backend) setMembershipCheckError, setIsMember(null) ...
+        if (response && response.length > 0) {
+          setIsMember(true);
+        } else {
+          setIsMember(false);
         }
       } else {
-        // Caso 3: Otro error en la API de HSBI (no 200 ni 404)
-        // ... (manejo de otros errores de HSBI API) setMembershipCheckError, setIsMember(null) ...
+        console.log("Error OnboardUser fetch", { error });
       }
-    } catch (networkError: any) {
-      // ... (manejo de errores de red) setMembershipCheckError, setIsMember(null) ...
     } finally {
       setIsChecking(false);
     }

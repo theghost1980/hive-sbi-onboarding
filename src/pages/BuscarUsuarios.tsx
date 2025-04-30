@@ -63,27 +63,6 @@ const BuscarUsuarios = () => {
           `/api/${selectedValue}`,
           true
         );
-        //TODO cleanup && handle 401???
-        // console.log({ responseTest });
-        // const response = await fetch(`${beBaseUrl}/api/${selectedValue}`, {
-        //   headers: {
-        //     Authorization: `Bearer ${token}`,
-        //     "Content-Type": "application/json",
-        //   },
-        // });
-        // if (response.status === 401) {
-        //   console.log(
-        //     "Token expirado o inválido al cargar la lista. Redirigiendo a login."
-        //   );
-        //   logout();
-        //   navigate("/login");
-        // }
-        // if (!response.ok) {
-        //   throw new Error("Error al obtener los datos");
-        // }
-        // const resData = await response.json();
-        // console.log({ resData });
-        //TODO add execution_time + limit used
         if (response.results) {
           setAccounts(response.results);
         }
