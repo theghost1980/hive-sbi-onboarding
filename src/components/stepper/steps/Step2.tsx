@@ -1,20 +1,16 @@
-// src/components/stepper/steps/Step2.tsx
-
 import DOMPurify from "dompurify";
-import { marked } from "marked"; // Asegúrate de que marked está instalado
-import React, { useEffect, useState } from "react";
-// Importamos tu KeychainUtils actualizado
-
-// Asegúrate de que estas rutas de importación sean correctas
 import { KeychainHelper } from "keychain-helper";
-import { editCommentPermlinkOnboardingEntry } from "../../../api/OnboardingApi";
-import { HttpError, post } from "../../../api/RequestsApi"; // Para cargar posts, si no usas otra cosa
+import { marked } from "marked";
+import React, { useEffect, useState } from "react";
+import backendApi from "../../../api/Backend";
+import { HttpError, post } from "../../../api/RequestsApi";
 import { config } from "../../../config/config";
+import { BE_EDIT_ONBOARDING } from "../../../config/constants";
 import { JWT_TOKEN_STORAGE_KEY } from "../../../context/AuthContext";
-import { BackendOnboardingInfo } from "../../../pages/OnboardUser"; // Tipo de datos backend
+import { BackendOnboardingInfo } from "../../../pages/OnboardUser";
 import { ImageUtils } from "../../../utils/image.utils";
 import { PermlinkUtils } from "../../../utils/permlink.utils";
-import { Post, StepData } from "../../OnboardModal"; // Tipo de Post
+import { Post, StepData } from "../../OnboardModal";
 import "./Step2.css";
 
 // Interfaz de props actualizada para incluir 'config'
@@ -115,37 +111,23 @@ const Step2: React.FC<Step2Props> = ({
 
       fetchPosts();
     }
-  }, [username, selectedPostForComment, existingOnboardInfo, config]); // Efecto para inicializar selectedPostForComment y commentMarkdown
+  }, [username, selectedPostForComment, existingOnboardInfo, config]);
 
   useEffect(() => {
-    console.log({ existingOnboardInfo }); //TODO REM
     let post: Post | null = null;
-    let initialText = ""; // Limpiar feedback de transacción al cambiar datos o contexto
+    let initialText = "";
 
     setPostCommentSuccess(false);
     setPostCommentError(null);
-    setIsPostingComment(false); // Escenario 1: Viene de Step 1 con post seleccionado
+    setIsPostingComment(false);
 
     if (stepData.selectedPost) {
-      console.log("step2: ", { stepData }); //TODO REM
       post = stepData.selectedPost;
       initialText = config.templates_comments[0].content_markdown(
         onboarded,
         onboarder
       );
     }
-    // else if (existingOnboardInfo?.originalPostAuthor && existingOnboardInfo.originalPostPermlink) {
-    //  console.log("Step 2: Initializing for Edit Comment mode.");
-    //  // Construir objeto Post con info del backend
-    //  post = {
-    //    author: existingOnboardInfo.originalPostAuthor,
-    //    permlink: existingOnboardInfo.originalPostPermlink,
-    //    title: 'Publicación Original', // Placeholder, idealmente se obtendría
-    //    body: '...', // Placeholder
-    //    url: `/@${existingOnboardInfo.originalPostAuthor}/${existingOnboardInfo.originalPostPermlink}`,
-    //  };
-    //  initialText = existingOnboardInfo.memo || ''; // Usar memo para editar
-    // }
     if (post) {
       setSelectedPostForComment(post);
       setCommentMarkdown(initialText);
@@ -156,7 +138,7 @@ const Step2: React.FC<Step2Props> = ({
     username,
     onboarderUsername,
     config,
-  ]); // Efecto para actualizar la previsualización HTML
+  ]);
 
   useEffect(() => {
     if (commentMarkdown) {
@@ -166,34 +148,23 @@ const Step2: React.FC<Step2Props> = ({
     } else {
       setPreviewHtml("");
     }
-  }, [commentMarkdown]); // Utilidad para extraer primera imagen
-
-  //TODO cleanup
-  // const extractFirstImage = (body: string): string | null => {
-  //   const imgRegex = /!\[.*?\]\((.*?)\)/;
-  //   const match = imgRegex.exec(body);
-  //   if (match && match[1]) return match[1];
-  //   const htmlImgRegex = /<img\s+[^>]*src=["']([^"']+)["'][^>]*>/i;
-  //   const htmlMatch = htmlImgRegex.exec(body);
-  //   if (htmlMatch && htmlMatch[1]) return htmlMatch[1];
-  //   return null;
-  // };
+  }, [commentMarkdown]);
 
   const handlePostSelected = (post: Post) => {
-    setSelectedPostForComment(post); // Usar plantilla de config al seleccionar de lista
+    setSelectedPostForComment(post);
     setCommentMarkdown(
       config.templates_comments[0].content_markdown(onboarded, onboarder)
-    ); // Limpiar feedback de transacción al seleccionar post
+    );
     setPostCommentSuccess(false);
     setPostCommentError(null);
     setIsPostingComment(false);
-  }; // Handler para cambios en el texto del comentario
+  };
 
   const handleMarkdownChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
     setCommentMarkdown(event.target.value);
-  }; // --- Handler para Publicar Comentario (Usando requestPost) ---
+  };
 
   const handlePostComment = () => {
     const token = localStorage.getItem(JWT_TOKEN_STORAGE_KEY);
@@ -223,7 +194,7 @@ const Step2: React.FC<Step2Props> = ({
     setIsPostingComment(true);
     setPostCommentSuccess(false);
     setPostCommentError(null);
-    //   onProcessError(null); // Limpiar error general del modal
+    onProcessError("");
 
     const parentAuthor = selectedPostForComment.author;
     const parentPermlink = selectedPostForComment.permlink;
@@ -250,7 +221,7 @@ const Step2: React.FC<Step2Props> = ({
       allow_votes: true,
       allow_curation_rewards: true,
       extensions: [],
-      percent_hbd: 100, //TODO test using 100 as it was like 63
+      percent_hbd: 100,
     };
 
     KeychainHelper.requestPost(
@@ -264,22 +235,28 @@ const Step2: React.FC<Step2Props> = ({
       JSON.stringify(commentOptions),
       async (response) => {
         if (response.success) {
-          setPostCommentSuccess(true); // Guardar respuesta y nuevo permlink en stepData
+          setPostCommentSuccess(true);
           try {
             setIsPostingComment(false);
-            const responsePutAPI = await editCommentPermlinkOnboardingEntry(
+            const responseBEEDIT = await backendApi.put(BE_EDIT_ONBOARDING, {
               onboarder,
               onboarded,
-              permlink,
-              token
-            );
-            console.log("editCommentPermlinkOnboardingEntry: ", {
-              responsePutAPI,
+              comment_permlink: permlink,
             });
+            //TODO cleanup
+            // const responsePutAPI = await editCommentPermlinkOnboardingEntry(
+            //   onboarder,
+            //   onboarded,
+            //   permlink,
+            //   token
+            // );
+            // console.log("editCommentPermlinkOnboardingEntry: ", {
+            //   responsePutAPI,
+            // });
             onStepDataChange({
               commentResponse: response,
               postedCommentPermlink: permlink,
-              editCommentBEresults: responsePutAPI,
+              editCommentBEresults: responseBEEDIT,
             });
             onNextStep();
           } catch (error) {
@@ -288,75 +265,29 @@ const Step2: React.FC<Step2Props> = ({
             });
           }
         } else {
-          console.error("Error posting comment:", response); // Usar response.message o display_msg si están disponibles
+          console.error("Error posting comment:", response);
           const errorMessage =
             response?.message ||
             response?.display_msg ||
             "Error desconocido al publicar el comentario.";
           setPostCommentError(errorMessage);
-          onProcessError(errorMessage); // Reportar error general al modal
+          onProcessError(errorMessage);
           setIsPostingComment(false);
         }
       }
     );
-
-    //TODO
-    //  -usar este mismo modulo de keychainUtils para convertirlo a un paquete npm y subirlo y darle publicicdad por HIVE.
-    //  -ojo: probar, que no tenga dependencias y añadir todas las demas requests.
-    //  - simple, sencillo pero robusto
-    //  - hacer ejemplos de codigo y crear un repositorio con indice de ejemplos, pedir ayuda de ideas a la IA
-    // KeychainUtils.requestPost(
-    //   authorNewComment, // account (la cuenta que publica, tu onboarderUsername)
-    //   title, // title (vacío para comentario)
-    //   body, // body (el contenido markdown)
-    //   parentPermlink, // parent_perm (permlink del post padre)
-    //   parentAuthor, // parent_account (autor del post padre)
-    //   JSON.stringify(jsonMetadata), // json_metadata
-    //   permlink, // permlink (el permlink generado para el comentario)
-    //   JSON.stringify(commentOptions), // comment_options (objeto de opciones, vacío por defecto)
-    //   (response: any) => {
-    //     // Callback al recibir respuesta de Keychain
-    //     console.log("Keychain requestPost response:", response);
-
-    //     if (response && response.success) {
-    //       setPostCommentSuccess(true); // Guardar respuesta y nuevo permlink en stepData
-    //       onStepDataChange({
-    //         commentResponse: response,
-    //         postedCommentPermlink: permlink,
-    //       });
-
-    //       // Esperar 3 segundos y avanzar
-    //       //TODO here, should update onboarding record in BE
-
-    //       setTimeout(() => {
-    //         setIsPostingComment(false);
-    //         onNextStep(); // Avanzar al siguiente paso (ej: Resumen)
-    //       }, 3000);
-    //     } else {
-    //       // Manejar errores o cancelación por usuario
-    //       console.error("Error posting comment:", response); // Usar response.message o display_msg si están disponibles
-    //       const errorMessage =
-    //         response?.message ||
-    //         response?.display_msg ||
-    //         "Error desconocido al publicar el comentario.";
-    //       setPostCommentError(errorMessage);
-    //       onProcessError(errorMessage); // Reportar error general al modal
-    //       setIsPostingComment(false);
-    //     }
-    //   }
-    // );
   };
 
   const showPostList = !selectedPostForComment;
-  const showEditorArea = selectedPostForComment !== null; // Texto del botón Siguiente/Publicar
+  const showEditorArea = selectedPostForComment !== null;
 
-  let continueButtonText = "Siguiente"; // Texto por defecto
+  let continueButtonText = "Siguiente";
   if (isPostingComment) {
     continueButtonText = "Publicando...";
   } else if (postCommentSuccess) {
     continueButtonText = "¡Publicado!";
   } else if (postCommentError) {
-    continueButtonText = "Intentar de Nuevo"; // Texto en caso de error
+    continueButtonText = "Intentar de Nuevo";
   }
 
   return (
@@ -416,7 +347,6 @@ const Step2: React.FC<Step2Props> = ({
           {!loadingPosts && !errorFetchingPosts && posts.length === 0 && (
             <p>No se encontraron publicaciones recientes para @{username}.</p>
           )}{" "}
-          {/* Botón Volver - Visible solo en la vista de selección de post */}{" "}
           <div className="step-navigation-buttons">
             <button onClick={onPrevStep}>Volver</button>{" "}
           </div>{" "}
@@ -448,7 +378,7 @@ const Step2: React.FC<Step2Props> = ({
                 rows={10}
                 className="comment-markdown-input"
                 placeholder="Escribe tu comentario aquí en formato Markdown..."
-                disabled={isPostingComment || postCommentSuccess} // Deshabilita durante publicación o éxito
+                disabled={isPostingComment || postCommentSuccess}
               />{" "}
             </div>{" "}
             <div className="markdown-preview-area">
@@ -458,8 +388,7 @@ const Step2: React.FC<Step2Props> = ({
                 dangerouslySetInnerHTML={{ __html: previewHtml }}
               />{" "}
             </div>{" "}
-          </div>
-          {/* --- Feedback de Transacción --- */}{" "}
+          </div>{" "}
           {isPostingComment && (
             <p style={{ color: "blue", textAlign: "center", margin: "10px 0" }}>
               Publicando comentario...
@@ -488,18 +417,14 @@ const Step2: React.FC<Step2Props> = ({
             >
               Error al publicar: {postCommentError}
             </p>
-          )}
-          {/* ------------------------------- */}{" "}
-          {/* Botones de navegación para esta vista */}{" "}
+          )}{" "}
           <div className="step-navigation-buttons">
             {" "}
-            {/* Botón 'Volver' - Visible solo si no estamos publicando ni tuvimos éxito */}{" "}
             {!isPostingComment && !postCommentSuccess && (
               <button onClick={onPrevStep}>Volver</button>
-            )}
-            {/* Botón 'Siguiente' / Publicar */}{" "}
+            )}{" "}
             <button
-              onClick={handlePostComment} // Llama a la función de publicación // Deshabilitado si: comentario vacío, Keychain no disponible, publicando, o éxito
+              onClick={handlePostComment}
               disabled={
                 !commentMarkdown.trim() ||
                 !isKeychainAvailable ||
@@ -517,7 +442,7 @@ const Step2: React.FC<Step2Props> = ({
               }
               className="next-step-button"
             >
-              {continueButtonText} {/* Texto dinámico según el estado */}{" "}
+              {continueButtonText}{" "}
             </button>{" "}
           </div>{" "}
         </div>

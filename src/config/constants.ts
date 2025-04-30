@@ -9,3 +9,5 @@ export const HSBI_API_URL = "https://api.hivesbi.com";
 export const HSBI_API_MEMBERS_EP = "/v1/members/";
 export const BE_ONBOARDED_BY_USERNAME_EP = "/query/onboarded-by-username";
 export const BE_GET_ALL_ONBOARDED_EP = "/query/getAll";
+export const BE_ADD_ONBOARDING = "/crud/add";
+export const BE_EDIT_ONBOARDING = "/crud/edit";

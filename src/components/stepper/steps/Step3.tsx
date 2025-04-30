@@ -43,6 +43,15 @@ const Step3: React.FC<Step3Props> = ({
       isEditMode ? "Editing existing record" : "New onboarding"
     }\n\n`;
 
+    reportText += `--- Backend Record Update Result ---\n`;
+    if (stepData.beResponse1) {
+      reportText += `Response Details:\n`;
+      reportText += `${JSON.stringify(stepData.beResponse1, null, 2)}\n`;
+    } else {
+      reportText += `Backend record update result is unavailable.\n`;
+    }
+    reportText += `\n`;
+
     reportText += `--- Post Selected ---\n`;
     if (stepData.selectedPost) {
       reportText += `Commented on: "${stepData.selectedPost.title}" by @${stepData.selectedPost.author}\n`;
@@ -52,7 +61,7 @@ const Step3: React.FC<Step3Props> = ({
     }
     reportText += `\n`;
 
-    reportText += `--- Stake Transaction Result ---\n`;
+    reportText += `--- Transfer Transaction Result ---\n`;
     if (stepData.transactionResponse) {
       reportText += `Status: ${
         stepData.transactionResponse.success ? "Success" : "Failed"
@@ -66,7 +75,6 @@ const Step3: React.FC<Step3Props> = ({
           stepData.transactionResponse.error
         )}\n`;
 
-      // Añadir detalles de la transacción si está presente y fue exitosa
       if (
         stepData.transactionResponse.success &&
         stepData.transactionResponse.result &&
@@ -77,14 +85,14 @@ const Step3: React.FC<Step3Props> = ({
           stepData.transactionResponse.result.tx_id ||
           stepData.transactionResponse.result.id
         }\n`;
-        reportText += `  From: @${stepData.transactionResponse.data.username}\n`; // Asumiendo que 'username' en data es el remitente
+        reportText += `  From: @${stepData.transactionResponse.data.username}\n`;
         reportText += `  To: @${stepData.transactionResponse.data.to}\n`;
         reportText += `  Amount: ${stepData.transactionResponse.data.amount} ${stepData.transactionResponse.data.currency}\n`;
         if (stepData.transactionResponse.data.memo)
           reportText += `  Memo: ${stepData.transactionResponse.data.memo}\n`;
       }
     } else {
-      reportText += `Stake transaction was not attempted or result is unavailable.\n`;
+      reportText += `Transfer transaction was not attempted or result is unavailable.\n`;
     }
     reportText += `\n`;
 
@@ -141,6 +149,18 @@ const Step3: React.FC<Step3Props> = ({
       )}
 
       <div className="summary-section">
+        <h3>Backend Record Update Result</h3>
+        {stepData.beResponse1 ? (
+          <div className="backend-response-details">
+            <p>Response Details:</p>
+            <pre>{JSON.stringify(stepData.beResponse1, null, 2)}</pre>
+          </div>
+        ) : (
+          <p>Backend record update result is unavailable.</p>
+        )}
+      </div>
+
+      <div className="summary-section">
         <h3>Post Selected</h3>
         {stepData.selectedPost ? (
           <p>
@@ -185,7 +205,6 @@ const Step3: React.FC<Step3Props> = ({
               <p>Error: {JSON.stringify(stepData.transactionResponse.error)}</p>
             )}
 
-            {/* Añadir detalles de la transacción si está presente y fue exitosa */}
             {stepData.transactionResponse.success &&
               stepData.transactionResponse.result &&
               stepData.transactionResponse.data && (
@@ -198,7 +217,6 @@ const Step3: React.FC<Step3Props> = ({
                     {stepData.transactionResponse.result.tx_id ||
                       stepData.transactionResponse.result.id}
                   </p>
-                  {/* Asumiendo que 'username' en data es el remitente */}
                   <p>From: @{stepData.transactionResponse.data.username}</p>
                   <p>To: @{stepData.transactionResponse.data.to}</p>
                   <p>

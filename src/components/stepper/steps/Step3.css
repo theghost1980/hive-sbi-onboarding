@@ -78,22 +78,65 @@
   margin: 3px 0;
 }
 
-/* Nuevo estilo para los detalles de la transacción dentro del resultado */
 .transaction-details {
-  margin-top: 10px; /* Espacio arriba */
-  padding-top: 8px; /* Espacio interno arriba */
-  border-top: 1px dashed rgba(0, 0, 0, 0.2); /* Línea separadora sutil */
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.2);
 }
 
 .transaction-details p {
-  margin: 2px 0; /* Margen reducido para los detalles */
-  font-size: 0.9em; /* Fuente ligeramente más pequeña */
-  color: inherit; /* Hereda el color del contenedor .transaction-result (verde/rojo) */
+  margin: 2px 0;
+  font-size: 0.9em;
+  color: inherit;
 }
 .transaction-details p strong {
-  color: inherit; /* Hereda el color del contenedor */
-  font-weight: normal; /* No negrita para las etiquetas internas */
-  margin-right: 5px; /* Espacio después de la etiqueta */
+  color: inherit;
+  font-weight: normal;
+  margin-right: 5px;
+}
+
+.backend-response-result {
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 10px;
+  font-size: 0.9em;
+}
+
+.backend-response-result.success {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.backend-response-result.error {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+.backend-response-result p {
+  margin: 3px 0;
+}
+
+.backend-response-details {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.2);
+}
+.backend-response-details p {
+  margin: 2px 0;
+  font-size: 0.9em;
+  color: inherit;
+}
+.backend-response-details pre {
+  margin: 5px 0;
+  padding: 10px;
+  background-color: #eee;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.85em;
+  word-wrap: break-word; /* Asegura que las líneas largas se envuelvan en pre */
+  white-space: pre-wrap; /* Mantiene el formato y envuelve */
 }
 
 .comment-text-preview {

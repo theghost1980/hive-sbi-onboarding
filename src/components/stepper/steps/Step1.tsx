@@ -1,7 +1,8 @@
 import { KeychainHelper } from "keychain-helper";
 import React from "react";
-import { addOnboardingEntry } from "../../../api/OnboardingApi";
+import backendApi from "../../../api/Backend";
 import { config } from "../../../config/config";
+import { BE_ADD_ONBOARDING } from "../../../config/constants";
 import { JWT_TOKEN_STORAGE_KEY } from "../../../context/AuthContext";
 import { BackendOnboardingInfo } from "../../../pages/OnboardUser";
 import { StepData } from "../../OnboardModal";
@@ -64,16 +65,26 @@ const Step1: React.FC<Step1Props> = ({
               "Transfer broadcast successful! Tx ID:",
               response.result.tx_id
             );
+            let dataBE;
             try {
-              const responseBE = await addOnboardingEntry(
-                onboarderUsername,
-                username,
-                `${hardCodedAmount} HIVE`,
-                memo,
-                token
-              );
-              if (responseBE.status === 201) {
+              const responseBE: any = await backendApi.post(BE_ADD_ONBOARDING, {
+                onboarder: onboarderUsername,
+                onboarded: username,
+                amount: `${hardCodedAmount} HIVE`,
+                memo: memo,
+              });
+              // const responseBE = await addOnboardingEntry(
+              //   onboarderUsername,
+              //   username,
+              //   `${hardCodedAmount} HIVE`,
+              //   memo,
+              //   token
+              // );
+              if (
+                responseBE.message === "Onboarding registered successfully."
+              ) {
                 console.log("addOnboardingEntry success!", { responseBE });
+                if (responseBE.data) dataBE = responseBE.data;
               }
             } catch (error) {
               console.error("addOnboardingEntry error", { error });
@@ -81,6 +92,7 @@ const Step1: React.FC<Step1Props> = ({
               onStepDataChange({
                 onboarder: onboarderUsername,
                 onboarded: username,
+                beResponse1: dataBE,
                 transactionResponse: response,
               });
               onNextStep();

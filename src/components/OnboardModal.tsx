@@ -12,6 +12,7 @@ export interface StepData {
   selectedPost?: Post; // Del Step 1
   onboarder?: string; // Del Step 1
   onboarded?: string; // Del Step 1
+  beResponse1?: any;
   transactionResponse?: any; // Del Step 1 (resultado stake)
   generatedComment?: string; // Del Step 2 (comentario generado)
   postedCommentPermlink?: string;
