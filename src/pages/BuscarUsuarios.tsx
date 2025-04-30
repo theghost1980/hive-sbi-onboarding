@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { FaAccessibleIcon, FaAngry, FaBaby } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { beBaseUrl } from "../components/BackendStatusBar";
+import backendApi from "../api/backend";
 import CustomSelect from "../components/CustomSelect";
 import UserItem from "../components/UserItem";
 import { JWT_TOKEN_STORAGE_KEY, useAuth } from "../context/AuthContext";
@@ -10,10 +10,10 @@ import "./BuscarUsuarios.css";
 
 export interface Account {
   name: string;
-  created?: string; // Fecha en formato ISO
-  account_created?: string; // Fecha en formato ISO
+  created?: string;
+  account_created?: string;
   reputation_ui?: number;
-  first_post_date?: string; // Fecha en formato ISO
+  first_post_date?: string;
   total_posts?: number;
   avg_votes?: number;
 }
@@ -57,31 +57,35 @@ const BuscarUsuarios = () => {
   useEffect(() => {
     const fetchAccounts = async () => {
       if (!selectedValue.trim().length) return;
-      //TODO cleanup
-      // const token = localStorage.getItem(JWT_TOKEN_STORAGE_KEY);
       setLoading(true);
       try {
-        const response = await fetch(`${beBaseUrl}/api/${selectedValue}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (response.status === 401) {
-          console.log(
-            "Token expirado o inválido al cargar la lista. Redirigiendo a login."
-          );
-          logout();
-          navigate("/login");
-        }
-        if (!response.ok) {
-          throw new Error("Error al obtener los datos");
-        }
-        const resData = await response.json();
-        console.log({ resData });
+        const response: any = await backendApi.get(
+          `/api/${selectedValue}`,
+          true
+        );
+        //TODO cleanup && handle 401???
+        // console.log({ responseTest });
+        // const response = await fetch(`${beBaseUrl}/api/${selectedValue}`, {
+        //   headers: {
+        //     Authorization: `Bearer ${token}`,
+        //     "Content-Type": "application/json",
+        //   },
+        // });
+        // if (response.status === 401) {
+        //   console.log(
+        //     "Token expirado o inválido al cargar la lista. Redirigiendo a login."
+        //   );
+        //   logout();
+        //   navigate("/login");
+        // }
+        // if (!response.ok) {
+        //   throw new Error("Error al obtener los datos");
+        // }
+        // const resData = await response.json();
+        // console.log({ resData });
         //TODO add execution_time + limit used
-        if (resData.results) {
-          setAccounts(resData.results);
+        if (response.results) {
+          setAccounts(response.results);
         }
       } catch (error) {
         console.error(error);

@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
+import backendApi from "../api/backend";
 import { HiveApi } from "../api/HIveApi";
-import { getOnboarded } from "../api/OnboardingApi";
+import { HSBIApi } from "../api/HSBI";
 import OnboardingList, { OnboardingEntry } from "../components/OnBoardingList";
 import OnboardModal from "../components/OnboardModal";
-import { config } from "../config/config";
-import { JWT_TOKEN_STORAGE_KEY, useAuth } from "../context/AuthContext";
+import {
+  BE_ONBOARDED_BY_USERNAME_EP,
+  HSBI_API_MEMBERS_EP,
+} from "../config/constants";
+import { useAuth } from "../context/AuthContext";
 import { formatTimestampManual } from "../utils/format.utils";
 import "./OnBoardUser.css";
 interface HiveAccount {
@@ -48,7 +52,6 @@ const OnBoardUser: React.FC = () => {
   useEffect(() => {
     if (usernameInput.trim().length > 3 && latestsAdditionsList?.length) {
       const trimmedUsername = usernameInput.trim();
-      //make a quick search in latest first
       const foundInList = latestsAdditionsList.find(
         (item) => item.onboarded.toLowerCase() === trimmedUsername
       );
@@ -76,61 +79,24 @@ const OnBoardUser: React.FC = () => {
     setBackendOnboardingInfo(null);
 
     try {
-      const hsbiApiResponse = await fetch(`${config.hsbi.api_url}${username}/`);
-
-      if (hsbiApiResponse.ok) {
-        setIsMember(true);
-        console.log(`User @${username} IS a member of HSBI.`);
-      } else if (hsbiApiResponse.status === 404) {
-        console.log(
-          `User @${username} not found in HSBI API. Checking backend records...`
+      const responseUsername: any = await HSBIApi.get(
+        `${HSBI_API_MEMBERS_EP}${username}/`
+      );
+      if (responseUsername.account) setIsMember(true);
+    } catch (error: any) {
+      if (error.message.includes("404")) {
+        const response: any = await backendApi.get(
+          `${BE_ONBOARDED_BY_USERNAME_EP}/?username=${username}`
         );
-        try {
-          const token = localStorage.getItem(JWT_TOKEN_STORAGE_KEY);
-          const backendRecords = await getOnboarded(username, token || "");
-
-          if (backendRecords && backendRecords.length > 0) {
-            setIsMember(true);
-            setBackendOnboardingInfo(backendRecords[0]);
-            console.log(`User @${username} found in backend records.`);
-          } else {
-            setIsMember(false);
-            console.log(
-              `User @${username} NOT found in backend records either. Can be onboarded.`
-            );
-          }
-        } catch (backendError: any) {
-          setIsMember(null);
-          setMembershipCheckError(
-            `Backend check failed: ${
-              (backendError as Error).message || "Unknown backend error"
-            }`
-          );
-          console.error(
-            `Error checking backend for @${username}:`,
-            backendError
-          );
+        if (response && response.length > 0) {
+          setIsMember(true);
+          setBackendOnboardingInfo(response[0]);
+        } else {
+          setIsMember(false);
         }
       } else {
-        setIsMember(null);
-        setMembershipCheckError(
-          `HSBI API error: ${hsbiApiResponse.status} ${hsbiApiResponse.statusText}`
-        );
-        console.error(
-          `HSBI API error for @${username}. Status: ${hsbiApiResponse.status}`
-        );
+        console.log("Error OnboardUser fetch", { error });
       }
-    } catch (networkError: any) {
-      setIsMember(null);
-      setMembershipCheckError(
-        `Network error checking HSBI status: ${
-          (networkError as Error).message || "Unknown network error"
-        }`
-      );
-      console.error(
-        `Network error checking HSBI API for @${username}:`,
-        networkError
-      );
     } finally {
       setIsCheckingMembership(false);
     }

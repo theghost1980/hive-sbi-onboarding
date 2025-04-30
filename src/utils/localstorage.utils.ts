@@ -37,7 +37,17 @@ function saveUsername(username: string): void {
   }
 }
 
+const getValue = (key: string) => {
+  try {
+    return localStorage.getItem(key);
+  } catch (error) {
+    console.log("Error reading localstorage: ", { error });
+    return null;
+  }
+};
+
 export const LocalStorageUtils = {
   saveUsername,
   getSavedUsernames,
+  getValue,
 };

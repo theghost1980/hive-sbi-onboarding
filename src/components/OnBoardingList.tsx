@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllOnboarded } from "../api/OnboardingApi";
+import backendApi from "../api/backend";
+import { BE_GET_ALL_ONBOARDED_EP } from "../config/constants";
 import { JWT_TOKEN_STORAGE_KEY, useAuth } from "../context/AuthContext";
 import { FormatUtils } from "../utils/format.utils";
 import "./OnboardingList.css";
@@ -37,7 +38,9 @@ function OnboardingList({ setOnboardingList }: OnboardingListProps) {
       setError(null);
 
       try {
-        const data: OnboardingEntry[] = await getAllOnboarded(token);
+        const data: OnboardingEntry[] = await backendApi.get(
+          BE_GET_ALL_ONBOARDED_EP
+        );
         setOnboardings(data);
         setOnboardingList(data);
       } catch (err: any) {
