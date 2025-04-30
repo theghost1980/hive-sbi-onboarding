@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
-import backendApi from "../api/backend";
+import backendApi from "../api/Backend";
 import { HSBIApi } from "../api/HSBI";
 import {
   BE_ONBOARDED_BY_USERNAME_EP,

@@ -123,6 +123,6 @@ export class BackendApi {
     return this.request<T>(route, bodyData, "DELETE", requireAuth);
   }
 }
-const backendApi = new BackendApi(beBaseUrl);
+const backendApi = new BackendApi(beBaseUrl!);
 
 export default backendApi;

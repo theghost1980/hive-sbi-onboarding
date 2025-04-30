@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import backendApi from "../api/backend";
+import backendApi from "../api/Backend";
 import { BE_GET_ALL_ONBOARDED_EP } from "../config/constants";
 import { JWT_TOKEN_STORAGE_KEY, useAuth } from "../context/AuthContext";
 import { FormatUtils } from "../utils/format.utils";

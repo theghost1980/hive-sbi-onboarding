@@ -24,7 +24,7 @@ const request = async <T>(
 
   try {
     if (method === "POST") {
-      const result: T = await post(beBaseUrl, route, bodyData);
+      const result: T = await post(beBaseUrl!, route, bodyData);
       return result;
     } else {
       throw new Error(`Method ${method} not supported`);

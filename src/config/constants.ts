@@ -1,4 +1,7 @@
-export const beBaseUrl = "http://localhost:4000";
+export const beBaseUrl =
+  process.env.REACT_APP_DEV === "TRUE"
+    ? "http://localhost:4000"
+    : process.env.REACT_APP_BE_API_URL;
 export const VERIFY_USER_ROUTE = "/auth/verify";
 export const GET_CHALLENGE_ROUTE = "/auth/challenge";
 export const JWT_TOKEN_STORAGE_KEY = "jwt_token";

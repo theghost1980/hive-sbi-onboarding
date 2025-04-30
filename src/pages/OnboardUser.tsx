@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import backendApi from "../api/backend";
+import backendApi from "../api/Backend";
 import { HiveApi } from "../api/HIveApi";
 import { HSBIApi } from "../api/HSBI";
 import OnboardingList, { OnboardingEntry } from "../components/OnBoardingList";
