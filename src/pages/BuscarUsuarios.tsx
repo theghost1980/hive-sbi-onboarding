@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaAccessibleIcon, FaAngry, FaBaby } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import styled, { keyframes } from "styled-components";
 import backendApi from "../api/Backend";
 import CustomSelect from "../components/CustomSelect";
 import UserItem from "../components/UserItem";
 import { JWT_TOKEN_STORAGE_KEY, useAuth } from "../context/AuthContext";
 import { Option } from "../types/selectors.type";
-import "./BuscarUsuarios.css";
 
 export interface Account {
   name: string;
@@ -39,6 +40,47 @@ const options: Option[] = [
 
 //TODO pagination server side.
 
+const StyledContainer = styled.div`
+  padding: 20px;
+`;
+
+const StyledUserList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+`;
+
+const spin = keyframes`
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+const StyledLoadingSpinner = styled(AiOutlineLoading3Quarters)`
+  animation: ${spin} 1s linear infinite; /* Aplica la animación de giro */
+  font-size: 2.5rem; /* Tamaño del spinner */
+  color: #007bff; /* Color del spinner (puedes ajustarlo) */
+  margin: 20px auto; /* Centra el spinner horizontalmente y añade margen */
+  display: block; /* Asegura que 'margin: auto' funcione para centrar */
+`;
+
+const StyledLoadingContainer = styled.div`
+  display: flex;
+  flex-direction: column; /* Apila los elementos verticalmente */
+  align-items: center; /* Centra horizontalmente */
+  margin-top: 20px; /* Espacio respecto al selector */
+  min-height: 100px; /* Altura mínima para que se vea centrado */
+  justify-content: center; /* Centra verticalmente si el contenedor tiene altura */
+  text-align: center; /* Centra el texto dentro del párrafo */
+
+  /* Estilos para el párrafo dentro de este contenedor */
+  p {
+    margin-top: 10px; /* Espacio entre el spinner y el texto */
+    color: #555; /* Color para el texto */
+    font-size: 0.95rem;
+  }
+`;
+
 const BuscarUsuarios = () => {
   const navigate = useNavigate();
   const [selectedValue, setSelectedValue] = useState<string>("");
@@ -50,9 +92,35 @@ const BuscarUsuarios = () => {
 
   const { user: onboarder, isAuthenticated, logout } = useAuth();
 
+  const [showLongLoadingMessage, setShowLongLoadingMessage] =
+    useState<boolean>(false);
+
+  const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const handleChange = (value: string) => {
     setSelectedValue(value);
   };
+
+  useEffect(() => {
+    if (loading) {
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+      }
+      loadingTimeoutRef.current = setTimeout(() => {
+        setShowLongLoadingMessage(true);
+      }, 10000);
+    } else {
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+      }
+      setShowLongLoadingMessage(false);
+    }
+    return () => {
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+      }
+    };
+  }, [loading]);
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -78,7 +146,7 @@ const BuscarUsuarios = () => {
   }, [selectedValue]);
 
   return (
-    <div className="buscar-usuarios">
+    <StyledContainer>
       <h1>Buscar nuevos usuarios</h1>
       <CustomSelect
         options={options}
@@ -87,9 +155,17 @@ const BuscarUsuarios = () => {
       />
 
       {loading ? (
-        <p>Cargando usuarios...</p>
+        <StyledLoadingContainer>
+          <StyledLoadingSpinner />
+          {showLongLoadingMessage && (
+            <p>
+              Esto está tardando un poco... ¡Seguro que los usuarios se están
+              haciendo de rogar!
+            </p>
+          )}
+        </StyledLoadingContainer>
       ) : accounts.length > 0 ? (
-        <ul className="user-list">
+        <StyledUserList>
           {accounts.map((account) => (
             <UserItem
               key={account.name}
@@ -99,14 +175,14 @@ const BuscarUsuarios = () => {
               token={token}
             />
           ))}
-        </ul>
+        </StyledUserList>
       ) : (
         <p>
           No se encontraron usuarios. O no se han hecho busquedas. Seleccione al
           menos una!
         </p>
       )}
-    </div>
+    </StyledContainer>
   );
 };
 

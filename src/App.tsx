@@ -6,9 +6,11 @@ import BuscarUsuarios from "./pages/BuscarUsuarios";
 import Home from "./pages/Home";
 import LoginPage from "./pages/LoginPage";
 import OnBoardUser from "./pages/OnboardUser";
+import GlobalStyles from "./styles/GlobalStyles";
 
 const App = () => (
-  <div>
+  <>
+    <GlobalStyles />
     <AuthProvider>
       <Router>
         <Layout>
@@ -28,7 +30,7 @@ const App = () => (
         </Layout>
       </Router>
     </AuthProvider>
-  </div>
+  </>
 );
 
 export default App;

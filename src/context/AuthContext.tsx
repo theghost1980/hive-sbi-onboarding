@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { beBaseUrl } from "../components/BackendStatusBar";
+import { beBaseUrl } from "../config/constants";
 interface AuthUser {
   username: string;
   role: string;

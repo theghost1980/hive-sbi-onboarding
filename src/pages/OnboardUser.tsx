@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import styled from "styled-components";
 import backendApi from "../api/Backend";
 import { HiveApi } from "../api/HIveApi";
 import { HSBIApi } from "../api/HSBI";
@@ -10,7 +11,7 @@ import {
 } from "../config/constants";
 import { useAuth } from "../context/AuthContext";
 import { formatTimestampManual } from "../utils/format.utils";
-import "./OnBoardUser.css";
+
 interface HiveAccount {
   name: string;
 }
@@ -23,6 +24,245 @@ export interface BackendOnboardingInfo {
   comment_permlink?: string;
   timestamp: number;
 }
+
+const StyledOnboardLayout = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 0 20px;
+  font-family: sans-serif;
+`;
+
+const StyledSearchSection = styled.div`
+  width: 100%;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  box-sizing: border-box;
+
+  h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+`;
+
+const StyledAllOnboardingsSection = styled.div`
+  width: 100%;
+`;
+
+const StyledListHeaderControls = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+  flex-wrap: wrap;
+  gap: 10px;
+`;
+
+const StyledAllOnboardingsTitle = styled.h2`
+  margin: 0;
+  color: #333;
+  font-size: 1.5em;
+`;
+
+const StyledToggleListButton = styled.button`
+  padding: 8px 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #eee;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #ddd;
+  }
+`;
+
+const StyledUserSearchForm = styled.form`
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+`;
+
+const StyledSearchInput = styled.input`
+  flex-grow: 1;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1em;
+`;
+
+const StyledButton = styled.button`
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+`;
+
+const StyledSearchButton = styled(StyledButton)`
+  background-color: #007bff;
+  color: white;
+
+  &:hover:not(:disabled) {
+    background-color: #0056b3;
+  }
+`;
+
+const StyledOnboardButton = styled(StyledButton)`
+  background-color: #28a745;
+  color: white;
+  margin-top: 15px;
+
+  &:hover:not(:disabled) {
+    background-color: #218838;
+  }
+`;
+
+const StyledEditOnboardButton = styled(StyledButton)`
+  background-color: #ffc107;
+  color: #333;
+  margin-top: 15px;
+  border: 1px solid #ffb000;
+
+  &:hover:not(:disabled) {
+    background-color: #e0a800;
+    border-color: #d39e00;
+  }
+`;
+
+const StyledSearchStatus = styled.p`
+  color: #555;
+  text-align: center;
+  font-style: italic;
+  margin-top: 10px;
+`;
+
+const StyledSearchError = styled.p`
+  color: #dc3545;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 10px;
+`;
+
+const StyledUserResult = styled.div`
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+
+  > p strong {
+    color: #0056b3;
+  }
+`;
+
+type MembershipStatusProps = { $isMember?: boolean | null };
+
+const StyledMembershipStatus = styled.div<MembershipStatusProps>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 15px;
+  padding-top: 0;
+
+  p {
+    margin: 5px 0;
+    font-size: 1em;
+    color: #333;
+  }
+
+  ${(props) =>
+    props.$isMember === true &&
+    `
+     p { color: #28a745; font-weight: bold; }
+  `}
+  ${(props) =>
+    props.$isMember === false &&
+    `
+     p { color: #ffc107; font-weight: bold; }
+  `}
+`;
+
+const StyledMembershipStatusIcon = styled.span<MembershipStatusProps>`
+  font-size: 2.5em;
+  font-weight: bold;
+  margin-bottom: 8px;
+
+  ${(props) =>
+    props.$isMember === true &&
+    `
+     color: #28a745;
+  `}
+  ${(props) =>
+    props.$isMember === false &&
+    `
+     color: #ffc107;
+  `}
+`;
+
+const StyledBackendOnboardInfo = styled.div`
+  width: 100%;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px dashed #ccc;
+  text-align: center;
+
+  p {
+    margin: 5px 0;
+    color: #555;
+    font-size: 0.9em;
+  }
+
+  strong {
+    color: #007bff;
+  }
+`;
+
+const StyledMissingCommentSection = styled.div`
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #eee;
+  width: 100%;
+  text-align: center;
+
+  p {
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #dc3545;
+  }
+`;
+
+const StyledCommentPermlinkLink = styled.a`
+  color: #007bff;
+  text-decoration: none;
+  font-weight: normal;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const StyledMembershipError = styled.p`
+  color: #dc3545;
+  font-weight: bold;
+  margin-top: 15px;
+  text-align: center;
+`;
 
 const OnBoardUser: React.FC = () => {
   const [usernameInput, setUsernameInput] = useState("");
@@ -51,15 +291,13 @@ const OnBoardUser: React.FC = () => {
 
   useEffect(() => {
     if (usernameInput.trim().length > 3 && latestsAdditionsList?.length) {
-      const trimmedUsername = usernameInput.trim();
+      const trimmedUsername = usernameInput.trim().toLowerCase();
       const foundInList = latestsAdditionsList.find(
         (item) => item.onboarded.toLowerCase() === trimmedUsername
       );
 
       if (foundInList) {
-        console.log(
-          `Usuario @${trimmedUsername} encontrado en la lista local.`
-        );
+        console.log(`User @${trimmedUsername} found in local list.`);
         setFoundUser({ name: trimmedUsername });
         setError(null);
         setIsMember(true);
@@ -69,7 +307,7 @@ const OnBoardUser: React.FC = () => {
         return;
       }
     }
-  }, [usernameInput]);
+  }, [usernameInput, latestsAdditionsList]);
 
   const checkMembership = async (username: string) => {
     setShowOnboardingList(false);
@@ -82,9 +320,9 @@ const OnBoardUser: React.FC = () => {
       const responseUsername: any = await HSBIApi.get(
         `${HSBI_API_MEMBERS_EP}${username}/`
       );
-      if (responseUsername.account) setIsMember(true);
-    } catch (error: any) {
-      if (error.message.includes("404")) {
+      if (responseUsername && responseUsername.account) {
+        setIsMember(true);
+      } else {
         const response: any = await backendApi.get(
           `${BE_ONBOARDED_BY_USERNAME_EP}/?username=${username}`
         );
@@ -94,8 +332,36 @@ const OnBoardUser: React.FC = () => {
         } else {
           setIsMember(false);
         }
+      }
+    } catch (error: any) {
+      if (
+        error.message &&
+        typeof error.message === "string" &&
+        error.message.includes("404")
+      ) {
+        try {
+          const response: any = await backendApi.get(
+            `${BE_ONBOARDED_BY_USERNAME_EP}/?username=${username}`
+          );
+          if (response && response.length > 0) {
+            setIsMember(true);
+            setBackendOnboardingInfo(response[0]);
+          } else {
+            setIsMember(false);
+          }
+        } catch (backendError: any) {
+          console.error("Error checking backend for onboarding:", backendError);
+          setMembershipCheckError(
+            `Backend check failed: ${backendError.message || "Unknown error"}`
+          );
+          setIsMember(null);
+        }
       } else {
-        console.log("Error OnboardUser fetch", { error });
+        console.error("Error checking HSBI membership:", error);
+        setMembershipCheckError(
+          `HSBI API check failed: ${error.message || "Unknown error"}`
+        );
+        setIsMember(null);
       }
     } finally {
       setIsCheckingMembership(false);
@@ -118,6 +384,7 @@ const OnBoardUser: React.FC = () => {
     }
 
     setIsLoading(true);
+    setShowOnboardingList(false);
 
     try {
       const accounts = await HiveApi.getAccount(trimmedUsername);
@@ -133,6 +400,7 @@ const OnBoardUser: React.FC = () => {
         setFoundUser(null);
         setIsMember(null);
         setBackendOnboardingInfo(null);
+        setIsCheckingMembership(false);
       }
     } catch (err: any) {
       console.error("Error fetching account:", err);
@@ -144,6 +412,7 @@ const OnBoardUser: React.FC = () => {
       setFoundUser(null);
       setIsMember(null);
       setBackendOnboardingInfo(null);
+      setIsCheckingMembership(false);
     } finally {
       setIsLoading(false);
     }
@@ -162,127 +431,125 @@ const OnBoardUser: React.FC = () => {
   };
 
   return (
-    <div className="onboard-layout">
-      {" "}
-      <div className="onboard-search-section">
-        {" "}
+    <StyledOnboardLayout>
+      <StyledSearchSection>
         <h1>Onboard User</h1>
-        <form onSubmit={handleSearch} className="user-search-form">
-          <input
+        <StyledUserSearchForm onSubmit={handleSearch}>
+          <StyledSearchInput
             type="text"
             placeholder="Enter Hive username"
             value={usernameInput}
             onChange={(e) => setUsernameInput(e.target.value)}
             disabled={isLoading || isCheckingMembership}
-            className="search-input"
           />
-          <button
+          <StyledSearchButton
             type="submit"
             disabled={
               isLoading || isCheckingMembership || !usernameInput.trim()
             }
-            className="search-button"
           >
             {isLoading
               ? "Searching..."
               : isCheckingMembership
               ? "Checking Membership..."
               : "Search User"}
-          </button>
-        </form>
-        {isLoading && <p className="search-status">Searching Hive...</p>}
-        {error && <p className="search-error">Error: {error}</p>}
+          </StyledSearchButton>
+        </StyledUserSearchForm>
+
+        {isLoading && (
+          <StyledSearchStatus>Searching Hive...</StyledSearchStatus>
+        )}
+        {error && <StyledSearchError>Error: {error}</StyledSearchError>}
+
         {foundUser && (
-          <div className="user-result">
+          <StyledUserResult>
             <p>
               User found: <strong>@{foundUser.name}</strong>
             </p>
 
             {isCheckingMembership ? (
-              <p className="membership-status">Checking membership...</p>
+              <StyledMembershipStatus>
+                <p>Checking membership...</p>
+              </StyledMembershipStatus>
             ) : membershipCheckError ? (
-              <p className="membership-error">
+              <StyledMembershipError>
                 Membership check failed: {membershipCheckError}
-              </p>
+              </StyledMembershipError>
             ) : isMember === true ? (
-              <div className="membership-status member">
-                {" "}
-                <span className="membership-status-icon is-member-icon">✓</span>
+              <StyledMembershipStatus $isMember={true}>
+                <StyledMembershipStatusIcon $isMember={true}>
+                  ✓
+                </StyledMembershipStatusIcon>
                 <p>Already a member of HSBI.</p>
                 {backendOnboardingInfo && (
-                  <div className="backend-onboard-info">
-                    {" "}
+                  <StyledBackendOnboardInfo>
                     <p>
                       Onboarded by:{" "}
                       <strong>{backendOnboardingInfo.onboarder}</strong> on{" "}
                       {formatTimestampManual(backendOnboardingInfo.timestamp)}
                     </p>
                     {!backendOnboardingInfo.comment_permlink && (
-                      <div className="missing-comment-section">
-                        {" "}
+                      <StyledMissingCommentSection>
                         <p>
                           Onboard Comment is missing. Click below to edit and
                           post it.
                         </p>
-                        <button
+                        <StyledEditOnboardButton
                           onClick={() => openOnboardModal(foundUser.name, 2)}
-                          className="edit-onboard-button"
                         >
                           Edit Comment
-                        </button>
-                      </div>
+                        </StyledEditOnboardButton>
+                      </StyledMissingCommentSection>
                     )}
                     {backendOnboardingInfo.comment_permlink && (
                       <p>
                         Comment posted:{" "}
-                        <a
+                        <StyledCommentPermlinkLink
                           href={`https://hive.blog/@${backendOnboardingInfo.onboarder}/${backendOnboardingInfo.comment_permlink}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="comment-permlink-link"
                         >
                           {backendOnboardingInfo.comment_permlink}
-                        </a>
+                        </StyledCommentPermlinkLink>
                       </p>
                     )}
-                  </div>
+                  </StyledBackendOnboardInfo>
                 )}
-              </div>
+              </StyledMembershipStatus>
             ) : isMember === false ? (
-              <div className="membership-status not-member">
-                {" "}
-                <span className="membership-status-icon not-member-icon">
+              <StyledMembershipStatus $isMember={false}>
+                <StyledMembershipStatusIcon $isMember={false}>
                   ✗
-                </span>
+                </StyledMembershipStatusIcon>
                 <p>Not yet a member of HSBI.</p>
-                <button
+                <StyledOnboardButton
                   onClick={() => openOnboardModal(foundUser.name, 1)}
-                  className="onboard-button"
                 >
                   Onboard @{foundUser.name}
-                </button>
-              </div>
+                </StyledOnboardButton>
+              </StyledMembershipStatus>
             ) : null}
-          </div>
+          </StyledUserResult>
         )}
-      </div>{" "}
-      <div className="all-onboardings-section">
-        {" "}
-        <div className="list-header-controls">
-          {" "}
-          <h2 className="all-onboardings-title">All Onboarding Records</h2>
-          <button
+      </StyledSearchSection>
+
+      <StyledAllOnboardingsSection>
+        <StyledListHeaderControls>
+          <StyledAllOnboardingsTitle>
+            All Onboarding Records
+          </StyledAllOnboardingsTitle>
+          <StyledToggleListButton
             type="button"
-            className="toggle-list-button"
             onClick={() => setShowOnboardingList(!showOnboardingList)}
           >
             {showOnboardingList ? "Hide List" : "Show List"}
-          </button>
-        </div>
+          </StyledToggleListButton>
+        </StyledListHeaderControls>
         {showOnboardingList && (
           <OnboardingList setOnboardingList={setLatestsAdditionsList} />
         )}{" "}
-      </div>{" "}
+      </StyledAllOnboardingsSection>
+
       {isModalOpen && modalUser && (
         <OnboardModal
           isOpen={isModalOpen}
@@ -293,7 +560,7 @@ const OnBoardUser: React.FC = () => {
           existingOnboardInfo={backendOnboardingInfo}
         />
       )}
-    </div>
+    </StyledOnboardLayout>
   );
 };
 

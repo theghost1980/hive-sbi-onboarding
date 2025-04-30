@@ -1,20 +1,29 @@
-// Layout.tsx
-
 import React from "react";
-import "./Layout.css";
+import styled from "styled-components";
 import Sidebar from "./Sidebar";
+
+const StyledLayoutContainer = styled.div`
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+`;
+
+const StyledMainContent = styled.main`
+  flex: 1;
+  background-color: #ecf0f1;
+  padding: 0px;
+  overflow-y: auto;
+`;
 
 type LayoutProps = {
   children: React.ReactNode;
 };
 
 const Layout = ({ children }: LayoutProps) => (
-  <div className="layout">
-    <div className="sidebar">
-      <Sidebar />
-    </div>
-    <main className="main">{children}</main>
-  </div>
+  <StyledLayoutContainer>
+    <Sidebar />
+    <StyledMainContent>{children}</StyledMainContent>
+  </StyledLayoutContainer>
 );
 
 export default Layout;
