@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
+import { BackendOnboardingInfo } from "../pages/OnboardUser";
 import { KeychainUtils } from "../utils/keychain.utils";
 import "./OnboardModal.css";
 import Stepper from "./stepper/Stepper";
-
-// Importa los componentes de todos tus pasos
-import { BackendOnboardingInfo } from "../pages/OnboardUser";
 import Step1 from "./stepper/steps/Step1";
 import Step2 from "./stepper/steps/Step2";
 import Step3 from "./stepper/steps/Step3";
-
-// Tipos para datos compartidos entre pasos
 export interface StepData {
   selectedPost?: Post; // Del Step 1
   onboarder?: string; // Del Step 1

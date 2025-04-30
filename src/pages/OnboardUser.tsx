@@ -1,16 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { HiveApi } from "../api/HIveApi";
 import { getOnboarded } from "../api/OnboardingApi";
+import OnboardingList, { OnboardingEntry } from "../components/OnBoardingList";
 import OnboardModal from "../components/OnboardModal";
 import { config } from "../config/config";
 import { JWT_TOKEN_STORAGE_KEY, useAuth } from "../context/AuthContext";
-import { formatTimestampManual } from "../utils/format,utils"; // Assuming this utility exists
+import { formatTimestampManual } from "../utils/format.utils";
 import "./OnBoardUser.css";
-
 interface HiveAccount {
   name: string;
 }
-
 export interface BackendOnboardingInfo {
   id: number;
   onboarder: string;
@@ -39,10 +38,38 @@ const OnBoardUser: React.FC = () => {
   const [modalUser, setModalUser] = useState<string | null>(null);
   const [modalStartStep, setModalStartStep] = useState<number>(1);
 
+  const [showOnboardingList, setShowOnboardingList] = useState(true);
+  const [latestsAdditionsList, setLatestsAdditionsList] =
+    useState<OnboardingEntry[]>();
+
   const { user: onboarder } = useAuth();
   const onboarderUsername = onboarder?.username || "unknown";
 
+  useEffect(() => {
+    if (usernameInput.trim().length > 3 && latestsAdditionsList?.length) {
+      const trimmedUsername = usernameInput.trim();
+      //make a quick search in latest first
+      const foundInList = latestsAdditionsList.find(
+        (item) => item.onboarded.toLowerCase() === trimmedUsername
+      );
+
+      if (foundInList) {
+        console.log(
+          `Usuario @${trimmedUsername} encontrado en la lista local.`
+        );
+        setFoundUser({ name: trimmedUsername });
+        setError(null);
+        setIsMember(true);
+        setBackendOnboardingInfo(foundInList as BackendOnboardingInfo);
+        setIsCheckingMembership(false);
+        setIsLoading(false);
+        return;
+      }
+    }
+  }, [usernameInput]);
+
   const checkMembership = async (username: string) => {
+    setShowOnboardingList(false);
     setIsCheckingMembership(true);
     setIsMember(null);
     setMembershipCheckError(null);
@@ -60,23 +87,23 @@ const OnBoardUser: React.FC = () => {
         );
         try {
           const token = localStorage.getItem(JWT_TOKEN_STORAGE_KEY);
-          const backendRecords = await getOnboarded(username, token!);
+          const backendRecords = await getOnboarded(username, token || "");
 
           if (backendRecords && backendRecords.length > 0) {
-            setIsMember(true); // Member from our perspective
+            setIsMember(true);
             setBackendOnboardingInfo(backendRecords[0]);
             console.log(`User @${username} found in backend records.`);
           } else {
-            setIsMember(false); // Not member anywhere
+            setIsMember(false);
             console.log(
               `User @${username} NOT found in backend records either. Can be onboarded.`
             );
           }
         } catch (backendError: any) {
-          setIsMember(null); // Status unknown due to backend error
+          setIsMember(null);
           setMembershipCheckError(
             `Backend check failed: ${
-              backendError.message || "Unknown backend error"
+              (backendError as Error).message || "Unknown backend error"
             }`
           );
           console.error(
@@ -85,7 +112,7 @@ const OnBoardUser: React.FC = () => {
           );
         }
       } else {
-        setIsMember(null); // Status unknown due to HSBI API error
+        setIsMember(null);
         setMembershipCheckError(
           `HSBI API error: ${hsbiApiResponse.status} ${hsbiApiResponse.statusText}`
         );
@@ -94,10 +121,10 @@ const OnBoardUser: React.FC = () => {
         );
       }
     } catch (networkError: any) {
-      setIsMember(null); // Status unknown due to network error
+      setIsMember(null);
       setMembershipCheckError(
         `Network error checking HSBI status: ${
-          networkError.message || "Unknown network error"
+          (networkError as Error).message || "Unknown network error"
         }`
       );
       console.error(
@@ -144,7 +171,9 @@ const OnBoardUser: React.FC = () => {
     } catch (err: any) {
       console.error("Error fetching account:", err);
       setError(
-        `Error searching for user: ${err.message || "An API error occurred"}`
+        `Error searching for user: ${
+          (err as Error).message || "An API error occurred"
+        }`
       );
       setFoundUser(null);
       setIsMember(null);
@@ -167,111 +196,127 @@ const OnBoardUser: React.FC = () => {
   };
 
   return (
-    <div className="onboard-user-container">
-      <h1>Onboard User</h1>
-
-      <form onSubmit={handleSearch} className="user-search-form">
-        <input
-          type="text"
-          placeholder="Enter Hive username"
-          value={usernameInput}
-          onChange={(e) => setUsernameInput(e.target.value)}
-          disabled={isLoading || isCheckingMembership}
-          className="search-input"
-        />
-        <button
-          type="submit"
-          disabled={isLoading || isCheckingMembership || !usernameInput.trim()}
-          className="search-button"
-        >
-          {isLoading
-            ? "Searching..."
-            : isCheckingMembership
-            ? "Checking Membership..."
-            : "Search User"}
-        </button>
-      </form>
-
-      {isLoading && <p className="search-status">Searching Hive...</p>}
-      {error && <p className="search-error">Error: {error}</p>}
-
-      {foundUser && (
-        <div className="user-result">
-          <p>
-            User found: <strong>@{foundUser.name}</strong>
-          </p>
-
-          {isCheckingMembership ? (
-            <p className="membership-status">Checking membership...</p>
-          ) : membershipCheckError ? (
-            <p className="membership-error">
-              Membership check failed: {membershipCheckError}
+    <div className="onboard-layout">
+      {" "}
+      <div className="onboard-search-section">
+        {" "}
+        <h1>Onboard User</h1>
+        <form onSubmit={handleSearch} className="user-search-form">
+          <input
+            type="text"
+            placeholder="Enter Hive username"
+            value={usernameInput}
+            onChange={(e) => setUsernameInput(e.target.value)}
+            disabled={isLoading || isCheckingMembership}
+            className="search-input"
+          />
+          <button
+            type="submit"
+            disabled={
+              isLoading || isCheckingMembership || !usernameInput.trim()
+            }
+            className="search-button"
+          >
+            {isLoading
+              ? "Searching..."
+              : isCheckingMembership
+              ? "Checking Membership..."
+              : "Search User"}
+          </button>
+        </form>
+        {isLoading && <p className="search-status">Searching Hive...</p>}
+        {error && <p className="search-error">Error: {error}</p>}
+        {foundUser && (
+          <div className="user-result">
+            <p>
+              User found: <strong>@{foundUser.name}</strong>
             </p>
-          ) : isMember === true ? (
-            <div className="membership-status member">
-              {" "}
-              {/* Added 'member' class for specific styling */}
-              <span className="membership-status-icon is-member-icon">✓</span>
-              <p>Already a member of HSBI.</p>
-              {backendOnboardingInfo && (
-                <div className="backend-onboard-info">
-                  {" "}
-                  {/* Added class for this section */}
-                  <p>
-                    Onboarded by:{" "}
-                    <strong>{backendOnboardingInfo.onboarder}</strong> on{" "}
-                    {/* Assuming formatTimestampManual expects ms */}
-                    {formatTimestampManual(backendOnboardingInfo.timestamp)}
-                  </p>
-                  {!backendOnboardingInfo.comment_permlink && (
-                    <div className="missing-comment-section">
-                      {" "}
-                      {/* Added class */}
-                      <p>
-                        Onboard Comment is missing. Click below to edit and post
-                        it.
-                      </p>
-                      <button
-                        onClick={() => openOnboardModal(foundUser.name, 2)} // Step 2 for editing comment
-                        className="edit-onboard-button"
-                      >
-                        Edit Comment
-                      </button>
-                    </div>
-                  )}
-                  {backendOnboardingInfo.comment_permlink && (
-                    <p>
-                      Comment posted:{" "}
-                      <a
-                        href={`https://hive.blog/@${backendOnboardingInfo.onboarder}/${backendOnboardingInfo.comment_permlink}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="comment-permlink-link"
-                      >
-                        {backendOnboardingInfo.comment_permlink}
-                      </a>
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-          ) : isMember === false ? (
-            <div className="membership-status not-member">
-              {" "}
-              {/* Added 'not-member' class */}
-              <span className="membership-status-icon not-member-icon">✗</span>
-              <p>Not yet a member of HSBI.</p>
-              <button
-                onClick={() => openOnboardModal(foundUser.name, 1)} // Step 1 for new onboarding
-                className="onboard-button"
-              >
-                Onboard @{foundUser.name}
-              </button>
-            </div>
-          ) : null}
-        </div>
-      )}
 
+            {isCheckingMembership ? (
+              <p className="membership-status">Checking membership...</p>
+            ) : membershipCheckError ? (
+              <p className="membership-error">
+                Membership check failed: {membershipCheckError}
+              </p>
+            ) : isMember === true ? (
+              <div className="membership-status member">
+                {" "}
+                <span className="membership-status-icon is-member-icon">✓</span>
+                <p>Already a member of HSBI.</p>
+                {backendOnboardingInfo && (
+                  <div className="backend-onboard-info">
+                    {" "}
+                    <p>
+                      Onboarded by:{" "}
+                      <strong>{backendOnboardingInfo.onboarder}</strong> on{" "}
+                      {formatTimestampManual(backendOnboardingInfo.timestamp)}
+                    </p>
+                    {!backendOnboardingInfo.comment_permlink && (
+                      <div className="missing-comment-section">
+                        {" "}
+                        <p>
+                          Onboard Comment is missing. Click below to edit and
+                          post it.
+                        </p>
+                        <button
+                          onClick={() => openOnboardModal(foundUser.name, 2)}
+                          className="edit-onboard-button"
+                        >
+                          Edit Comment
+                        </button>
+                      </div>
+                    )}
+                    {backendOnboardingInfo.comment_permlink && (
+                      <p>
+                        Comment posted:{" "}
+                        <a
+                          href={`https://hive.blog/@${backendOnboardingInfo.onboarder}/${backendOnboardingInfo.comment_permlink}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="comment-permlink-link"
+                        >
+                          {backendOnboardingInfo.comment_permlink}
+                        </a>
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : isMember === false ? (
+              <div className="membership-status not-member">
+                {" "}
+                <span className="membership-status-icon not-member-icon">
+                  ✗
+                </span>
+                <p>Not yet a member of HSBI.</p>
+                <button
+                  onClick={() => openOnboardModal(foundUser.name, 1)}
+                  className="onboard-button"
+                >
+                  Onboard @{foundUser.name}
+                </button>
+              </div>
+            ) : null}
+          </div>
+        )}
+      </div>{" "}
+      <div className="all-onboardings-section">
+        {" "}
+        <div className="list-header-controls">
+          {" "}
+          <h2 className="all-onboardings-title">All Onboarding Records</h2>
+          <button
+            type="button"
+            className="toggle-list-button"
+            onClick={() => setShowOnboardingList(!showOnboardingList)}
+          >
+            {showOnboardingList ? "Hide List" : "Show List"}
+          </button>
+        </div>
+        {showOnboardingList && (
+          <OnboardingList setOnboardingList={setLatestsAdditionsList} />
+        )}{" "}
+      </div>{" "}
       {isModalOpen && modalUser && (
         <OnboardModal
           isOpen={isModalOpen}

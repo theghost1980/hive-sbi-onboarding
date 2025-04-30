@@ -1,21 +1,23 @@
+import React, { useState } from "react";
 import { BackendOnboardingInfo } from "../../../pages/OnboardUser";
 import { StepData } from "../../OnboardModal";
+import "./Step3.css";
 
 interface Step3Props {
-  stepData: StepData; // Datos recolectados de pasos anteriores
-  existingOnboardInfo?: BackendOnboardingInfo | null; // Datos para modo edición
+  stepData: StepData;
+  existingOnboardInfo?: BackendOnboardingInfo | null;
 
-  onStepDataChange: (data: Partial<any>) => void; // Para actualizar stepData en el Modal
-  onProcessError: (message: string) => void; // Para reportar errores generales al Modal
-  onCancel: () => void; // Para cancelar el flujo completo
+  onStepDataChange: (data: Partial<any>) => void;
+  onProcessError: (message: string) => void;
+  onCancel: () => void;
 
-  onNextStep: () => void; // Para avanzar al siguiente paso (ej: Summary)
-  onPrevStep: () => void; // Para ir al paso anterior
-  onComplete: () => void; // Para finalizar el flujo (si este fuera el último paso)
+  onNextStep: () => void;
+  onPrevStep: () => void;
+  onComplete: () => void;
 
-  username: string; // El usuario a quien se le comentará (el 'onboarded')
-  onboarderUsername: string; // El usuario que hace el comentario (el 'onboarder' loggeado)
-  isKeychainAvailable: boolean; // Estado de disponibilidad de Keychain
+  username: string;
+  onboarderUsername: string;
+  isKeychainAvailable: boolean;
 }
 
 const Step3: React.FC<Step3Props> = ({
@@ -23,18 +25,258 @@ const Step3: React.FC<Step3Props> = ({
   existingOnboardInfo,
   onStepDataChange,
   onProcessError,
+  onCancel,
   onNextStep,
   onPrevStep,
   onComplete,
-  onCancel,
   username,
   onboarderUsername,
   isKeychainAvailable,
 }) => {
-  console.log({ stepData });
+  const isEditMode = !!existingOnboardInfo;
+  const [copyStatus, setCopyStatus] = useState<string | null>(null);
+
+  const handleCopyReport = async () => {
+    let reportText = `--- Onboarding Summary for @${username} by @${onboarderUsername} ---\n\n`;
+
+    reportText += `Mode: ${
+      isEditMode ? "Editing existing record" : "New onboarding"
+    }\n\n`;
+
+    reportText += `--- Post Selected ---\n`;
+    if (stepData.selectedPost) {
+      reportText += `Commented on: "${stepData.selectedPost.title}" by @${stepData.selectedPost.author}\n`;
+      reportText += `View Post: https://peakd.com${stepData.selectedPost.url}\n`;
+    } else {
+      reportText += `No specific post selected.\n`;
+    }
+    reportText += `\n`;
+
+    reportText += `--- Stake Transaction Result ---\n`;
+    if (stepData.transactionResponse) {
+      reportText += `Status: ${
+        stepData.transactionResponse.success ? "Success" : "Failed"
+      }\n`;
+      if (stepData.transactionResponse.id)
+        reportText += `Transaction ID: ${stepData.transactionResponse.id}\n`;
+      if (stepData.transactionResponse.message)
+        reportText += `Message: ${stepData.transactionResponse.message}\n`;
+      if (stepData.transactionResponse.error)
+        reportText += `Error: ${JSON.stringify(
+          stepData.transactionResponse.error
+        )}\n`;
+
+      // Añadir detalles de la transacción si está presente y fue exitosa
+      if (
+        stepData.transactionResponse.success &&
+        stepData.transactionResponse.result &&
+        stepData.transactionResponse.data
+      ) {
+        reportText += `\nTransaction Details:\n`;
+        reportText += `  Tx ID: ${
+          stepData.transactionResponse.result.tx_id ||
+          stepData.transactionResponse.result.id
+        }\n`;
+        reportText += `  From: @${stepData.transactionResponse.data.username}\n`; // Asumiendo que 'username' en data es el remitente
+        reportText += `  To: @${stepData.transactionResponse.data.to}\n`;
+        reportText += `  Amount: ${stepData.transactionResponse.data.amount} ${stepData.transactionResponse.data.currency}\n`;
+        if (stepData.transactionResponse.data.memo)
+          reportText += `  Memo: ${stepData.transactionResponse.data.memo}\n`;
+      }
+    } else {
+      reportText += `Stake transaction was not attempted or result is unavailable.\n`;
+    }
+    reportText += `\n`;
+
+    reportText += `--- Comment Transaction Result ---\n`;
+    if (stepData.commentResponse) {
+      reportText += `Status: ${
+        stepData.commentResponse.success ? "Success" : "Failed"
+      }\n`;
+      if (stepData.postedCommentPermlink) {
+        reportText += `Comment Permlink: ${stepData.postedCommentPermlink}\n`;
+        reportText += `View Comment: https://hive.blog/@${onboarderUsername}/${stepData.postedCommentPermlink}\n`;
+      }
+      if (stepData.commentResponse.message)
+        reportText += `Message: ${stepData.commentResponse.message}\n`;
+      if (stepData.commentResponse.error)
+        reportText += `Error: ${JSON.stringify(
+          stepData.commentResponse.error
+        )}\n`;
+    } else {
+      reportText += `Comment was not posted or result is unavailable.\n`;
+    }
+    reportText += `\n`;
+
+    if (stepData.generatedComment || stepData.editedComment) {
+      reportText += `--- Comment Text ---\n`;
+      reportText += `${stepData.editedComment || stepData.generatedComment}\n`;
+      reportText += `\n`;
+    }
+
+    try {
+      await navigator.clipboard.writeText(reportText);
+      setCopyStatus("Report Copied!");
+      setTimeout(() => setCopyStatus(null), 3000);
+    } catch (err) {
+      console.error("Failed to copy report:", err);
+      setCopyStatus("Failed to copy report.");
+      setTimeout(() => setCopyStatus(null), 3000);
+    }
+  };
+
   return (
-    <div>
-      <h2>Final Report! //TODO</h2>
+    <div className="onboarding-step step-3-summary">
+      <h2>Onboarding Summary</h2>
+
+      {isEditMode ? (
+        <p className="summary-mode-info">
+          Reviewing existing onboarding record for @{username} by @
+          {onboarderUsername}.
+        </p>
+      ) : (
+        <p className="summary-mode-info">
+          Reviewing process for onboarding @{username} by @{onboarderUsername}.
+        </p>
+      )}
+
+      <div className="summary-section">
+        <h3>Post Selected</h3>
+        {stepData.selectedPost ? (
+          <p>
+            Commented on: <strong>{stepData.selectedPost.title}</strong> by @
+            {stepData.selectedPost.author}
+            {" ("}
+            <a
+              href={`https://peakd.com${stepData.selectedPost.url}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Post
+            </a>
+            {")"}
+          </p>
+        ) : (
+          <p>No specific post selected in previous steps.</p>
+        )}
+      </div>
+
+      <div className="summary-section">
+        <h3>Transfer Transaction Result</h3>
+        {stepData.transactionResponse ? (
+          <div
+            className={`transaction-result ${
+              stepData.transactionResponse.success ? "success" : "error"
+            }`}
+          >
+            <p>
+              Status:{" "}
+              <strong>
+                {stepData.transactionResponse.success ? "Success" : "Failed"}
+              </strong>
+            </p>
+            {stepData.transactionResponse.id && (
+              <p>Transaction ID: {stepData.transactionResponse.id}</p>
+            )}
+            {stepData.transactionResponse.message && (
+              <p>Message: {stepData.transactionResponse.message}</p>
+            )}
+            {stepData.transactionResponse.error && (
+              <p>Error: {JSON.stringify(stepData.transactionResponse.error)}</p>
+            )}
+
+            {/* Añadir detalles de la transacción si está presente y fue exitosa */}
+            {stepData.transactionResponse.success &&
+              stepData.transactionResponse.result &&
+              stepData.transactionResponse.data && (
+                <div className="transaction-details">
+                  <p>
+                    <strong>Transaction Details:</strong>
+                  </p>
+                  <p>
+                    Tx ID:{" "}
+                    {stepData.transactionResponse.result.tx_id ||
+                      stepData.transactionResponse.result.id}
+                  </p>
+                  {/* Asumiendo que 'username' en data es el remitente */}
+                  <p>From: @{stepData.transactionResponse.data.username}</p>
+                  <p>To: @{stepData.transactionResponse.data.to}</p>
+                  <p>
+                    Amount: {stepData.transactionResponse.data.amount}{" "}
+                    {stepData.transactionResponse.data.currency}
+                  </p>
+                  {stepData.transactionResponse.data.memo && (
+                    <p>Memo: {stepData.transactionResponse.data.memo}</p>
+                  )}
+                </div>
+              )}
+          </div>
+        ) : (
+          <p>
+            Transfer transaction was not attempted or result is unavailable.
+          </p>
+        )}
+      </div>
+
+      <div className="summary-section">
+        <h3>Comment Transaction Result</h3>
+        {stepData.commentResponse ? (
+          <div
+            className={`transaction-result ${
+              stepData.commentResponse.success ? "success" : "error"
+            }`}
+          >
+            <p>
+              Status:{" "}
+              <strong>
+                {stepData.commentResponse.success ? "Success" : "Failed"}
+              </strong>
+            </p>
+            {stepData.postedCommentPermlink && (
+              <p>
+                Comment Permlink:
+                <a
+                  href={`https://hive.blog/@${onboarderUsername}/${stepData.postedCommentPermlink}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {stepData.postedCommentPermlink}
+                </a>
+              </p>
+            )}
+            {stepData.commentResponse.message && (
+              <p>Message: {stepData.commentResponse.message}</p>
+            )}
+            {stepData.commentResponse.error && (
+              <p>Error: {JSON.stringify(stepData.commentResponse.error)}</p>
+            )}
+          </div>
+        ) : (
+          <p>Comment was not posted or result is unavailable.</p>
+        )}
+      </div>
+
+      {(stepData.generatedComment || stepData.editedComment) && (
+        <div className="summary-section">
+          <h3>Comment Text</h3>
+          <div className="comment-text-preview">
+            {stepData.editedComment || stepData.generatedComment}
+          </div>
+        </div>
+      )}
+
+      <div className="step-navigation-buttons">
+        <button onClick={onPrevStep} className="prev-step-button">
+          Back
+        </button>
+        <button onClick={onComplete} className="complete-button">
+          Complete
+        </button>
+        <button onClick={handleCopyReport} className="copy-report-button">
+          Copy Report
+        </button>
+      </div>
+      {copyStatus && <p className="copy-status-message">{copyStatus}</p>}
     </div>
   );
 };

@@ -7,10 +7,6 @@ import Home from "./pages/Home";
 import LoginPage from "./pages/LoginPage";
 import OnBoardUser from "./pages/OnboardUser";
 
-//TODO keep coding
-// refs:
-//  - https://api.hivesbi.com/v1/members/theghost1980/
-
 const App = () => (
   <div>
     <AuthProvider>

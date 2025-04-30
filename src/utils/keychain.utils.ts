@@ -1,3 +1,4 @@
+//TODO delete file before releasing first MVP
 interface HiveKeychain {
   requestHandshake?: (callback: (response: any) => void) => void;
   requestSignBuffer?: (

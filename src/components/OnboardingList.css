@@ -1,0 +1,75 @@
+.onboarding-list-container {
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  font-family: sans-serif;
+  font-size: small;
+}
+
+.onboarding-list-container h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.loading-message,
+.error-message,
+.no-records-message {
+  text-align: center;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.loading-message {
+  color: #007bff;
+  background-color: #e9f5ff;
+  border: 1px solid #b8daff;
+}
+
+.error-message {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+
+.no-records-message {
+  color: #6c757d;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+}
+
+.onboarding-items-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.onboarding-item {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* Espacio horizontal entre los elementos <p> */
+  align-items: center; /* Alineación vertical de los elementos en la fila */
+}
+
+.onboarding-item p {
+  margin: 0; /* Eliminar margen vertical por defecto de los párrafos */
+  font-size: 0.95em;
+  /* Los <p> son los ítems flex, puedes controlar su tamaño/crecimiento si es necesario */
+  /* flex-basis: auto; */
+  /* flex-grow: 0; */
+  /* flex-shrink: 0; */
+}
+
+.onboarding-item p strong {
+  display: inline-block; /* Mantiene el strong en línea pero le permite tener ancho fijo */
+  width: 100px; /* Ancho fijo para las etiquetas */
+  margin-right: 5px; /* Espacio entre la etiqueta y el valor */
+}

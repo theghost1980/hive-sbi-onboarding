@@ -68,7 +68,7 @@ const Step1: React.FC<Step1Props> = ({
               const responseBE = await addOnboardingEntry(
                 onboarderUsername,
                 username,
-                hardCodedAmount,
+                `${hardCodedAmount} HIVE`,
                 memo,
                 token
               );
@@ -81,6 +81,7 @@ const Step1: React.FC<Step1Props> = ({
               onStepDataChange({
                 onboarder: onboarderUsername,
                 onboarded: username,
+                transactionResponse: response,
               });
               onNextStep();
             }

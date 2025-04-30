@@ -79,6 +79,34 @@ export const getOnboarded = async (
   }
 };
 
+export const getAllOnboarded = async (token: string): Promise<any> => {
+  const baseUrl = beBaseUrl;
+  const route = "/query/getAll";
+
+  try {
+    console.log(`Buscando all onboarded!`);
+    const result = await get(baseUrl, route, undefined, token);
+    console.log("Petición exitosa:", route, result);
+    return result;
+  } catch (error: any) {
+    console.error("Ocurrió un error al hacer la petición:", route, error);
+
+    if (error instanceof HttpError) {
+      console.error(
+        "Error HTTP:",
+        error.response.status,
+        error.response.statusText
+      );
+      console.error("Cuerpo del error del servidor:", error.body);
+      // No manejamos la redirección aquí, solo logueamos.
+      // La acción de redirección (o mostrar un mensaje UI) debe ir en el componente React.
+    } else {
+      console.error("Error de red o desconocido:", error.message);
+    }
+    throw error;
+  }
+};
+
 export const editCommentPermlinkOnboardingEntry = async (
   onboarder: string,
   onboarded: string,

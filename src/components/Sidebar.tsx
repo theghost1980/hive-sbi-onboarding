@@ -34,7 +34,7 @@ const Sidebar = () => {
               Buscar nuevos usuarios
             </NavLink>
           </li>
-          <li>
+          {/* <li>
             <NavLink
               to="/chequear-hive-sbi"
               className={({ isActive }) => (isActive ? "active" : "")}
@@ -49,7 +49,7 @@ const Sidebar = () => {
             >
               Mostrar últimos agregados en HSBI
             </NavLink>
-          </li>
+          </li> */}
         </ul>
       </nav>
 
