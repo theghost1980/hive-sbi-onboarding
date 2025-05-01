@@ -1,0 +1,86 @@
+{
+  "homepage": {
+    "hero": {
+      "title": "Welcome to the HSBI Onboarding Tool",
+      "subtitle": "Simplifies the process of sponsoring new users on the Hive blockchain quickly and easily."
+    },
+    "what_is_sbi": {
+      "title": "What is Hive SBI?",
+      "p1": "Hive SBI (Hive Basic Income) is a project supporting content creators on the Hive blockchain. Its goal is to provide a long-term passive basic income to its members through shares that generate daily rewards in Hive Power.",
+      "p2": "You become a member (or sponsor someone else) by sending HIVE or HBD to the @steembasicincome account with a specific memo. Each share you own (or your sponsored person owns) contributes to a daily passive income, incentivizing participation and curation on the chain."
+    },
+    "simplifying": {
+      "title": "Simplifying the Process",
+      "p1": "Sponsoring a new user on Hive SBI manually involves several technical steps: verifying their account, finding a suitable post, generating the correct memo for the transaction, and then publishing a notification comment on one of their posts.",
+      "p2": "This tool has been designed to automate and guide much of this process, making it accessible even if you are new to sponsoring.",
+      "p3": "It helps you search for users, verify their membership status, find recent posts, generate the necessary memo for the transaction, and assists you in creating and publishing the onboarding comment, all in one place."
+    },
+    "how_it_works": {
+      "title": "How It Works (Step-by-Step)",
+      "intro": "Using this tool is easy. Follow these steps:",
+      "steps": {
+        "s1_title": "Search for the User",
+        "s1_text": "Go to the \"Onboard User\" section and use the search to find the Hive name of the person you want to sponsor.",
+        "s2_title": "Membership Verification",
+        "s2_text": "The application will automatically verify if the user is already an HSBI member.",
+        "s3_title": "Select a Post",
+        "s3_text": "If the user is not a member, the application will show you a list of their recent posts. Choose the post where you want to leave the notification comment.",
+        "s4_title": "Generate the Comment",
+        "s4_text": "The application will create a draft of the onboarding comment with all the relevant information.",
+        "s5_title": "Review and Edit",
+        "s5_text": "You will have the option to review and edit the comment draft before publishing it.",
+        "s6_title": "Perform the Transaction",
+        "s6_text": "You will be provided with the exact memo and amount you need to send to @steembasicincome using Hive Keychain to sponsor the user.",
+        "s7_title": "Publish the Comment",
+        "s7_text": "Once the transaction is confirmed, the application will guide you to publish the notification comment on the post you chose.",
+        "s8_title": "Confirmation",
+        "s8_text": "You will see a confirmation and a summary of the completed sponsorship."
+      }
+    },
+    "cta": {
+      "title": "Start Now!",
+      "intro": "Ready to sponsor your first user on Hive SBI?",
+      "button": "Go to Onboard User"
+    },
+    "contact": {
+      "title": "Resources and Contact",
+      "general": {
+        "title": "General",
+        "intro": "Find more information and support about HSBI and this tool at:",
+        "community_link_text": "C/Synergy Builders",
+        "discord_link_text": "Discord (Tool Support & Community)"
+      },
+      "developers": {
+        "title": "Developers and Contributors"
+      },
+      "dev_resources": {
+        "title": "Useful Resources for Hive Development",
+        "discord_general_text": "Hive Discord (General)",
+        "discord_engine_text": "Hive Engine Discord",
+        "docs_text": "Hive Developers Documentation",
+        "discord_hivesql_text": "HiveSQL Discord",
+        "npm_package_text": "npm Package `keychain-helper`"
+      }
+    }
+  },
+  "global": {
+    "github_label": "GitHub",
+    "hive_label": "Hive",
+    "homepage_label": "Home Page"
+  },
+  "footer": {
+    "made_by": "Made with ❤️ by {{developer}} @{{year}}",
+    "powered_by_title": "Powered by"
+  },
+  "alt": {
+    "hive_logo": "Hive Logo",
+    "keychain_logo": "Keychain Logo",
+    "hivesql_logo": "HiveSQL Logo",
+    "privex_logo": "Privex Logo",
+    "tipu_love_title": "Tipu Love",
+    "tipjar_button_alt": "Button icon"
+  },
+  "carousel": {
+    "paused_message": "paused by cursor"
+  }
+}

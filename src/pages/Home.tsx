@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { FaDiscord, FaGithub, FaLink, FaNpm } from "react-icons/fa";
 import { IoDocumentText } from "react-icons/io5";
 import { NavLink } from "react-router-dom";
@@ -138,11 +139,11 @@ const StyledButton = styled.a`
 `;
 
 const tremble = keyframes`
-  0%, 100% { transform: translate(0, 0); }
-  20% { transform: translate(-1px, -1px); }
-  40% { transform: translate(1px, 1px); }
-  60% { transform: translate(-1px, 1px); }
-  80% { transform: translate(1px, -1px); }
+ 0%, 100% { transform: translate(0, 0); }
+ 20% { transform: translate(-1px, -1px); }
+ 40% { transform: translate(1px, 1px); }
+ 60% { transform: translate(-1px, 1px); }
+ 80% { transform: translate(1px, -1px); }
 `;
 
 const StyledFixedButton = styled.button`
@@ -272,8 +273,6 @@ const StyledFooterContent = styled.div`
 `;
 
 const StyledMadeWithLove = styled.div`
-  /* margin-bottom: 20px; */ /* El gap en StyledFooterContent maneja el espacio */
-
   svg {
     vertical-align: middle;
     margin: 0 5px;
@@ -283,7 +282,6 @@ const StyledMadeWithLove = styled.div`
 `;
 
 const StyledPoweredBy = styled.div`
-  /* margin-top: 20px; */ /* El gap en StyledFooterContent maneja el espacio */
   border-top: 1px solid rgba(255, 255, 255, 0.1); /* Separador visual */
   padding-top: 20px;
   width: 100%; /* Asegura que el borde se extienda */
@@ -292,7 +290,7 @@ const StyledPoweredBy = styled.div`
     color: #ecf0f1;
     font-size: 1.1em;
     margin-bottom: 15px;
-    margin-top: 0; /* Sin margen superior duplicado */
+    margin-top: 0;
   }
 `;
 
@@ -315,363 +313,369 @@ const StyledLogoLink = styled.a`
 const StyledLogoImage = styled.img`
   height: 30px;
   width: auto;
-  /* Optional: Añadir filtro si los logos son claros sobre fondo oscuro */
-  /* filter: invert(0.8) grayscale(0.5); */
 `;
 
 const HomePage: React.FC = () => {
+  const { t } = useTranslation();
+
   const contactCarouselComponents = [
     <div key="general-links">
-      <h3>General</h3>
-      <p>
-        Encuentra más información y soporte sobre HSBI y esta herramienta en:
-      </p>
+      <h3>{t("homepage.contact.general.title", "homepage")}</h3>
+      <p>{t("homepage.contact.general.intro")}</p>
       <StyledResourceList>
+        {" "}
         <StyledResourceItem>
-          {/* Usando icono real de react-icons */}
+          {" "}
           <StyledLinkIcon>
-            <FaLink />
-          </StyledLinkIcon>
+            <FaLink />{" "}
+          </StyledLinkIcon>{" "}
           <a
             href="https://peakd.com/c/hive-186392/created"
             target="_blank"
             rel="noopener noreferrer"
           >
-            C/Synergy Builders
-          </a>
-        </StyledResourceItem>
+            {t("homepage.contact.general.community_link_text")}{" "}
+          </a>{" "}
+        </StyledResourceItem>{" "}
         <StyledResourceItem>
-          {/* Usando icono real de react-icons */}
+          {" "}
           <StyledLinkIcon>
-            <FaDiscord />
-          </StyledLinkIcon>
+            <FaDiscord />{" "}
+          </StyledLinkIcon>{" "}
           <a
             href="https://discord.gg/Ypw9aqJk5A"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Discord (Soporte y Comunidad de la Herramienta)
-          </a>
-        </StyledResourceItem>
-      </StyledResourceList>
+            {t("homepage.contact.general.discord_link_text")}{" "}
+          </a>{" "}
+        </StyledResourceItem>{" "}
+      </StyledResourceList>{" "}
     </div>,
     <div key="developers">
-      <h3>Desarrolladores y Colaboradores</h3>
+      <h3>{t("homepage.contact.developers.title")}</h3>{" "}
       <StyledContactCard>
-        <h4>Saturno Mangieri @theghost1980</h4>
+        <h4>Saturno Mangieri @theghost1980</h4>{" "}
         <p>
-          {/* Usando icono real de react-icons */}
+          {" "}
           <StyledLinkIcon>
-            <FaGithub />
+            <FaGithub />{" "}
           </StyledLinkIcon>
+          {t("global.github_label")}:{" "}
           <a
             href="https://github.com/theghost1980"
             target="_blank"
             rel="noopener noreferrer"
           >
-            https://github.com/theghost1980
-          </a>
-        </p>
+            https://github.com/theghost1980{" "}
+          </a>{" "}
+        </p>{" "}
         <p>
+          {" "}
           <StyledLinkIcon>
-            <FaLink />
+            <FaLink />{" "}
           </StyledLinkIcon>
+          {t("global.hive_label")}:{" "}
           <a
             href="https://peakd.com/@theghost1980"
             target="_blank"
             rel="noopener noreferrer"
           >
-            https://peakd.com/@theghost1980
-          </a>
-        </p>
-      </StyledContactCard>
-
+            https://peakd.com/@theghost1980{" "}
+          </a>{" "}
+        </p>{" "}
+      </StyledContactCard>{" "}
       <StyledContactCard>
-        <h4>@thecrazygm</h4>
+        <h4>@thecrazygm</h4>{" "}
         <p>
+          {" "}
           <StyledLinkIcon>
-            <FaLink />
+            <FaLink />{" "}
           </StyledLinkIcon>{" "}
+          {t("global.homepage_label")}:{" "}
           <a
             href="https://thecrazygm.com/home"
             target="_blank"
             rel="noopener noreferrer"
           >
-            https://thecrazygm.com/home
-          </a>
-        </p>
+            https://thecrazygm.com/home{" "}
+          </a>{" "}
+        </p>{" "}
         <p>
+          {" "}
           <StyledLinkIcon>
-            <FaLink />
+            <FaLink />{" "}
           </StyledLinkIcon>
+          {t("global.hive_label")}:{" "}
           <a
             href="https://peakd.com/@thecrazygm"
             target="_blank"
             rel="noopener noreferrer"
           >
-            https://peakd.com/@thecrazygm
-          </a>
-        </p>
-      </StyledContactCard>
-
+            https://peakd.com/@thecrazygm{" "}
+          </a>{" "}
+        </p>{" "}
+      </StyledContactCard>{" "}
       <StyledContactCard>
-        <h4>@ecoinstant</h4>
+        <h4>@ecoinstant</h4>{" "}
         <p>
+          {" "}
           <StyledLinkIcon>
-            <FaLink />
+            <FaLink />{" "}
           </StyledLinkIcon>
+          {t("global.hive_label")}:{" "}
           <a
             href="https://peakd.com/@ecoinstant"
             target="_blank"
             rel="noopener noreferrer"
           >
-            https://peakd.com/@ecoinstant
-          </a>
-        </p>
-      </StyledContactCard>
+            https://peakd.com/@ecoinstant{" "}
+          </a>{" "}
+        </p>{" "}
+      </StyledContactCard>{" "}
     </div>,
     <div key="dev-resources">
-      <h3>Recursos Útiles para Desarrollo en Hive</h3>
+      <h3>{t("homepage.contact.dev_resources.title")}</h3>{" "}
       <StyledResourceList>
+        {" "}
         <StyledResourceItem>
+          {" "}
           <StyledLinkIcon>
-            <FaDiscord />
-          </StyledLinkIcon>
+            <FaDiscord />{" "}
+          </StyledLinkIcon>{" "}
           <a
             href="https://discord.gg/cgZbmhBbw7"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Discord Hive (General)
-          </a>
-        </StyledResourceItem>
+            {t("homepage.contact.dev_resources.discord_general_text")}{" "}
+          </a>{" "}
+        </StyledResourceItem>{" "}
         <StyledResourceItem>
+          {" "}
           <StyledLinkIcon>
-            <FaDiscord />
-          </StyledLinkIcon>
+            <FaDiscord />{" "}
+          </StyledLinkIcon>{" "}
           <a
             href="https://discord.gg/t3Cg3w4nr4"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Discord Hive Engine
-          </a>
-        </StyledResourceItem>
+            {t("homepage.contact.dev_resources.discord_engine_text")}{" "}
+          </a>{" "}
+        </StyledResourceItem>{" "}
         <StyledResourceItem>
+          {" "}
           <StyledLinkIcon>
-            <IoDocumentText />
-          </StyledLinkIcon>
+            <IoDocumentText />{" "}
+          </StyledLinkIcon>{" "}
           <a
             href="https://developers.hive.io/"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Documentación Hive Developers
-          </a>
-        </StyledResourceItem>
+            {t("homepage.contact.dev_resources.docs_text")}{" "}
+          </a>{" "}
+        </StyledResourceItem>{" "}
         <StyledResourceItem>
+          {" "}
           <StyledLinkIcon>
-            <FaDiscord />
-          </StyledLinkIcon>
+            <FaDiscord />{" "}
+          </StyledLinkIcon>{" "}
           <a
             href="https://discord.gg/jKE5crrPsm"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Discord HiveSQL
-          </a>
-        </StyledResourceItem>
+            {t("homepage.contact.dev_resources.discord_hivesql_text")}{" "}
+          </a>{" "}
+        </StyledResourceItem>{" "}
         <StyledResourceItem>
+          {" "}
           <StyledLinkIcon>
-            <FaNpm />
-          </StyledLinkIcon>
+            <FaNpm />{" "}
+          </StyledLinkIcon>{" "}
           <a
             href="https://www.npmjs.com/package/keychain-helper"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Paquete npm `keychain-helper`
-          </a>
-        </StyledResourceItem>
-      </StyledResourceList>
+            {t("homepage.contact.dev_resources.npm_package_text")}{" "}
+          </a>{" "}
+        </StyledResourceItem>{" "}
+      </StyledResourceList>{" "}
     </div>,
   ];
 
   return (
     <>
+      {" "}
       <StyledHomePage>
+        {" "}
         <StyledHeroSection>
-          <StyledOverlay />
-          <h1>Bienvenido a la Herramienta de Onboarding HSBI</h1>
-          <p>
-            Facilita el proceso de apadrinar nuevos usuarios en la blockchain de
-            Hive SBI de forma rápida y sencilla.
-          </p>
-        </StyledHeroSection>
-
+          <StyledOverlay /> <h1>{t("homepage.hero.title")}</h1>{" "}
+          <p>{t("homepage.hero.subtitle")}</p>{" "}
+        </StyledHeroSection>{" "}
         <StyledSection>
-          <StyledSectionTitle>¿Qué es Hive SBI?</StyledSectionTitle>
-          <p>
-            Hive SBI (Hive Basic Income) es un proyecto de apoyo a creadores de
-            contenido en la blockchain de Hive. Su objetivo es proporcionar un
-            ingreso básico pasivo a largo plazo a sus miembros a través de
-            shares (acciones) que generan recompensas diarias en Hive Power.
-          </p>
-          <p>
-            Te conviertes en miembro (o apadrinas a alguien más) enviando HIVE o
-            HBD a la cuenta @steembasicincome con un memo específico. Cada share
-            que posees (o que tiene tu apadrinado) contribuye a un ingreso
-            pasivo diario, incentivando la participación y la curación en la
-            cadena.
-          </p>
-        </StyledSection>
-
+          {" "}
+          <StyledSectionTitle>
+            {t("homepage.what_is_sbi.title")}
+          </StyledSectionTitle>
+          <p>{t("homepage.what_is_sbi.p1")}</p>{" "}
+          <p>{t("homepage.what_is_sbi.p2")}</p>{" "}
+        </StyledSection>{" "}
         <StyledSection>
-          <StyledSectionTitle>Simplificando el Proceso</StyledSectionTitle>
-          <p>
-            Apadrinar a un nuevo usuario en Hive SBI manualmente implica varios
-            pasos técnicos: verificar su cuenta, encontrar un post adecuado,
-            generar el memo correcto para la transacción y luego publicar un
-            comentario de notificación en uno de sus posts.
-          </p>
-          <p>
-            Esta herramienta ha sido diseñada para automatizar y guiar gran
-            parte de este proceso, haciéndolo accesible incluso si eres nuevo
-            apadrinando.
-          </p>
-          <p>
-            Te ayuda a buscar usuarios, verificar su estado de membresía,
-            encontrar posts recientes, generar el memo necesario para la
-            transacción y te asiste en la creación y publicación del comentario
-            de onboarding, todo en un solo lugar.
-          </p>
-        </StyledSection>
-
+          {" "}
+          <StyledSectionTitle>
+            {t("homepage.simplifying.title")}
+          </StyledSectionTitle>
+          <p>{t("homepage.simplifying.p1")}</p>{" "}
+          <p>{t("homepage.simplifying.p2")}</p>{" "}
+          <p>{t("homepage.simplifying.p3")}</p>{" "}
+        </StyledSection>{" "}
         <StyledSection>
-          <StyledSectionTitle>Cómo Funciona (Paso a Paso)</StyledSectionTitle>
+          {" "}
+          <StyledSectionTitle>
+            {t("homepage.how_it_works.title")}
+          </StyledSectionTitle>
           <ImageCarousel images={IMAGES} interval={4000} />
-          <p>Usar esta herramienta es fácil. Sigue estos pasos:</p>
+          <p>{t("homepage.how_it_works.intro")}</p>{" "}
           <ol>
+            {" "}
             <li>
-              <strong>Busca el Usuario:</strong> Ve a la sección "Onboard
-              Usuario" y usa el buscador para encontrar el nombre de Hive de la
-              persona que quieres apadrinar.
+              {" "}
+              <strong>{t("homepage.how_it_works.steps.s1_title")}:</strong>{" "}
+              {t("homepage.how_it_works.steps.s1_text")}{" "}
+            </li>{" "}
+            <li>
+              {" "}
+              <strong>{t("homepage.how_it_works.steps.s2_title")}:</strong>{" "}
+              {t("homepage.how_it_works.steps.s2_text")}{" "}
+            </li>{" "}
+            <li>
+              {" "}
+              <strong>{t("homepage.how_it_works.steps.s3_title")}:</strong>{" "}
+              {t("homepage.how_it_works.steps.s3_text")}{" "}
+            </li>{" "}
+            <li>
+              {" "}
+              <strong>{t("homepage.how_it_works.steps.s4_title")}:</strong>{" "}
+              {t("homepage.how_it_works.steps.s4_text")}{" "}
+            </li>{" "}
+            <li>
+              {" "}
+              <strong>{t("homepage.how_it_works.steps.s5_title")}:</strong>{" "}
+              {t("homepage.how_it_works.steps.s5_text")}{" "}
+            </li>{" "}
+            <li>
+              {" "}
+              <strong>{t("homepage.how_it_works.steps.s6_title")}:</strong>{" "}
+              {t("homepage.how_it_works.steps.s6_text")}{" "}
+            </li>{" "}
+            <li>
+              {" "}
+              <strong>{t("homepage.how_it_works.steps.s7_title")}:</strong>{" "}
+              {t("homepage.how_it_works.steps.s7_text")}{" "}
             </li>
             <li>
-              <strong>Verificación de Membresía:</strong> La aplicación
-              verificará automáticamente si el usuario ya es miembro de HSBI.
-            </li>
-            <li>
-              <strong>Selecciona un Post:</strong> Si el usuario no es miembro,
-              la aplicación te mostrará una lista de sus posts recientes. Elige
-              el post donde quieras dejar el comentario de notificación.
-            </li>
-            <li>
-              <strong>Genera el Comentario:</strong> La aplicación creará un
-              borrador del comentario de onboarding con toda la información
-              relevante.
-            </li>
-            <li>
-              <strong>Revisa y Edita:</strong> Tendrás la opción de revisar y
-              editar el borrador del comentario antes de publicarlo.
-            </li>
-            <li>
-              <strong>Realiza la Transacción:</strong> Se te proporcionará el
-              memo exacto y la cantidad que debes enviar a @steembasicincome
-              usando Hive Keychain para apadrinar al usuario.
-            </li>
-            <li>
-              <strong>Publica el Comentario:</strong> Una vez confirmada la
-              transacción, la aplicación te guiará para publicar el comentario
-              de notificación en el post que elegiste.
-            </li>
-            <li>
-              <strong>Confirmación:</strong> Verás una confirmación y un resumen
-              del apadrinamiento completado.
-            </li>
-          </ol>
-        </StyledSection>
-
+              {" "}
+              <strong>{t("homepage.how_it_works.steps.s8_title")}:</strong>{" "}
+              {t("homepage.how_it_works.steps.s8_text")}{" "}
+            </li>{" "}
+          </ol>{" "}
+        </StyledSection>{" "}
         <StyledSection style={{ textAlign: "center" }}>
-          <StyledSectionTitle>¡Comienza Ahora!</StyledSectionTitle>
-          <p>¿Listo para apadrinar a tu primer usuario en Hive SBI?</p>
+          {" "}
+          <StyledSectionTitle>{t("homepage.cta.title")}</StyledSectionTitle>
+          <p>{t("homepage.cta.intro")}</p>{" "}
           <StyledButton as={NavLink} to="/onboard-user">
-            Ir a Onboard Usuario
-          </StyledButton>
-        </StyledSection>
-
+            {t("homepage.cta.button")}{" "}
+          </StyledButton>{" "}
+        </StyledSection>{" "}
         <StyledSection>
-          <StyledSectionTitle>Recursos y Contacto</StyledSectionTitle>
+          {" "}
+          <StyledSectionTitle>
+            {t("homepage.contact.title")}
+          </StyledSectionTitle>{" "}
           <ComponentCarousel
             components={contactCarouselComponents}
             height="450px" // Define una altura fija para el carrusel
-            interval={10000} // Opcional: auto-slide cada 10 segundos
-          />
-        </StyledSection>
-      </StyledHomePage>
-
+            interval={4000} // Opcional: auto-slide cada 10 segundos
+          />{" "}
+        </StyledSection>{" "}
+      </StyledHomePage>{" "}
       <StyledFooter>
+        {" "}
         <StyledFooterContent>
+          {" "}
           <StyledMadeWithLove>
-            Hecho con ❤️ por{" "}
-            <a
-              href="https://peakd.com/@theghost1980"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              @theghost1980
-            </a>{" "}
-            @2025
-          </StyledMadeWithLove>
-
+            {" "}
+            {t("footer.made_by", {
+              developer: "@theghost1980",
+              year: "2025",
+            })}{" "}
+          </StyledMadeWithLove>{" "}
           <StyledPoweredBy>
-            <h4>Powered by</h4>
+            <h4>{t("footer.powered_by_title")}</h4>{" "}
             <StyledPoweredByLogos>
+              {" "}
               <StyledLogoLink
                 href="https://hive.io/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <StyledLogoImage src={hiveLogo} alt="Hive Logo" />
-              </StyledLogoLink>
+                {" "}
+                <StyledLogoImage src={hiveLogo} alt={t("alt.hive_logo")} />{" "}
+              </StyledLogoLink>{" "}
               <StyledLogoLink
                 href="https://github.com/hiveio/hive-keychain"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 {" "}
-                {/* Link a GitHub repo */}
-                <StyledLogoImage src={keychainLogo} alt="Keychain Logo" />
-              </StyledLogoLink>
+                <StyledLogoImage
+                  src={keychainLogo}
+                  alt={t("alt.keychain_logo")}
+                />{" "}
+              </StyledLogoLink>{" "}
               <StyledLogoLink
                 href="https://hivesql.io/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <StyledLogoImage src={hivesqlLogo} alt="HiveSQL Logo" />
-              </StyledLogoLink>
+                {" "}
+                <StyledLogoImage
+                  src={hivesqlLogo}
+                  alt={t("alt.hivesql_logo")}
+                />{" "}
+              </StyledLogoLink>{" "}
               <StyledLogoLink
                 href="https://www.privex.io/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <StyledLogoImage src={privexLogo} alt="Privex Logo" />
-              </StyledLogoLink>
-            </StyledPoweredByLogos>
-          </StyledPoweredBy>
-        </StyledFooterContent>
-      </StyledFooter>
-
+                {" "}
+                <StyledLogoImage
+                  src={privexLogo}
+                  alt={t("alt.privex_logo")}
+                />{" "}
+              </StyledLogoLink>{" "}
+            </StyledPoweredByLogos>{" "}
+          </StyledPoweredBy>{" "}
+        </StyledFooterContent>{" "}
+      </StyledFooter>{" "}
       <StyledFixedButton>
+        {" "}
         <a
           href={"https://thecrazygm.com/hivetools/give/theghost1980/10/HBD"}
           target="_blank"
           rel="noopener noreferrer"
-          title="Tipu Love"
+          title={t("alt.tipu_love_title")}
         >
-          <img src={fixedButtonImage} alt="Button icon" />
-        </a>
-      </StyledFixedButton>
+          {" "}
+          <img src={fixedButtonImage} alt={t("alt.tipjar_button_alt")} />{" "}
+        </a>{" "}
+      </StyledFixedButton>{" "}
     </>
   );
 };

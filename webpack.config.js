@@ -46,7 +46,7 @@ module.exports = {
     new Dotenv(),
   ],
   devServer: {
-    static: "./dist",
+    static: "./public",
     hot: true,
     port: 5000,
     historyApiFallback: true,
