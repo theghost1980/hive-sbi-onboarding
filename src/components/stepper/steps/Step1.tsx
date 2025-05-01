@@ -1,5 +1,6 @@
 import { KeychainHelper } from "keychain-helper";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import backendApi from "../../../api/Backend";
 import { config } from "../../../config/config";
@@ -125,6 +126,7 @@ const Step1: React.FC<Step1Props> = ({
   onCancel,
   onStepDataChange,
 }) => {
+  const { t } = useTranslation();
   const handlePayWithKeychain = async () => {
     const hardCodedAmount = "1.000";
     const memo = `@${username}`;
@@ -189,67 +191,60 @@ const Step1: React.FC<Step1Props> = ({
 
   return (
     <StyledStep1Container>
-      <h3>Paso 1: Confirmación y Pago</h3>
+      <h3>{t("onboard_step1.title")}</h3>
       <p>
-        Vamos a llevar a cabo el onboarding para el usuario{" "}
-        <strong>@{username}</strong>.
+        {t("onboard_step1.intro.p1_prefix")} <strong>@{username}</strong>.
       </p>
-      <p>Por favor, antes de continuar, verifica lo siguiente:</p>
-
+      <p>{t("onboard_step1.intro.p2")}</p>
       <StyledPrerequisitesList>
         <StyledPrerequisiteItem>
           <StyledPrerequisiteIcon className="icon-hive">
             🐝
           </StyledPrerequisiteIcon>
-          Poseo al menos 1 HIVE disponible en mi cuenta.
+          {t("onboard_step1.prerequisites.p1")}
         </StyledPrerequisiteItem>
         <StyledPrerequisiteItem>
           <StyledPrerequisiteIcon className="icon-keychain">
             🔑
           </StyledPrerequisiteIcon>
-          {`Tengo acceso a Keychain, donde he cargado mi cuenta
-          @${onboarderUsername} con su clave activa o posting.`}
+          {t("onboard_step1.prerequisites.p2", {
+            onboarderUsername: onboarderUsername,
+          })}
         </StyledPrerequisiteItem>
         <StyledPrerequisiteItem>
           <StyledPrerequisiteIcon className="icon-gain">
             💰
           </StyledPrerequisiteIcon>
-          Sé que por cada HIVE que otorgue al apadrinar a este usuario, ganaré
-          unidades SBI.
+          {t("onboard_step1.prerequisites.p3")}
         </StyledPrerequisiteItem>
         <StyledPrerequisiteItem>
           <StyledPrerequisiteIcon className="icon-beta">
             🧪
           </StyledPrerequisiteIcon>
-          Estoy consciente de que a pesar de los esfuerzos, el chequeo de las
-          cuentas y los registros en HSBI tardan y por ende pueden haber errores
-          (esto es BETA).
+          {t("onboard_step1.prerequisites.p4")}
         </StyledPrerequisiteItem>
         <StyledPrerequisiteItem>
           <StyledPrerequisiteIcon className="icon-time">
             ⏱️
           </StyledPrerequisiteIcon>
-          Dispongo de al menos unos minutos para llevar a cabo el proceso.
+          {t("onboard_step1.prerequisites.p5")}
         </StyledPrerequisiteItem>
       </StyledPrerequisitesList>
-
-      <p>Estoy de acuerdo con empezar el proceso.</p>
-
+      <p>{t("onboard_step1.consent")}</p>
       {!isKeychainAvailable && (
         <StyledKeychainRequiredMessage>
-          Hive Keychain es requerido para apadrinar usuarios. Por favor,
-          asegúrese de que está instalado.
+          {t("onboard_step1.keychain_required")}
         </StyledKeychainRequiredMessage>
       )}
-
       <StyledPayButton
         onClick={handlePayWithKeychain}
         disabled={!isKeychainAvailable}
       >
-        Pagar con Keychain (1 HIVE)
+        {t("onboard_step1.pay_button")}
       </StyledPayButton>
-
-      <StyledCancelButton onClick={onCancel}>Cancelar</StyledCancelButton>
+      <StyledCancelButton onClick={onCancel}>
+        {t("onboard_step1.cancel_button")}
+      </StyledCancelButton>
     </StyledStep1Container>
   );
 };

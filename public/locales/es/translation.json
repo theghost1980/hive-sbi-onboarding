@@ -219,5 +219,23 @@
     "of": "de",
     "prev": "Anterior",
     "next": "Siguiente"
+  },
+  "onboard_step1": {
+    "title": "Paso 1: Confirmación y Pago",
+    "intro": {
+      "p1_prefix": "Vamos a llevar a cabo el onboarding para el usuario ",
+      "p2": "Por favor, antes de continuar, verifica lo siguiente:"
+    },
+    "prerequisites": {
+      "p1": "Poseo al menos 1 HIVE disponible en mi cuenta.",
+      "p2": "Tengo acceso a Keychain, donde he cargado mi cuenta @{{onboarderUsername}} con su clave activa o posting.",
+      "p3": "Sé que por cada HIVE que otorgue al apadrinar a este usuario, ganaré unidades SBI.",
+      "p4": "Estoy consciente de que a pesar de los esfuerzos, el chequeo de las cuentas y los registros en HSBI tardan y por ende pueden haber errores (esto es BETA).",
+      "p5": "Dispongo de al menos unos minutos para llevar a cabo el proceso."
+    },
+    "consent": "Estoy de acuerdo con empezar el proceso.",
+    "keychain_required": "Hive Keychain es requerido para apadrinar usuarios. Por favor, asegúrese de que está instalado.",
+    "pay_button": "Pagar con Keychain (1 HIVE)",
+    "cancel_button": "Cancelar"
   }
 }

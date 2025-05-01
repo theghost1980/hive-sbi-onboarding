@@ -206,6 +206,24 @@ interface ResourceType {
       prev: string;
       next: string;
     };
+    onboard_step1: {
+      title: string;
+      intro: {
+        p1_prefix: string;
+        p2: string;
+      };
+      prerequisites: {
+        p1: string;
+        p2: string;
+        p3: string;
+        p4: string;
+        p5: string;
+      };
+      consent: string;
+      keychain_required: string;
+      pay_button: string;
+      cancel_button: string;
+    };
   };
   /*
   Si tuvieras otros archivos JSON de traducción con nombres diferentes a translation.json

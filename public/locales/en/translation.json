@@ -219,5 +219,23 @@
     "of": "of",
     "prev": "Prev",
     "next": "Next"
+  },
+  "onboard_step1": {
+    "title": "Step 1: Confirmation and Payment",
+    "intro": {
+      "p1_prefix": "We are going to carry out the onboarding for user ",
+      "p2": "Please, before continuing, verify the following:"
+    },
+    "prerequisites": {
+      "p1": "I have at least 1 HIVE available in my account.",
+      "p2": "I have access to Keychain, where I have loaded my account @{{onboarderUsername}} with its active or posting key.",
+      "p3": "I know that for every HIVE I grant when sponsoring this user, I will earn SBI units.",
+      "p4": "I am aware that despite efforts, account checking and HSBI registrations take time and therefore there may be errors (this is BETA).",
+      "p5": "I have at least a few minutes available to carry out the process."
+    },
+    "consent": "I agree to start the process.",
+    "keychain_required": "Hive Keychain is required to sponsor users. Please ensure it is installed.",
+    "pay_button": "Pay with Keychain (1 HIVE)",
+    "cancel_button": "Cancel"
   }
 }
