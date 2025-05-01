@@ -274,8 +274,8 @@ interface ResourceType {
     onboard_step3: {
       title: string;
       summary_mode: {
-        editing: string;
-        new_onboarding: string;
+        editing: string; // Es string aunque tenga interpolación
+        new_onboarding: string; // Es string aunque tenga interpolación
       };
       sections: {
         backend_result: {
@@ -335,6 +335,56 @@ interface ResourceType {
       copy_status: {
         success: string;
         failed: string;
+      };
+      report: {
+        header: string;
+        mode_prefix: string;
+        mode: {
+          editing: string;
+          new: string;
+        };
+        sections: {
+          backend_result: {
+            title: string;
+            response_details: string;
+            unavailable: string;
+          };
+          post_selected: {
+            title: string;
+            commented_on_prefix: string;
+            by_author_connector: string;
+            view_post_link: string;
+            not_selected: string;
+          };
+          transfer_result: {
+            title: string;
+            status_prefix: string;
+            tx_id_prefix: string;
+            message_prefix: string;
+            error_prefix: string;
+            details_title: string;
+            detail: {
+              tx_id_prefix: string;
+              from_prefix: string;
+              to_prefix: string;
+              amount_prefix: string;
+              memo_prefix: string;
+            };
+            unavailable: string;
+          };
+          comment_result: {
+            title: string;
+            status_prefix: string;
+            comment_permlink_prefix: string;
+            view_comment_link: string;
+            message_prefix: string;
+            error_prefix: string;
+            unavailable: string;
+          };
+          comment_text: {
+            title: string;
+          };
+        };
       };
     };
   };

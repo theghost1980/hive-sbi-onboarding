@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { BackendOnboardingInfo } from "../../../pages/OnboardUser";
 import { StepData } from "../../OnboardModal";
 import {
-  StyledCompleteButton, // Usaremos este para el botón "Complete"
+  StyledCompleteButton,
   StyledCopyReportButton,
   StyledNavigationButtons,
   StyledPrevButton,
@@ -230,150 +230,199 @@ const Step3: React.FC<Step3Props> = ({
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
 
   const handleCopyReport = async () => {
-    let reportText = `${t("onboard_step3.report.header", {
+    const reportHeader = t("onboard_step3.report.header", {
       username: username,
       onboarderUsername: onboarderUsername,
-    })}\n\n`;
+    });
+    const modePrefix = t("onboard_step3.report.mode_prefix");
+    const mode = isEditMode
+      ? t("onboard_step3.report.mode.editing")
+      : t("onboard_step3.report.mode.new");
 
-    reportText += `${t("onboard_step3.report.mode_prefix")}: ${
-      isEditMode
-        ? t("onboard_step3.report.mode.editing")
-        : t("onboard_step3.report.mode.new")
-    }\n\n`;
-
-    reportText += `${t(
+    const backendResultTitle = t(
       "onboard_step3.report.sections.backend_result.title"
-    )}\n`;
+    );
+    const backendResultResponseDetails = t(
+      "onboard_step3.report.sections.backend_result.response_details"
+    );
+    const backendResultUnavailable = t(
+      "onboard_step3.report.sections.backend_result.unavailable"
+    );
+
+    const postSelectedTitle = t(
+      "onboard_step3.report.sections.post_selected.title"
+    );
+    const postSelectedCommentedOnPrefix = t(
+      "onboard_step3.report.sections.post_selected.commented_on_prefix"
+    );
+    const postSelectedByAuthorConnector = t(
+      "onboard_step3.report.sections.post_selected.by_author_connector"
+    );
+    const postSelectedViewPostLink = t(
+      "onboard_step3.report.sections.post_selected.view_post_link"
+    );
+    const postSelectedNotSelected = t(
+      "onboard_step3.report.sections.post_selected.not_selected"
+    );
+
+    const transferResultTitle = t(
+      "onboard_step3.report.sections.transfer_result.title"
+    );
+    const transferResultStatusPrefix = t(
+      "onboard_step3.report.sections.transfer_result.status_prefix"
+    );
+    const transferResultStatusSuccess = t(
+      "onboard_step3.sections.transfer_result.status.success"
+    );
+    const transferResultStatusFailed = t(
+      "onboard_step3.sections.transfer_result.status.failed"
+    );
+    const transferResultTxIdPrefix = t(
+      "onboard_step3.report.sections.transfer_result.tx_id_prefix"
+    );
+    const transferResultMessagePrefix = t(
+      "onboard_step3.report.sections.transfer_result.message_prefix"
+    );
+    const transferResultErrorPrefix = t(
+      "onboard_step3.report.sections.transfer_result.error_prefix"
+    );
+    const transferResultDetailsTitle = t(
+      "onboard_step3.report.sections.transfer_result.details_title"
+    );
+    const transferResultDetailTxIdPrefix = t(
+      "onboard_step3.report.sections.transfer_result.detail.tx_id_prefix"
+    );
+    const transferResultDetailFromPrefix = t(
+      "onboard_step3.report.sections.transfer_result.detail.from_prefix"
+    );
+    const transferResultDetailToPrefix = t(
+      "onboard_step3.report.sections.transfer_result.detail.to_prefix"
+    );
+    const transferResultDetailAmountPrefix = t(
+      "onboard_step3.report.sections.transfer_result.detail.amount_prefix"
+    );
+    const transferResultDetailMemoPrefix = t(
+      "onboard_step3.report.sections.transfer_result.detail.memo_prefix"
+    );
+    const transferResultUnavailable = t(
+      "onboard_step3.report.sections.transfer_result.unavailable"
+    );
+
+    const commentResultTitle = t(
+      "onboard_step3.report.sections.comment_result.title"
+    );
+    const commentResultStatusPrefix = t(
+      "onboard_step3.report.sections.comment_result.status_prefix"
+    ); // Use from transferResult? No, keep separate as per JSON
+    const commentResultStatusSuccess = t(
+      "onboard_step3.sections.comment_result.status.success"
+    );
+    const commentResultStatusFailed = t(
+      "onboard_step3.sections.comment_result.status.failed"
+    );
+    const commentResultPermlinkPrefix = t(
+      "onboard_step3.report.sections.comment_result.comment_permlink_prefix"
+    );
+    const commentResultViewCommentLink = t(
+      "onboard_step3.report.sections.comment_result.view_comment_link"
+    );
+    const commentResultMessagePrefix = t(
+      "onboard_step3.report.sections.comment_result.message_prefix"
+    ); // Use from transferResult? No, keep separate as per JSON
+    const commentResultErrorPrefix = t(
+      "onboard_step3.report.sections.comment_result.error_prefix"
+    ); // Use from transferResult? No, keep separate as per JSON
+    const commentResultUnavailable = t(
+      "onboard_step3.report.sections.comment_result.unavailable"
+    );
+
+    const commentTextTitle = t(
+      "onboard_step3.report.sections.comment_text.title"
+    );
+
+    let reportText = `${reportHeader}\n\n`;
+
+    reportText += `${modePrefix}: ${mode}\n\n`;
+
+    reportText += `${backendResultTitle}\n`;
     if (stepData.beResponse1) {
-      reportText += `${t(
-        "onboard_step3.report.sections.backend_result.response_details"
-      )}\n`;
+      reportText += `${backendResultResponseDetails}\n`;
       reportText += `${JSON.stringify(stepData.beResponse1, null, 2)}\n`;
     } else {
-      reportText += `${t(
-        "onboard_step3.report.sections.backend_result.unavailable"
-      )}\n`;
+      reportText += `${backendResultUnavailable}\n`;
     }
     reportText += `\n`;
 
-    reportText += `${t("onboard_step3.report.sections.post_selected.title")}\n`;
+    reportText += `${postSelectedTitle}\n`;
     if (stepData.selectedPost) {
-      reportText += `${t(
-        "onboard_step3.report.sections.post_selected.commented_on_prefix"
-      )}"${stepData.selectedPost.title}" ${t(
-        "onboard_step3.report.sections.post_selected.by_author_connector"
-      )}@${stepData.selectedPost.author}\n`;
-      reportText += `${t(
-        "onboard_step3.report.sections.post_selected.view_post_link"
-      )}: https://peakd.com${stepData.selectedPost.url}\n`;
+      reportText += `${postSelectedCommentedOnPrefix}"${stepData.selectedPost.title}" ${postSelectedByAuthorConnector}@${stepData.selectedPost.author}\n`;
+      reportText += `${postSelectedViewPostLink}: https://peakd.com${stepData.selectedPost.url}\n`;
     } else {
-      reportText += `${t(
-        "onboard_step3.report.sections.post_selected.not_selected"
-      )}\n`;
+      reportText += `${postSelectedNotSelected}\n`;
     }
     reportText += `\n`;
 
-    reportText += `${t(
-      "onboard_step3.report.sections.transfer_result.title"
-    )}\n`;
+    reportText += `${transferResultTitle}\n`;
     if (stepData.transactionResponse) {
-      reportText += `${t(
-        "onboard_step3.report.sections.transfer_result.status_prefix"
-      )}: ${
+      reportText += `${transferResultStatusPrefix}: ${
         stepData.transactionResponse.success
-          ? t("onboard_step3.sections.transfer_result.status.success")
-          : t("onboard_step3.sections.transfer_result.status.failed")
+          ? transferResultStatusSuccess
+          : transferResultStatusFailed
       }\n`;
       if (stepData.transactionResponse.id)
-        reportText += `${t(
-          "onboard_step3.report.sections.transfer_result.tx_id_prefix"
-        )}: ${stepData.transactionResponse.id}\n`;
+        reportText += `${transferResultTxIdPrefix}: ${stepData.transactionResponse.id}\n`;
       if (stepData.transactionResponse.message)
-        reportText += `${t(
-          "onboard_step3.report.sections.transfer_result.message_prefix"
-        )}: ${stepData.transactionResponse.message}\n`;
+        reportText += `${transferResultMessagePrefix}: ${stepData.transactionResponse.message}\n`;
       if (stepData.transactionResponse.error)
-        reportText += `${t(
-          "onboard_step3.report.sections.transfer_result.error_prefix"
-        )}: ${JSON.stringify(stepData.transactionResponse.error)}\n`;
+        reportText += `${transferResultErrorPrefix}: ${JSON.stringify(
+          stepData.transactionResponse.error
+        )}\n`;
 
       if (
         stepData.transactionResponse.success &&
         stepData.transactionResponse.result &&
         stepData.transactionResponse.data
       ) {
-        reportText += `\n${t(
-          "onboard_step3.report.sections.transfer_result.details_title"
-        )}\n`;
-        reportText += ` ${t(
-          "onboard_step3.report.sections.transfer_result.detail.tx_id_prefix"
-        )}: ${
+        reportText += `\n${transferResultDetailsTitle}\n`;
+        reportText += ` ${transferResultDetailTxIdPrefix} ${
           stepData.transactionResponse.result.tx_id ||
           stepData.transactionResponse.result.id
         }\n`;
-        reportText += ` ${t(
-          "onboard_step3.report.sections.transfer_result.detail.from_prefix"
-        )}@${stepData.transactionResponse.data.username}\n`;
-        reportText += ` ${t(
-          "onboard_step3.report.sections.transfer_result.detail.to_prefix"
-        )}@${stepData.transactionResponse.data.to}\n`;
-        reportText += ` ${t(
-          "onboard_step3.report.sections.transfer_result.detail.amount_prefix"
-        )}: ${stepData.transactionResponse.data.amount} ${
-          stepData.transactionResponse.data.currency
-        }\n`;
+        reportText += ` ${transferResultDetailFromPrefix}@${stepData.transactionResponse.data.username}\n`;
+        reportText += ` ${transferResultDetailToPrefix}@${stepData.transactionResponse.data.to}\n`;
+        reportText += ` ${transferResultDetailAmountPrefix} ${stepData.transactionResponse.data.amount} ${stepData.transactionResponse.data.currency}\n`;
         if (stepData.transactionResponse.data.memo)
-          reportText += ` ${t(
-            "onboard_step3.report.sections.transfer_result.detail.memo_prefix"
-          )}: ${stepData.transactionResponse.data.memo}\n`;
+          reportText += ` ${transferResultDetailMemoPrefix}: ${stepData.transactionResponse.data.memo}\n`;
       }
     } else {
-      reportText += `${t(
-        "onboard_step3.report.sections.transfer_result.unavailable"
-      )}\n`;
+      reportText += `${transferResultUnavailable}\n`;
     }
     reportText += `\n`;
 
-    reportText += `${t(
-      "onboard_step3.report.sections.comment_result.title"
-    )}\n`;
+    reportText += `${commentResultTitle}\n`;
     if (stepData.commentResponse) {
-      reportText += `${t(
-        "onboard_step3.report.sections.comment_result.status_prefix"
-      )}: ${
+      reportText += `${commentResultStatusPrefix}: ${
         stepData.commentResponse.success
-          ? t("onboard_step3.sections.comment_result.status.success")
-          : t("onboard_step3.sections.comment_result.status.failed")
+          ? commentResultStatusSuccess
+          : commentResultStatusFailed
       }\n`;
       if (stepData.postedCommentPermlink) {
-        reportText += `${t(
-          "onboard_step3.report.sections.comment_result.comment_permlink_prefix"
-        )}: ${stepData.postedCommentPermlink}\n`;
-        reportText += `${t(
-          "onboard_step3.report.sections.comment_result.view_comment_link"
-        )} https://hive.blog/@${onboarderUsername}/${
-          stepData.postedCommentPermlink
-        }\n`;
+        reportText += `${commentResultPermlinkPrefix}: ${stepData.postedCommentPermlink}\n`;
+        reportText += `${commentResultViewCommentLink} https://hive.blog/@${onboarderUsername}/${stepData.postedCommentPermlink}\n`;
       }
       if (stepData.commentResponse.message)
-        reportText += `${t(
-          "onboard_step3.report.sections.comment_result.message_prefix"
-        )}: ${stepData.commentResponse.message}\n`;
+        reportText += `${commentResultMessagePrefix}: ${stepData.commentResponse.message}\n`;
       if (stepData.commentResponse.error)
-        reportText += `${t(
-          "onboard_step3.report.sections.comment_result.error_prefix"
-        )}: ${JSON.stringify(stepData.commentResponse.error)}\n`;
+        reportText += `${commentResultErrorPrefix}: ${JSON.stringify(
+          stepData.commentResponse.error
+        )}\n`;
     } else {
-      reportText += `${t(
-        "onboard_step3.report.sections.comment_result.unavailable"
-      )}\n`;
+      reportText += `${commentResultUnavailable}\n`;
     }
     reportText += `\n`;
 
     if (stepData.generatedComment || stepData.editedComment) {
-      reportText += `${t(
-        "onboard_step3.report.sections.comment_text.title"
-      )}\n`;
+      reportText += `${commentTextTitle}\n`;
       reportText += `${stepData.editedComment || stepData.generatedComment}\n`;
       reportText += `\n`;
     }

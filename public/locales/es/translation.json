@@ -306,35 +306,35 @@
       },
       "transfer_result": {
         "title": "Resultado de la Transacción de Transferencia",
-        "status_prefix": "Estado: ",
+        "status_prefix": "Estado",
         "status": {
           "success": "Éxito",
           "failed": "Fallido"
         },
-        "tx_id_prefix": "ID de Transacción: ",
-        "message_prefix": "Mensaje: ",
-        "error_prefix": "Error: ",
+        "tx_id_prefix": "ID de Transacción",
+        "message_prefix": "Mensaje",
+        "error_prefix": "Error",
         "details_title": "Detalles de la Transacción:",
         "detail": {
-          "tx_id_prefix": "ID Tx:",
-          "from_prefix": "De:",
-          "to_prefix": "Para:",
-          "amount_prefix": "Cantidad:",
-          "memo_prefix": "Memo:"
+          "tx_id_prefix": "ID Tx",
+          "from_prefix": "De",
+          "to_prefix": "Para",
+          "amount_prefix": "Cantidad",
+          "memo_prefix": "Memo"
         },
         "unavailable": "La transacción de transferencia no se intentó o el resultado no está disponible."
       },
       "comment_result": {
         "title": "Resultado de la Transacción del Comentario",
-        "status_prefix": "Estado: ",
+        "status_prefix": "Estado",
         "status": {
           "success": "Éxito",
           "failed": "Fallido"
         },
-        "comment_permlink_prefix": "Permlink del Comentario:",
-        "view_comment_link": "Ver Comentario:",
-        "message_prefix": "Mensaje: ",
-        "error_prefix": "Error: ",
+        "comment_permlink_prefix": "Permlink del Comentario",
+        "view_comment_link": "Ver Comentario",
+        "message_prefix": "Mensaje",
+        "error_prefix": "Error",
         "unavailable": "El comentario no se publicó o el resultado no está disponible."
       },
       "comment_text": {
@@ -349,6 +349,56 @@
     "copy_status": {
       "success": "¡Reporte Copiado!",
       "failed": "Fallo al copiar reporte."
+    },
+    "report": {
+      "header": "--- Resumen del Onboarding para @{{username}} por @{{onboarderUsername}} ---",
+      "mode_prefix": "Modo",
+      "mode": {
+        "editing": "Editando registro existente",
+        "new": "Nuevo onboarding"
+      },
+      "sections": {
+        "backend_result": {
+          "title": "--- Resultado de la Actualización del Registro en el Backend ---",
+          "response_details": "Detalles de la Respuesta:",
+          "unavailable": "El resultado de la actualización del registro en el backend no está disponible."
+        },
+        "post_selected": {
+          "title": "--- Publicación Seleccionada ---",
+          "commented_on_prefix": "Comentado en: ",
+          "by_author_connector": " por @",
+          "view_post_link": "Ver Publicación",
+          "not_selected": "No se seleccionó una publicación específica."
+        },
+        "transfer_result": {
+          "title": "--- Resultado de la Transacción de Transferencia ---",
+          "status_prefix": "Estado",
+          "tx_id_prefix": "ID de Transacción",
+          "message_prefix": "Mensaje",
+          "error_prefix": "Error",
+          "details_title": "Detalles de la Transacción:",
+          "detail": {
+            "tx_id_prefix": "ID Tx",
+            "from_prefix": "De",
+            "to_prefix": "Para",
+            "amount_prefix": "Cantidad",
+            "memo_prefix": "Memo"
+          },
+          "unavailable": "La transacción de transferencia no se intentó o el resultado no está disponible."
+        },
+        "comment_result": {
+          "title": "--- Resultado de la Transacción del Comentario ---",
+          "status_prefix": "Estado",
+          "comment_permlink_prefix": "Permlink del Comentario",
+          "view_comment_link": "Ver Comentario:",
+          "message_prefix": "Mensaje",
+          "error_prefix": "Error",
+          "unavailable": "El comentario no se publicó o el resultado no está disponible."
+        },
+        "comment_text": {
+          "title": "--- Texto del Comentario ---"
+        }
+      }
     }
   }
 }

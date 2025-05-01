@@ -306,35 +306,35 @@
       },
       "transfer_result": {
         "title": "Transfer Transaction Result",
-        "status_prefix": "Status: ",
+        "status_prefix": "Status",
         "status": {
           "success": "Success",
           "failed": "Failed"
         },
-        "tx_id_prefix": "Transaction ID: ",
-        "message_prefix": "Message: ",
-        "error_prefix": "Error: ",
+        "tx_id_prefix": "Transaction ID",
+        "message_prefix": "Message",
+        "error_prefix": "Error",
         "details_title": "Transaction Details:",
         "detail": {
-          "tx_id_prefix": "Tx ID:",
-          "from_prefix": "From:",
-          "to_prefix": "To:",
-          "amount_prefix": "Amount:",
-          "memo_prefix": "Memo:"
+          "tx_id_prefix": "Tx ID",
+          "from_prefix": "From",
+          "to_prefix": "To",
+          "amount_prefix": "Amount",
+          "memo_prefix": "Memo"
         },
         "unavailable": "Transfer transaction was not attempted or result is unavailable."
       },
       "comment_result": {
         "title": "Comment Transaction Result",
-        "status_prefix": "Status: ",
+        "status_prefix": "Status",
         "status": {
           "success": "Success",
           "failed": "Failed"
         },
-        "comment_permlink_prefix": "Comment Permlink:",
+        "comment_permlink_prefix": "Comment Permlink",
         "view_comment_link": "View Comment:",
-        "message_prefix": "Message: ",
-        "error_prefix": "Error: ",
+        "message_prefix": "Message",
+        "error_prefix": "Error",
         "unavailable": "Comment was not posted or result is unavailable."
       },
       "comment_text": {
@@ -349,6 +349,56 @@
     "copy_status": {
       "success": "Report Copied!",
       "failed": "Failed to copy report."
+    },
+    "report": {
+      "header": "--- Onboarding Summary for @{{username}} by @{{onboarderUsername}} ---",
+      "mode_prefix": "Mode",
+      "mode": {
+        "editing": "Editing existing record",
+        "new": "New onboarding"
+      },
+      "sections": {
+        "backend_result": {
+          "title": "--- Backend Record Update Result ---",
+          "response_details": "Response Details:",
+          "unavailable": "Backend record update result is unavailable."
+        },
+        "post_selected": {
+          "title": "--- Post Selected ---",
+          "commented_on_prefix": "Commented on: ",
+          "by_author_connector": " by @",
+          "view_post_link": "View Post",
+          "not_selected": "No specific post selected."
+        },
+        "transfer_result": {
+          "title": "--- Transfer Transaction Result ---",
+          "status_prefix": "Status",
+          "tx_id_prefix": "Transaction ID",
+          "message_prefix": "Message",
+          "error_prefix": "Error",
+          "details_title": "Transaction Details:",
+          "detail": {
+            "tx_id_prefix": "Tx ID",
+            "from_prefix": "From",
+            "to_prefix": "To",
+            "amount_prefix": "Amount",
+            "memo_prefix": "Memo"
+          },
+          "unavailable": "Transfer transaction was not attempted or result is unavailable."
+        },
+        "comment_result": {
+          "title": "--- Comment Transaction Result ---",
+          "status_prefix": "Status",
+          "comment_permlink_prefix": "Comment Permlink",
+          "view_comment_link": "View Comment:",
+          "message_prefix": "Message",
+          "error_prefix": "Error",
+          "unavailable": "Comment was not posted or result is unavailable."
+        },
+        "comment_text": {
+          "title": "--- Comment Text ---"
+        }
+      }
     }
   }
 }
