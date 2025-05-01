@@ -82,5 +82,37 @@
   },
   "carousel": {
     "paused_message": "paused by cursor"
+  },
+  "search_users_page": {
+    "title": "Search for New Users",
+    "options": {
+      "new_24h_label": "Registered in the Last 24 Hours",
+      "fish_new_label": "Registered within the Last 30 Days - Low Activity",
+      "fish_new_limit_label": "Registered within the Last 30 Days - Low Activity - LIMITED to 10"
+    },
+    "loading": {
+      "long_message": "This is taking a bit long... The users must be playing hard to get!"
+    },
+    "no_results_message": "No users found. Or no searches have been made. Please select at least one!"
+  },
+  "user_item": {
+    "tooltip": {
+      "member": "HSBI Member",
+      "non_member": "Not an HSBI Member",
+      "check_membership": "Check HSBI Membership"
+    },
+    "alt": {
+      "check_membership_icon": "Check Membership"
+    },
+    "button": {
+      "onboard": "On-board"
+    },
+    "detail": {
+      "registered": "📅 Registered:",
+      "first_post": "📝 First post:",
+      "reputation": "⭐ Reputation:",
+      "posts": "🧾 Posts:",
+      "avg_votes": "📊 Avg. votes:"
+    }
   }
 }

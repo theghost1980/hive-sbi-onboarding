@@ -82,5 +82,37 @@
   },
   "carousel": {
     "paused_message": "pausado por cursor"
+  },
+  "search_users_page": {
+    "title": "Buscar nuevos usuarios",
+    "options": {
+      "new_24h_label": "Registrados en las últimas 24 horas",
+      "fish_new_label": "Registrados desde hace 30 días - Sin muchos votos",
+      "fish_new_limit_label": "Registrados desde hace 30 días - Sin muchos votos - LIMITADO a 10"
+    },
+    "loading": {
+      "long_message": "Esto está tardando un poco... ¡Seguro que los usuarios se están haciendo de rogar!"
+    },
+    "no_results_message": "No se encontraron usuarios. O no se han hecho busquedas. Seleccione al menos una!"
+  },
+  "user_item": {
+    "tooltip": {
+      "member": "Miembro de HSBI",
+      "non_member": "No es miembro de HSBI",
+      "check_membership": "Verificar membresía HSBI"
+    },
+    "alt": {
+      "check_membership_icon": "Verificar membresía"
+    },
+    "button": {
+      "onboard": "On-board"
+    },
+    "detail": {
+      "registered": "📅 Registrado:",
+      "first_post": "📝 Primer post:",
+      "reputation": "⭐ Reputación:",
+      "posts": "🧾 Posts:",
+      "avg_votes": "📊 Promedio votos:"
+    }
   }
 }

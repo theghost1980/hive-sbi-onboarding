@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
@@ -148,14 +149,13 @@ const StyledUserDetail = styled.div`
   }
 `;
 
-// --- Fin de los estilos ---
-
 const UserItem: React.FC<UserItemProps> = ({
   onboarded,
   onboarder,
   token,
   linkPeakdPrefix,
 }) => {
+  const { t } = useTranslation();
   const [isChecking, setIsChecking] = useState<boolean>(false);
   const [isMember, setIsMember] = useState<boolean | null>(null);
 
@@ -209,87 +209,132 @@ const UserItem: React.FC<UserItemProps> = ({
 
   return (
     <StyledUserItem>
+           {" "}
       <StyledUserHeader>
+               {" "}
         <StyledUserName>
+                   {" "}
           {linkPeakdPrefix ? (
             <NavLink
               target="_blank"
               rel="noopener noreferrer"
               to={`${linkPeakdPrefix}@${onboarded.name}`}
             >
-              @{onboarded.name}
+                            @{onboarded.name}           {" "}
             </NavLink>
           ) : (
             `@${onboarded.name}`
           )}
+                 {" "}
         </StyledUserName>
+               {" "}
         <StyledUserStatus>
+                   {" "}
           {isChecking ? (
             <AiOutlineLoading3Quarters className="loading-icon" />
           ) : isMember === true ? (
-            <FaCheckCircle className="member-icon" title="Miembro de HSBI" />
+            <FaCheckCircle
+              className="member-icon"
+              title={t("user_item.tooltip.member")}
+            />
           ) : isMember === false ? (
             <>
+                           {" "}
               <FaTimesCircle
                 className="non-member-icon"
-                title="No es miembro de HSBI"
+                title={t("user_item.tooltip.non_member")}
               />
-
+                           {" "}
               <StyledOnboardButton onClick={openModal}>
-                On-board
+                                {t("user_item.button.onboard")}             {" "}
               </StyledOnboardButton>
+                           {" "}
               <OnboardModal
                 isOpen={isModalOpen}
                 onRequestClose={closeModal}
                 username={onboarded.name}
                 onboarderUsername={onboarder}
               />
+                         {" "}
             </>
           ) : (
             <img
               src="https://files.peakd.com/file/peakd-hive/theghost1980/23yJXfDYQfGae8EdUPf7jX6B564dxmTSKr9qfUnH3MsAmPkhNSZ3Yo2irSw33WChfnC9m.png"
-              alt="Verificar membresía"
+              alt={t("user_item.alt.check_membership_icon")}
               className="check-icon"
               onClick={handleCheckMembership}
-              title="Verificar membresía HSBI"
+              title={t("user_item.tooltip.check_membership")}
             />
           )}
+                 {" "}
         </StyledUserStatus>
+             {" "}
       </StyledUserHeader>
+           {" "}
       <StyledUserDetails>
+               {" "}
         {formattedCreatedDate && (
           <StyledUserDetail>
-            <span className="detail-label">📅 Registrado:</span>
-            <span className="detail-value">{formattedCreatedDate}</span>
+                       {" "}
+            <span className="detail-label">
+              {t("user_item.detail.registered")}
+            </span>
+                       {" "}
+            <span className="detail-value">{formattedCreatedDate}</span>       
+             {" "}
           </StyledUserDetail>
         )}
+               {" "}
         {formattedFirstPostDate && (
           <StyledUserDetail>
-            <span className="detail-label">📝 Primer post:</span>
-            <span className="detail-value">{formattedFirstPostDate}</span>
+                       {" "}
+            <span className="detail-label">
+              {t("user_item.detail.first_post")}
+            </span>
+                       {" "}
+            <span className="detail-value">{formattedFirstPostDate}</span>     
+               {" "}
           </StyledUserDetail>
         )}
+               {" "}
         {onboarded.reputation_ui !== undefined && (
           <StyledUserDetail>
-            <span className="detail-label">⭐ Reputación:</span>
-            <span className="detail-value">{onboarded.reputation_ui}</span>
+                       {" "}
+            <span className="detail-label">
+              {t("user_item.detail.reputation")}
+            </span>
+                       {" "}
+            <span className="detail-value">{onboarded.reputation_ui}</span>     
+               {" "}
           </StyledUserDetail>
         )}
+               {" "}
         {onboarded.total_posts !== undefined && (
           <StyledUserDetail>
-            <span className="detail-label">🧾 Posts:</span>
-            <span className="detail-value">{onboarded.total_posts}</span>
+                       {" "}
+            <span className="detail-label">{t("user_item.detail.posts")}</span> 
+                     {" "}
+            <span className="detail-value">{onboarded.total_posts}</span>       
+             {" "}
           </StyledUserDetail>
         )}
+               {" "}
         {onboarded.avg_votes !== undefined && (
           <StyledUserDetail>
-            <span className="detail-label">📊 Promedio votos:</span>
-            <span className="detail-value">
-              {onboarded.avg_votes.toFixed(2)}
+                       {" "}
+            <span className="detail-label">
+              {t("user_item.detail.avg_votes")}
             </span>
+                       {" "}
+            <span className="detail-value">
+                            {onboarded.avg_votes.toFixed(2)}           {" "}
+            </span>
+                     {" "}
           </StyledUserDetail>
         )}
+             {" "}
       </StyledUserDetails>
+         {" "}
     </StyledUserItem>
   );
 };

@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next"; // Importa el hook useTranslation
+
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaAccessibleIcon, FaAngry, FaBaby } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -19,25 +21,10 @@ export interface Account {
   avg_votes?: number;
 }
 
-//TODO añade que el limite para la consulta "fish-new-limit" el usuario lo fije
-const options: Option[] = [
-  {
-    value: "new-24-h",
-    label: "Registrados en las últimas 24 horas",
-    icon: FaBaby,
-  },
-  {
-    value: "fish-new",
-    label: "Registrados desde hace 30 días - Sin muchos votos",
-    icon: FaAccessibleIcon,
-  },
-  {
-    value: "fish-new-limit",
-    label: "Registrados desde hace 30 días - Sin muchos votos - LIMITADO a 10",
-    icon: FaAngry,
-  },
-];
+// Elimina o comenta la definición global de options
+// const options: Option[] = [...]
 
+//TODO añade que el limite para la consulta "fish-new-limit" el usuario lo fije
 //TODO pagination server side.
 
 const StyledContainer = styled.div`
@@ -51,37 +38,37 @@ const StyledUserList = styled.ul`
 `;
 
 const spin = keyframes`
-  to {
-    transform: rotate(360deg);
-  }
+ to {
+  transform: rotate(360deg);
+ }
 `;
 
 const StyledLoadingSpinner = styled(AiOutlineLoading3Quarters)`
-  animation: ${spin} 1s linear infinite; /* Aplica la animación de giro */
-  font-size: 2.5rem; /* Tamaño del spinner */
-  color: #007bff; /* Color del spinner (puedes ajustarlo) */
-  margin: 20px auto; /* Centra el spinner horizontalmente y añade margen */
-  display: block; /* Asegura que 'margin: auto' funcione para centrar */
+  animation: ${spin} 1s linear infinite;
+  font-size: 2.5rem;
+  color: #007bff;
+  margin: 20px auto;
+  display: block;
 `;
 
 const StyledLoadingContainer = styled.div`
   display: flex;
-  flex-direction: column; /* Apila los elementos verticalmente */
-  align-items: center; /* Centra horizontalmente */
-  margin-top: 20px; /* Espacio respecto al selector */
-  min-height: 100px; /* Altura mínima para que se vea centrado */
-  justify-content: center; /* Centra verticalmente si el contenedor tiene altura */
-  text-align: center; /* Centra el texto dentro del párrafo */
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  min-height: 100px;
+  justify-content: center;
+  text-align: center;
 
-  /* Estilos para el párrafo dentro de este contenedor */
   p {
-    margin-top: 10px; /* Espacio entre el spinner y el texto */
-    color: #555; /* Color para el texto */
+    margin-top: 10px;
+    color: #555;
     font-size: 0.95rem;
   }
 `;
 
 const BuscarUsuarios = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedValue, setSelectedValue] = useState<string>("");
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -100,6 +87,25 @@ const BuscarUsuarios = () => {
   const handleChange = (value: string) => {
     setSelectedValue(value);
   };
+
+  // Define options DENTRO del componente para usar t()
+  const options: Option[] = [
+    {
+      value: "new-24-h",
+      label: t("search_users_page.options.new_24h_label"), // Usa la clave de traducción
+      icon: FaBaby,
+    },
+    {
+      value: "fish-new",
+      label: t("search_users_page.options.fish_new_label"), // Usa la clave de traducción
+      icon: FaAccessibleIcon,
+    },
+    {
+      value: "fish-new-limit",
+      label: t("search_users_page.options.fish_new_limit_label"), // Usa la clave de traducción
+      icon: FaAngry,
+    },
+  ];
 
   useEffect(() => {
     if (loading) {
@@ -147,25 +153,23 @@ const BuscarUsuarios = () => {
 
   return (
     <StyledContainer>
-      <h1>Buscar nuevos usuarios</h1>
+      {/* Usa t() para el título principal */}{" "}
+      <h1>{t("search_users_page.title")}</h1>{" "}
       <CustomSelect
-        options={options}
+        options={options} // options ahora está definido dentro del componente
         value={selectedValue}
         onChange={handleChange}
-      />
-
+      />{" "}
       {loading ? (
         <StyledLoadingContainer>
-          <StyledLoadingSpinner />
+          <StyledLoadingSpinner />{" "}
           {showLongLoadingMessage && (
-            <p>
-              Esto está tardando un poco... ¡Seguro que los usuarios se están
-              haciendo de rogar!
-            </p>
-          )}
+            <p>{t("search_users_page.loading.long_message")}</p>
+          )}{" "}
         </StyledLoadingContainer>
       ) : accounts.length > 0 ? (
         <StyledUserList>
+          {" "}
           {accounts.map((account) => (
             <UserItem
               key={account.name}
@@ -174,14 +178,11 @@ const BuscarUsuarios = () => {
               linkPeakdPrefix={"https://peakd.com/"}
               token={token}
             />
-          ))}
+          ))}{" "}
         </StyledUserList>
       ) : (
-        <p>
-          No se encontraron usuarios. O no se han hecho busquedas. Seleccione al
-          menos una!
-        </p>
-      )}
+        <p>{t("search_users_page.no_results_message")}</p>
+      )}{" "}
     </StyledContainer>
   );
 };
