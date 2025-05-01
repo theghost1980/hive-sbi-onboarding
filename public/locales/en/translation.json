@@ -212,5 +212,12 @@
       "no_recent_posts": "No recent posts for @{{username}}."
     },
     "close_button": "Close"
+  },
+  "stepper": {
+    "internal_error_step_not_found": "Stepper internal error: Step not found.",
+    "step": "Step",
+    "of": "of",
+    "prev": "Prev",
+    "next": "Next"
   }
 }

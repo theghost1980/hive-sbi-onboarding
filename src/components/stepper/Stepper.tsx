@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StepData } from "../OnboardModal";
 interface StepDefinition {
   component: React.ComponentType<any>;
@@ -35,6 +36,7 @@ const Stepper: React.FC<StepperProps> = ({
   onTransactionComplete,
   onTransactionError,
 }) => {
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(initialStep);
 
   useEffect(() => {
@@ -64,7 +66,7 @@ const Stepper: React.FC<StepperProps> = ({
     console.error(`Stepper: Step index ${currentStep} out of bounds.`);
     return (
       <p style={{ color: "red" }}>
-        Error interno del Stepper: Paso no encontrado.
+        {t("stepper.internal_error_step_not_found")}
       </p>
     );
   }
@@ -81,7 +83,7 @@ const Stepper: React.FC<StepperProps> = ({
         color: "#555",
       }}
     >
-      Paso {currentStep + 1} de {steps.length}
+      {t("stepper.step")} {currentStep + 1} {t("stepper.of")} {steps.length}
     </div>
   );
 
@@ -114,9 +116,11 @@ const Stepper: React.FC<StepperProps> = ({
           justifyContent: "space-between",
         }}
       >
-        {currentStep > 0 && <button onClick={handlePrevStep}>Anterior</button>}
+        {currentStep > 0 && (
+          <button onClick={handlePrevStep}>{t("stepper.prev")}</button>
+        )}
         {currentStep < steps.length - 1 && (
-          <button onClick={handleNextStep}>Siguiente</button>
+          <button onClick={handleNextStep}>{t("stepper.next")}</button>
         )}
         {currentStep === steps.length - 1 && null}
       </div>

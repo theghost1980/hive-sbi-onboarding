@@ -199,6 +199,13 @@ interface ResourceType {
       };
       close_button: string;
     };
+    stepper: {
+      internal_error_step_not_found: string;
+      step: string;
+      of: string;
+      prev: string;
+      next: string;
+    };
   };
   /*
   Si tuvieras otros archivos JSON de traducción con nombres diferentes a translation.json

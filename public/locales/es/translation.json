@@ -212,5 +212,12 @@
       "no_recent_posts": "No hay publicaciones recientes para @{{username}}."
     },
     "close_button": "Cerrar"
+  },
+  "stepper": {
+    "internal_error_step_not_found": "Error interno del Stepper: Paso no encontrado.",
+    "step": "Paso",
+    "of": "de",
+    "prev": "Anterior",
+    "next": "Siguiente"
   }
 }
