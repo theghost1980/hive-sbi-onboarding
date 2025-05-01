@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FaCheckCircle,
   FaExclamationTriangle,
@@ -67,6 +68,7 @@ const StyledWarningIcon = styled(FaExclamationTriangle)`
 `;
 
 export const BackendStatusBar = () => {
+  const { t } = useTranslation();
   const [status, setStatus] = useState<Status>("checking");
   const [backendUrl, setBackendUrl] = useState<string>("");
 
@@ -95,19 +97,19 @@ export const BackendStatusBar = () => {
       case "checking":
         return {
           icon: StyledSpinnerIcon,
-          text: "Verificando conexión...",
+          text: t("backend_status_bar.checking_status_text"),
           color: "gray",
         };
       case "online":
         return {
           icon: StyledCheckIcon,
-          text: "Backend disponible",
+          text: t("backend_status_bar.online_status_text"),
           color: "green",
         };
       case "offline":
         return {
           icon: StyledWarningIcon,
-          text: "Backend no disponible",
+          text: t("backend_status_bar.offline_status_text"),
           color: "red",
         };
       default:
@@ -128,7 +130,7 @@ export const BackendStatusBar = () => {
         {StatusIconComponent && <StatusIconComponent color={color} />}
       </StyledStatusText>
       <StyledStatusUrl>
-        Disponible en:{" "}
+        {t("backend_status_bar.available_at_prefix")}
         <a href={`${backendUrl}`} target="_blank" rel="noopener noreferrer">
           {backendUrl}
         </a>

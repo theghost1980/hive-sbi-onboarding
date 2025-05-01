@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import backendApi from "../api/Backend";
@@ -93,6 +94,7 @@ const StyledOnboardingItem = styled.li`
 `;
 
 function OnboardingList({ setOnboardingList }: OnboardingListProps) {
+  const { t } = useTranslation();
   const { setAuth, isLoadingAuth, isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -143,42 +145,45 @@ function OnboardingList({ setOnboardingList }: OnboardingListProps) {
 
   return (
     <StyledContainer>
-      <h2>Last Onboardings</h2>
-
+         <h2>{t("onboarding_list.title")}</h2>     
       {isLoading && (
-        <StyledLoadingMessage>Loading onboardings...</StyledLoadingMessage>
+        <StyledLoadingMessage>
+          {t("onboarding_list.loading_message")}
+        </StyledLoadingMessage>
       )}
-
-      {error && <StyledErrorMessage>{error}</StyledErrorMessage>}
-
+      {error && <StyledErrorMessage>{error}</StyledErrorMessage>}     
       {!isLoading && !error && onboardings.length > 0 && (
         <StyledOnboardingList>
           {onboardings.map((item, index) => (
             <StyledOnboardingItem key={index}>
               <p>
-                <strong>Onboarder:</strong> {item.onboarder}
+                <strong>{t("onboarding_list.labels.onboarder")}</strong>
+                {item.onboarder}             
               </p>
               <p>
-                <strong>Onboarded:</strong> {item.onboarded}
+                <strong>{t("onboarding_list.labels.onboarded")}</strong>
+                {item.onboarded}             
               </p>
               <p>
-                <strong>Amount:</strong> {item.amount}
+                <strong>{t("onboarding_list.labels.amount")}</strong>
+                {item.amount}             
               </p>
               <p>
-                <strong>Memo:</strong> {item.memo}
+                <strong>{t("onboarding_list.labels.memo")}</strong>
+                {item.memo}   
               </p>
               <p>
-                <strong>Date:</strong>{" "}
-                {FormatUtils.formatTimestampManual(item.timestamp)}
+                <strong>{t("onboarding_list.labels.date")}</strong>      
+                {FormatUtils.formatTimestampManual(item.timestamp)}             
               </p>
             </StyledOnboardingItem>
           ))}
         </StyledOnboardingList>
       )}
-
+           
       {!isLoading && !error && onboardings.length === 0 && (
         <StyledNoRecordsMessage>
-          No onboarding records found yet.
+          {t("onboarding_list.no_records_message")}       
         </StyledNoRecordsMessage>
       )}
     </StyledContainer>

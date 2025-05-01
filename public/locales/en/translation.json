@@ -114,5 +114,81 @@
       "posts": "🧾 Posts:",
       "avg_votes": "📊 Avg. votes:"
     }
+  },
+  "sidebar": {
+    "nav": {
+      "home": "Home",
+      "onboard_user": "Onboard User",
+      "search_users": "Search for New Users"
+    },
+    "auth_status": {
+      "loading": "Loading authentication status...",
+      "logged_in_prefix": "Logged in as:",
+      "logout_button": "Logout",
+      "go_to_login_button": "Go to Login"
+    },
+    "alt": {
+      "hsbi_logo": "HIVE HSBI Community Logo"
+    }
+  },
+  "backend_status_bar": {
+    "available_at_prefix": "Available at: ",
+    "checking_status_text": "Checking connection...",
+    "online_status_text": "Online",
+    "offline_status_text": "Offline"
+  },
+  "onboarding_list": {
+    "title": "Last Onboardings",
+    "loading_message": "Loading onboardings...",
+    "labels": {
+      "onboarder": "Onboarder: ",
+      "onboarded": "Onboarded: ",
+      "amount": "Amount: ",
+      "memo": "Memo: ",
+      "date": "Date: "
+    },
+    "no_records_message": "No onboarding records found yet."
+  },
+  "onboard_user_page": {
+    "title": "Onboard User",
+    "search": {
+      "placeholder": "Enter Hive username",
+      "button": {
+        "searching": "Searching...",
+        "checking": "Checking Membership...",
+        "search": "Search User"
+      },
+      "status": {
+        "searching_hive": "Searching Hive..."
+      },
+      "error_prefix": "Error: "
+    },
+    "result": {
+      "user_found_prefix": "User found: ",
+      "membership": {
+        "checking": "Checking membership...",
+        "check_failed_prefix": "Membership check failed: ",
+        "already_member": "Already a member of HSBI.",
+        "backend_info": {
+          "onboarded_by_prefix": "Onboarded by: ",
+          "on_date_connector": " on ",
+          "missing_comment": {
+            "message": "Onboard Comment is missing. Click below to edit and post it.",
+            "edit_button": "Edit Comment"
+          },
+          "comment_posted_prefix": "Comment posted: "
+        },
+        "not_yet_member": "Not yet a member of HSBI.",
+        "onboard_button": "Onboard @{{username}}"
+      }
+    },
+    "all_records": {
+      "title": "All Onboarding Records",
+      "toggle_button": {
+        "hide": "Hide List",
+        "show": "Show List"
+      },
+      "no_records_message": "No onboarding records found yet."
+    }
   }
 }

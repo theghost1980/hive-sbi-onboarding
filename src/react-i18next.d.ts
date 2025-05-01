@@ -1,34 +1,199 @@
 import "react-i18next";
-
 interface ResourceType {
   translation: {
-    welcome_title: string;
-    how_it_works_title: string;
-    contact_title: string;
-    made_by: string;
-    Powered_by: string;
-    General: string;
-    "Encuentra más información y soporte sobre HSBI y esta herramienta en:": string;
-    "Desarrolladores y Colaboradores": string;
-    "Recursos Útiles para Desarrollo en Hive": string;
-    "Usar esta herramienta es fácil. Sigue estos pasos:": string;
-    "¡Comienza Ahora!": string;
-    "¿Listo para apadrinar a tu primer usuario en Hive SBI?": string;
-    "Ir a Onboard Usuario": string;
-    pausado_por_cursor: string;
-
-    // Ajusta esta sección según la estructura real de tu translation.json
-    // homepage: {
-    //   hero: { title: string; subtitle: string; },
-    //   what_is_sbi: { title: string; p1: string; p2: string; },
-    //   // ... etc.
-    // }
+    homepage: {
+      hero: { title: string; subtitle: string };
+      what_is_sbi: { title: string; p1: string; p2: string };
+      simplifying: { title: string; p1: string; p2: string; p3: string };
+      how_it_works: {
+        title: string;
+        intro: string;
+        steps: {
+          s1_title: string;
+          s1_text: string;
+          s2_title: string;
+          s2_text: string;
+          s3_title: string;
+          s3_text: string;
+          s4_title: string;
+          s4_text: string;
+          s5_title: string;
+          s5_text: string;
+          s6_title: string;
+          s6_text: string;
+          s7_title: string;
+          s7_text: string;
+          s8_title: string;
+          s8_text: string;
+        };
+      };
+      cta: { title: string; intro: string; button: string };
+      contact: {
+        title: string;
+        general: {
+          title: string;
+          intro: string;
+          community_link_text: string;
+          discord_link_text: string;
+        };
+        developers: {
+          title: string;
+        };
+        dev_resources: {
+          title: string;
+          discord_general_text: string;
+          discord_engine_text: string;
+          docs_text: string;
+          discord_hivesql_text: string;
+          npm_package_text: string;
+        };
+      };
+    };
+    global: {
+      github_label: string;
+      hive_label: string;
+      homepage_label: string;
+    };
+    footer: {
+      made_by: string; // Esta tiene interpolación, pero sigue siendo string
+      powered_by_title: string;
+    };
+    alt: {
+      hive_logo: string;
+      keychain_logo: string;
+      hivesql_logo: string;
+      privex_logo: string;
+      tipu_love_title: string;
+      tipjar_button_alt: string;
+    };
+    carousel: {
+      paused_message: string;
+    };
+    search_users_page: {
+      title: string;
+      options: {
+        new_24h_label: string;
+        fish_new_label: string;
+        fish_new_limit_label: string;
+      };
+      loading: {
+        long_message: string;
+      };
+      no_results_message: string;
+    };
+    user_item: {
+      tooltip: {
+        member: string;
+        non_member: string;
+        check_membership: string;
+      };
+      alt: {
+        check_membership_icon: string;
+      };
+      button: {
+        onboard: string;
+      };
+      detail: {
+        registered: string;
+        first_post: string;
+        reputation: string;
+        posts: string;
+        avg_votes: string;
+      };
+    };
+    sidebar: {
+      nav: {
+        home: string;
+        onboard_user: string;
+        search_users: string;
+      };
+      auth_status: {
+        loading: string;
+        logged_in_prefix: string;
+        logout_button: string;
+        go_to_login_button: string;
+      };
+      alt: {
+        hsbi_logo: string;
+      };
+    };
+    backend_status_bar: {
+      available_at_prefix: string;
+      checking_status_text: string;
+      online_status_text: string;
+      offline_status_text: string;
+    };
+    onboarding_list: {
+      title: string;
+      loading_message: string;
+      labels: {
+        onboarder: string;
+        onboarded: string;
+        amount: string;
+        memo: string;
+        date: string;
+      };
+      no_records_message: string;
+    };
+    onboard_user_page: {
+      title: string;
+      search: {
+        placeholder: string;
+        button: {
+          searching: string;
+          checking: string;
+          search: string;
+        };
+        status: {
+          searching_hive: string;
+        };
+        error_prefix: string;
+      };
+      result: {
+        user_found_prefix: string;
+        membership: {
+          checking: string;
+          check_failed_prefix: string;
+          already_member: string;
+          backend_info: {
+            onboarded_by_prefix: string;
+            on_date_connector: string;
+            missing_comment: {
+              message: string;
+              edit_button: string;
+            };
+            comment_posted_prefix: string;
+          };
+          not_yet_member: string;
+          onboard_button: string; // Es string aunque tenga interpolación
+        };
+      };
+      all_records: {
+        title: string;
+        toggle_button: {
+          hide: string;
+          show: string;
+        };
+        no_records_message: string;
+      };
+    };
   };
+  /*
+  Si tuvieras otros archivos JSON de traducción con nombres diferentes a translation.json
+  (por ejemplo, common.json), agregarías aquí interfaces para ellos al mismo nivel que 'translation'. Por ejemplo:
+  common: {
+      some_key: string;
+  };
+  */
 }
 
+// Esto extiende el módulo 'react-i18next' para decirle los tipos personalizados
+// que estamos usando (nuestro namespace por defecto y nuestra estructura de recursos).
 declare module "react-i18next" {
   interface CustomTypeOptions {
+    // Especifica el namespace por defecto que estás usando (tu archivo translation.json)
     defaultNS: "translation";
+    // Especifica la interfaz que define la estructura de tus recursos (el JSON)
     resources: ResourceType;
   }
 }

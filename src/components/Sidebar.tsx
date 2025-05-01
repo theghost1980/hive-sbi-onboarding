@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 import HSBIlogo from "../assets/logos/hsbi-logo.png";
@@ -7,10 +8,9 @@ import { BackendStatusBar } from "./BackendStatusBar";
 const StyledMainContent = styled.div`
   display: flex;
   flex-direction: column;
-  flex-grow: 1; /* Ocupa todo el espacio disponible */
-  justify-content: flex-start; /* Alinea el contenido principal al inicio */
-  padding: 20px 0; /* Añade padding superior e inferior para separar del borde del sidebar y el logo */
-  /* El padding lateral se manejará dentro de StyledNav y StyledAuthStatus */
+  flex-grow: 1;
+  justify-content: flex-start;
+  padding: 20px 0;
 `;
 
 const StyledSidebar = styled.div`
@@ -112,16 +112,45 @@ const StyledLogoutButton = styled.button`
 `;
 
 const StyledLogo = styled.img`
-  width: 150px; /* Ajusta el tamaño según necesites */
-  height: auto; /* Mantiene la proporción */
-  margin-bottom: 20px; /* Espacio debajo del logo */
-  /* Si quieres centrar el logo horizontalmente dentro del sidebar */
+  width: 150px;
+  height: auto;
+  margin-bottom: 20px;
   display: block;
   margin-left: auto;
   margin-right: auto;
 `;
 
+const StyledLanguageSwitcher = styled.div`
+  margin-top: 20px;
+  text-align: center;
+
+  button {
+    background: none;
+    border: 1px solid #ecf0f1;
+    color: #ecf0f1;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-size: 0.9em;
+
+    &:hover {
+      background-color: #ecf0f1;
+      color: #2c3e50;
+    }
+  }
+`;
+
 const Sidebar = () => {
+  const { t, i18n } = useTranslation();
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+  };
+
+  const isSpanish = i18n.language.startsWith("es");
+  const targetLanguage = isSpanish ? "en" : "es";
+  const targetLanguageLabel = isSpanish ? "English" : "Español";
+
   const { isAuthenticated, user, logout, isLoadingAuth } = useAuth();
 
   return (
@@ -134,7 +163,7 @@ const Sidebar = () => {
                 to="/"
                 className={({ isActive }) => (isActive ? "active" : "")}
               >
-                Home
+                {t("sidebar.nav.home")}
               </NavLink>
             </li>
             <li>
@@ -142,7 +171,7 @@ const Sidebar = () => {
                 to="/onboard-user"
                 className={({ isActive }) => (isActive ? "active" : "")}
               >
-                Onboard Usuario
+                {t("sidebar.nav.onboard_user")}
               </NavLink>
             </li>
             <li>
@@ -150,50 +179,41 @@ const Sidebar = () => {
                 to="/buscar-usuarios"
                 className={({ isActive }) => (isActive ? "active" : "")}
               >
-                Buscar nuevos usuarios
+                {t("sidebar.nav.search_users")}
               </NavLink>
             </li>
-            {/* <li>
-              <NavLink
-                to="/chequear-hive-sbi"
-                className={({ isActive }) => (isActive ? "active" : "")}
-              >
-                Chequear usuario en Hive SBI
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/ultimos-agregados"
-                className={({ isActive }) => (isActive ? "active" : "")}
-              >
-                Mostrar últimos agregados en HSBI
-              </NavLink>
-            </li> */}
           </ul>
         </StyledNav>
-
+        <StyledLanguageSwitcher>
+          <button onClick={() => changeLanguage(targetLanguage)}>
+            {targetLanguageLabel}
+          </button>
+        </StyledLanguageSwitcher>
         <StyledAuthStatus>
           {isLoadingAuth ? (
-            <p>Loading auth...</p>
+            <p>{t("sidebar.auth_status.loading")}</p>
           ) : isAuthenticated ? (
             <div>
-              <p>Logged in as: {user?.username}</p>
-              <StyledLogoutButton onClick={logout}>Logout</StyledLogoutButton>
+              <p>
+                {t("sidebar.auth_status.logged_in_prefix")} {user?.username}
+              </p>
+              <StyledLogoutButton onClick={logout}>
+                {t("sidebar.auth_status.logout_button")}
+              </StyledLogoutButton>
             </div>
           ) : (
             <NavLink to="/login">
-              <button>Go to Login</button>
+              <button>{t("sidebar.auth_status.go_to_login_button")}</button>
             </NavLink>
           )}
         </StyledAuthStatus>
       </StyledMainContent>
-
       <a
         href="https://www.hivesbi.com/"
         target="_blank"
         rel="noopener noreferrer"
       >
-        <StyledLogo src={HSBIlogo} alt="Logo de la comunidad HSBI de HIVE" />
+        <StyledLogo src={HSBIlogo} alt={t("sidebar.alt.hsbi_logo")} />
       </a>
       <BackendStatusBar />
     </StyledSidebar>

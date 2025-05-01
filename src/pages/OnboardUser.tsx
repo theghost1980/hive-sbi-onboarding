@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import backendApi from "../api/Backend";
 import { HiveApi } from "../api/HIveApi";
@@ -265,6 +266,7 @@ const StyledMembershipError = styled.p`
 `;
 
 const OnBoardUser: React.FC = () => {
+  const { t } = useTranslation();
   const [usernameInput, setUsernameInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -433,11 +435,11 @@ const OnBoardUser: React.FC = () => {
   return (
     <StyledOnboardLayout>
       <StyledSearchSection>
-        <h1>Onboard User</h1>
+        <h1>{t("onboard_user_page.title")}</h1>
         <StyledUserSearchForm onSubmit={handleSearch}>
           <StyledSearchInput
             type="text"
-            placeholder="Enter Hive username"
+            placeholder={t("onboard_user_page.search.placeholder")}
             value={usernameInput}
             onChange={(e) => setUsernameInput(e.target.value)}
             disabled={isLoading || isCheckingMembership}
@@ -449,67 +451,83 @@ const OnBoardUser: React.FC = () => {
             }
           >
             {isLoading
-              ? "Searching..."
+              ? t("onboard_user_page.search.button.searching")
               : isCheckingMembership
-              ? "Checking Membership..."
-              : "Search User"}
+              ? t("onboard_user_page.search.button.checking")
+              : t("onboard_user_page.search.button.search")}
           </StyledSearchButton>
         </StyledUserSearchForm>
-
         {isLoading && (
-          <StyledSearchStatus>Searching Hive...</StyledSearchStatus>
+          <StyledSearchStatus>
+            {t("onboard_user_page.search.status.searching_hive")}
+          </StyledSearchStatus>
         )}
-        {error && <StyledSearchError>Error: {error}</StyledSearchError>}
-
+        {error && (
+          <StyledSearchError>
+            {t("onboard_user_page.search.error_prefix")}
+            {error}
+          </StyledSearchError>
+        )}
         {foundUser && (
           <StyledUserResult>
             <p>
-              User found: <strong>@{foundUser.name}</strong>
+              {t("onboard_user_page.result.user_found_prefix")}
+              <strong>@{foundUser.name}</strong>
             </p>
-
             {isCheckingMembership ? (
               <StyledMembershipStatus>
-                <p>Checking membership...</p>
+                <p>{t("onboard_user_page.result.membership.checking")}</p>
               </StyledMembershipStatus>
             ) : membershipCheckError ? (
               <StyledMembershipError>
-                Membership check failed: {membershipCheckError}
+                {t("onboard_user_page.result.membership.check_failed_prefix")}
+                {membershipCheckError}
               </StyledMembershipError>
             ) : isMember === true ? (
               <StyledMembershipStatus $isMember={true}>
                 <StyledMembershipStatusIcon $isMember={true}>
-                  ✓
+                  ✓{" "}
                 </StyledMembershipStatusIcon>
-                <p>Already a member of HSBI.</p>
+                <p>{t("onboard_user_page.result.membership.already_member")}</p>
                 {backendOnboardingInfo && (
                   <StyledBackendOnboardInfo>
                     <p>
-                      Onboarded by:{" "}
-                      <strong>{backendOnboardingInfo.onboarder}</strong> on{" "}
+                      {t(
+                        "onboard_user_page.result.membership.backend_info.onboarded_by_prefix"
+                      )}
+                      <strong>{backendOnboardingInfo.onboarder}</strong>
+                      {t(
+                        "onboard_user_page.result.membership.backend_info.on_date_connector"
+                      )}
                       {formatTimestampManual(backendOnboardingInfo.timestamp)}
                     </p>
                     {!backendOnboardingInfo.comment_permlink && (
                       <StyledMissingCommentSection>
                         <p>
-                          Onboard Comment is missing. Click below to edit and
-                          post it.
+                          {t(
+                            "onboard_user_page.result.membership.backend_info.missing_comment.message"
+                          )}
                         </p>
                         <StyledEditOnboardButton
                           onClick={() => openOnboardModal(foundUser.name, 2)}
                         >
-                          Edit Comment
+                          {t(
+                            "onboard_user_page.result.membership.backend_info.missing_comment.edit_button"
+                          )}
                         </StyledEditOnboardButton>
                       </StyledMissingCommentSection>
                     )}
                     {backendOnboardingInfo.comment_permlink && (
                       <p>
-                        Comment posted:{" "}
+                        {t(
+                          "onboard_user_page.result.membership.backend_info.comment_posted_prefix"
+                        )}
                         <StyledCommentPermlinkLink
                           href={`https://hive.blog/@${backendOnboardingInfo.onboarder}/${backendOnboardingInfo.comment_permlink}`}
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          {backendOnboardingInfo.comment_permlink}
+                          {backendOnboardingInfo.comment_permlink}             
                         </StyledCommentPermlinkLink>
                       </p>
                     )}
@@ -519,37 +537,39 @@ const OnBoardUser: React.FC = () => {
             ) : isMember === false ? (
               <StyledMembershipStatus $isMember={false}>
                 <StyledMembershipStatusIcon $isMember={false}>
-                  ✗
+                  ✗{" "}
                 </StyledMembershipStatusIcon>
-                <p>Not yet a member of HSBI.</p>
+                <p>{t("onboard_user_page.result.membership.not_yet_member")}</p>
                 <StyledOnboardButton
                   onClick={() => openOnboardModal(foundUser.name, 1)}
                 >
-                  Onboard @{foundUser.name}
+                  {t("onboard_user_page.result.membership.onboard_button", {
+                    username: foundUser.name,
+                  })}
                 </StyledOnboardButton>
               </StyledMembershipStatus>
             ) : null}
           </StyledUserResult>
         )}
       </StyledSearchSection>
-
       <StyledAllOnboardingsSection>
         <StyledListHeaderControls>
           <StyledAllOnboardingsTitle>
-            All Onboarding Records
+            {t("onboard_user_page.all_records.title")}
           </StyledAllOnboardingsTitle>
           <StyledToggleListButton
             type="button"
             onClick={() => setShowOnboardingList(!showOnboardingList)}
           >
-            {showOnboardingList ? "Hide List" : "Show List"}
+            {showOnboardingList
+              ? t("onboard_user_page.all_records.toggle_button.hide")
+              : t("onboard_user_page.all_records.toggle_button.show")}
           </StyledToggleListButton>
         </StyledListHeaderControls>
         {showOnboardingList && (
           <OnboardingList setOnboardingList={setLatestsAdditionsList} />
-        )}{" "}
+        )}
       </StyledAllOnboardingsSection>
-
       {isModalOpen && modalUser && (
         <OnboardModal
           isOpen={isModalOpen}

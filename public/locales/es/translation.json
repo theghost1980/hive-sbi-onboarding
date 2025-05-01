@@ -114,5 +114,81 @@
       "posts": "🧾 Posts:",
       "avg_votes": "📊 Promedio votos:"
     }
+  },
+  "sidebar": {
+    "nav": {
+      "home": "Home",
+      "onboard_user": "Onboard Usuario",
+      "search_users": "Buscar nuevos usuarios"
+    },
+    "auth_status": {
+      "loading": "Cargando autenticación...",
+      "logged_in_prefix": "Sesión iniciada como:",
+      "logout_button": "Cerrar sesión",
+      "go_to_login_button": "Ir a Iniciar Sesión"
+    },
+    "alt": {
+      "hsbi_logo": "Logo de la comunidad HSBI de HIVE"
+    }
+  },
+  "backend_status_bar": {
+    "available_at_prefix": "Disponible en: ",
+    "checking_status_text": "Verificando conexión...",
+    "online_status_text": "En linea",
+    "offline_status_text": "Fuera de linea"
+  },
+  "onboarding_list": {
+    "title": "Últimos Onboardings",
+    "loading_message": "Cargando onboardings...",
+    "labels": {
+      "onboarder": "Onboarder: ",
+      "onboarded": "Onboarded: ",
+      "amount": "Cantidad: ",
+      "memo": "Memo: ",
+      "date": "Fecha: "
+    },
+    "no_records_message": "No se encontraron registros de onboarding todavía."
+  },
+  "onboard_user_page": {
+    "title": "Onboard Usuario",
+    "search": {
+      "placeholder": "Ingresa nombre de usuario de Hive",
+      "button": {
+        "searching": "Buscando...",
+        "checking": "Verificando Membresía...",
+        "search": "Buscar Usuario"
+      },
+      "status": {
+        "searching_hive": "Buscando en Hive..."
+      },
+      "error_prefix": "Error: "
+    },
+    "result": {
+      "user_found_prefix": "Usuario encontrado: ",
+      "membership": {
+        "checking": "Verificando membresía...",
+        "check_failed_prefix": "Fallo al verificar membresía: ",
+        "already_member": "Ya es miembro de HSBI.",
+        "backend_info": {
+          "onboarded_by_prefix": "Onboardeado por: ",
+          "on_date_connector": " el ",
+          "missing_comment": {
+            "message": "Falta el comentario de Onboarding. Haz clic abajo para editarlo y publicarlo.",
+            "edit_button": "Editar Comentario"
+          },
+          "comment_posted_prefix": "Comentario publicado: "
+        },
+        "not_yet_member": "Aún no es miembro de HSBI.",
+        "onboard_button": "Onboard a @{{username}}"
+      }
+    },
+    "all_records": {
+      "title": "Todos los registros de Onboarding",
+      "toggle_button": {
+        "hide": "Ocultar Lista",
+        "show": "Mostrar Lista"
+      },
+      "no_records_message": "No se encontraron registros de onboarding todavía."
+    }
   }
 }

@@ -209,27 +209,21 @@ const UserItem: React.FC<UserItemProps> = ({
 
   return (
     <StyledUserItem>
-           {" "}
       <StyledUserHeader>
-               {" "}
         <StyledUserName>
-                   {" "}
           {linkPeakdPrefix ? (
             <NavLink
               target="_blank"
               rel="noopener noreferrer"
               to={`${linkPeakdPrefix}@${onboarded.name}`}
             >
-                            @{onboarded.name}           {" "}
+              @{onboarded.name}
             </NavLink>
           ) : (
             `@${onboarded.name}`
           )}
-                 {" "}
         </StyledUserName>
-               {" "}
         <StyledUserStatus>
-                   {" "}
           {isChecking ? (
             <AiOutlineLoading3Quarters className="loading-icon" />
           ) : isMember === true ? (
@@ -239,23 +233,19 @@ const UserItem: React.FC<UserItemProps> = ({
             />
           ) : isMember === false ? (
             <>
-                           {" "}
               <FaTimesCircle
                 className="non-member-icon"
                 title={t("user_item.tooltip.non_member")}
               />
-                           {" "}
               <StyledOnboardButton onClick={openModal}>
-                                {t("user_item.button.onboard")}             {" "}
+                {t("user_item.button.onboard")}
               </StyledOnboardButton>
-                           {" "}
               <OnboardModal
                 isOpen={isModalOpen}
                 onRequestClose={closeModal}
                 username={onboarded.name}
                 onboarderUsername={onboarder}
               />
-                         {" "}
             </>
           ) : (
             <img
@@ -266,75 +256,50 @@ const UserItem: React.FC<UserItemProps> = ({
               title={t("user_item.tooltip.check_membership")}
             />
           )}
-                 {" "}
         </StyledUserStatus>
-             {" "}
       </StyledUserHeader>
-           {" "}
       <StyledUserDetails>
-               {" "}
         {formattedCreatedDate && (
           <StyledUserDetail>
-                       {" "}
             <span className="detail-label">
               {t("user_item.detail.registered")}
             </span>
-                       {" "}
-            <span className="detail-value">{formattedCreatedDate}</span>       
-             {" "}
+            <span className="detail-value">{formattedCreatedDate}</span>
           </StyledUserDetail>
         )}
-               {" "}
         {formattedFirstPostDate && (
           <StyledUserDetail>
-                       {" "}
             <span className="detail-label">
               {t("user_item.detail.first_post")}
             </span>
-                       {" "}
-            <span className="detail-value">{formattedFirstPostDate}</span>     
-               {" "}
+            <span className="detail-value">{formattedFirstPostDate}</span>
           </StyledUserDetail>
         )}
-               {" "}
         {onboarded.reputation_ui !== undefined && (
           <StyledUserDetail>
-                       {" "}
             <span className="detail-label">
               {t("user_item.detail.reputation")}
             </span>
-                       {" "}
-            <span className="detail-value">{onboarded.reputation_ui}</span>     
-               {" "}
+            <span className="detail-value">{onboarded.reputation_ui}</span>
           </StyledUserDetail>
         )}
-               {" "}
         {onboarded.total_posts !== undefined && (
           <StyledUserDetail>
-                       {" "}
-            <span className="detail-label">{t("user_item.detail.posts")}</span> 
-                     {" "}
-            <span className="detail-value">{onboarded.total_posts}</span>       
-             {" "}
+            <span className="detail-label">{t("user_item.detail.posts")}</span>
+            <span className="detail-value">{onboarded.total_posts}</span>
           </StyledUserDetail>
         )}
-               {" "}
         {onboarded.avg_votes !== undefined && (
           <StyledUserDetail>
-                       {" "}
             <span className="detail-label">
               {t("user_item.detail.avg_votes")}
             </span>
-                       {" "}
             <span className="detail-value">
-                            {onboarded.avg_votes.toFixed(2)}           {" "}
+              {onboarded.avg_votes.toFixed(2)}
             </span>
-                     {" "}
           </StyledUserDetail>
         )}
-             {" "}
       </StyledUserDetails>
-         {" "}
     </StyledUserItem>
   );
 };
