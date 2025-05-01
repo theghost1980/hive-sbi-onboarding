@@ -44,7 +44,10 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: "public/index.html",
     }),
-    new Dotenv(),
+    new Dotenv({
+      path: "./.env",
+      systemvars: true,
+    }),
     new CopyPlugin({
       patterns: [
         { from: "public", to: ".", globOptions: { ignore: ["**/index.html"] } },
