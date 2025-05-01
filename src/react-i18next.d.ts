@@ -55,7 +55,7 @@ interface ResourceType {
       homepage_label: string;
     };
     footer: {
-      made_by: string; // Esta tiene interpolación, pero sigue siendo string
+      made_by: string;
       powered_by_title: string;
     };
     alt: {
@@ -165,7 +165,7 @@ interface ResourceType {
             comment_posted_prefix: string;
           };
           not_yet_member: string;
-          onboard_button: string; // Es string aunque tenga interpolación
+          onboard_button: string;
         };
       };
       all_records: {
@@ -274,8 +274,8 @@ interface ResourceType {
     onboard_step3: {
       title: string;
       summary_mode: {
-        editing: string; // Es string aunque tenga interpolación
-        new_onboarding: string; // Es string aunque tenga interpolación
+        editing: string;
+        new_onboarding: string;
       };
       sections: {
         backend_result: {
