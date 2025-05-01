@@ -311,7 +311,7 @@ const StyledLogoLink = styled.a`
 `;
 
 const StyledLogoImage = styled.img`
-  height: 30px;
+  height: 45px;
   width: auto;
 `;
 
@@ -599,8 +599,8 @@ const HomePage: React.FC = () => {
           </StyledSectionTitle>{" "}
           <ComponentCarousel
             components={contactCarouselComponents}
-            height="450px" // Define una altura fija para el carrusel
-            interval={4000} // Opcional: auto-slide cada 10 segundos
+            height="300px" // Define una altura fija para el carrusel
+            interval={3000} // Opcional: auto-slide cada 10 segundos
           />{" "}
         </StyledSection>{" "}
       </StyledHomePage>{" "}
@@ -628,7 +628,7 @@ const HomePage: React.FC = () => {
                 <StyledLogoImage src={hiveLogo} alt={t("alt.hive_logo")} />{" "}
               </StyledLogoLink>{" "}
               <StyledLogoLink
-                href="https://github.com/hiveio/hive-keychain"
+                href="https://hive-keychain.com/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
