@@ -1,7 +1,17 @@
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
+import HSBIlogo from "../assets/logos/hsbi-logo.png";
 import { useAuth } from "../context/AuthContext";
 import { BackendStatusBar } from "./BackendStatusBar";
+
+const StyledMainContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Ocupa todo el espacio disponible */
+  justify-content: flex-start; /* Alinea el contenido principal al inicio */
+  padding: 20px 0; /* Añade padding superior e inferior para separar del borde del sidebar y el logo */
+  /* El padding lateral se manejará dentro de StyledNav y StyledAuthStatus */
+`;
 
 const StyledSidebar = styled.div`
   display: flex;
@@ -101,38 +111,49 @@ const StyledLogoutButton = styled.button`
   }
 `;
 
+const StyledLogo = styled.img`
+  width: 150px; /* Ajusta el tamaño según necesites */
+  height: auto; /* Mantiene la proporción */
+  margin-bottom: 20px; /* Espacio debajo del logo */
+  /* Si quieres centrar el logo horizontalmente dentro del sidebar */
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+`;
+
 const Sidebar = () => {
   const { isAuthenticated, user, logout, isLoadingAuth } = useAuth();
 
   return (
     <StyledSidebar>
-      <StyledNav>
-        <ul>
-          <li>
-            <NavLink
-              to="/"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Home
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/onboard-user"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Onboard Usuario
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/buscar-usuarios"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Buscar nuevos usuarios
-            </NavLink>
-          </li>
-          {/* <li>
+      <StyledMainContent>
+        <StyledNav>
+          <ul>
+            <li>
+              <NavLink
+                to="/"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Home
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/onboard-user"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Onboard Usuario
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/buscar-usuarios"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Buscar nuevos usuarios
+              </NavLink>
+            </li>
+            {/* <li>
               <NavLink
                 to="/chequear-hive-sbi"
                 className={({ isActive }) => (isActive ? "active" : "")}
@@ -148,24 +169,32 @@ const Sidebar = () => {
                 Mostrar últimos agregados en HSBI
               </NavLink>
             </li> */}
-        </ul>
-      </StyledNav>
+          </ul>
+        </StyledNav>
 
-      <StyledAuthStatus>
-        {isLoadingAuth ? (
-          <p>Loading auth...</p>
-        ) : isAuthenticated ? (
-          <div>
-            <p>Logged in as: {user?.username}</p>
-            <StyledLogoutButton onClick={logout}>Logout</StyledLogoutButton>
-          </div>
-        ) : (
-          <NavLink to="/login">
-            <button>Go to Login</button>
-          </NavLink>
-        )}
-      </StyledAuthStatus>
+        <StyledAuthStatus>
+          {isLoadingAuth ? (
+            <p>Loading auth...</p>
+          ) : isAuthenticated ? (
+            <div>
+              <p>Logged in as: {user?.username}</p>
+              <StyledLogoutButton onClick={logout}>Logout</StyledLogoutButton>
+            </div>
+          ) : (
+            <NavLink to="/login">
+              <button>Go to Login</button>
+            </NavLink>
+          )}
+        </StyledAuthStatus>
+      </StyledMainContent>
 
+      <a
+        href="https://www.hivesbi.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <StyledLogo src={HSBIlogo} alt="Logo de la comunidad HSBI de HIVE" />
+      </a>
       <BackendStatusBar />
     </StyledSidebar>
   );
