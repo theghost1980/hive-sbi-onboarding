@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import Modal from "react-modal";
 import styled from "styled-components";
 import { BackendOnboardingInfo } from "../pages/OnboardUser";
@@ -171,6 +172,7 @@ const OnboardModal: React.FC<OnboardModalProps> = ({
   startStep = 1,
   existingOnboardInfo,
 }) => {
+  const { t } = useTranslation();
   const [stepData, setStepData] = useState<StepData>({});
   const [posts, setPosts] = useState<Post[]>([]);
   const [loadingPosts, setLoadingPosts] = useState<boolean>(false);
@@ -326,38 +328,37 @@ const OnboardModal: React.FC<OnboardModalProps> = ({
     <Modal
       isOpen={isOpen}
       onRequestClose={handleCancelFlow}
-      contentLabel="Onboard HSBI Modal"
+      contentLabel={t("onboard_modal.content_label")}
       className="onboard-modal"
       overlayClassName="onboard-modal-overlay"
       ariaHideApp={false}
     >
       <StyledModalContent>
         <StyledModalHeaderBar>
-          <h2>Onboard HSBI</h2>
+          <h2>{t("onboard_modal.title")}</h2>
           <p>
-            Usuario: <strong>@{username}</strong> (Onboarder: @
-            {onboarderUsername})
+            {t("onboard_modal.user_info.username_prefix")}
+            <strong>@{username}</strong>
+            {t("onboard_modal.user_info.onboarder_prefix")} {onboarderUsername})
           </p>
         </StyledModalHeaderBar>
-
         <StyledModalContentBody>
           {processError && (
             <StyledProcessErrorMessage>
               {processError}
             </StyledProcessErrorMessage>
           )}
-
           {showPostSelectionList && (
             <>
               {!isKeychainAvailable && !loadingPosts && !errorFetchingPosts && (
                 <StyledKeychainRequiredMessage>
-                  Hive Keychain es requerido para apadrinar usuarios. Por favor,
-                  asegúrese de que está instalado.
+                  {t("onboard_modal.post_selection.keychain_required")}
                 </StyledKeychainRequiredMessage>
               )}
-              {loadingPosts && <p>Cargando publicaciones...</p>}
+              {loadingPosts && (
+                <p>{t("onboard_modal.post_selection.loading_posts")}</p>
+              )}
               {errorFetchingPosts && <p>{errorFetchingPosts}</p>}
-
               {!loadingPosts && !errorFetchingPosts && posts.length > 0 && (
                 <StyledPostList>
                   {posts.map((post, index) => (
@@ -370,11 +371,10 @@ const OnboardModal: React.FC<OnboardModalProps> = ({
                           />
                         ) : (
                           <StyledNoImagePlaceholder>
-                            No image
+                            {t("onboard_modal.post_selection.no_image")}
                           </StyledNoImagePlaceholder>
                         )}
                       </StyledPostThumbnail>
-
                       <StyledPostContent>
                         <a
                           href={`https://peakd.com${post.url}`}
@@ -383,27 +383,37 @@ const OnboardModal: React.FC<OnboardModalProps> = ({
                         >
                           <h3>{post.title}</h3>
                         </a>
-                        <p>por @{post.author}</p>
+                        <p>
+                          {t("onboard_modal.post_selection.post_author_prefix")}
+                          @{post.author}
+                        </p>
                       </StyledPostContent>
                       <StyledItemActionButton
                         onClick={() => handlePostSelected(post)}
                         disabled={!isKeychainAvailable}
                         title={
-                          !isKeychainAvailable ? "Requires Hive Keychain" : ""
+                          !isKeychainAvailable
+                            ? t(
+                                "onboard_modal.post_selection.button.tooltip.keychain_required"
+                              )
+                            : ""
                         }
                       >
-                        On-board here
+                        {t("onboard_modal.post_selection.button.onboard_here")}
                       </StyledItemActionButton>
                     </StyledPostItem>
                   ))}
                 </StyledPostList>
               )}
               {!loadingPosts && !errorFetchingPosts && posts.length === 0 && (
-                <p>No hay publicaciones recientes para @{username}.</p>
+                <p>
+                  {t("onboard_modal.post_selection.no_recent_posts", {
+                    username: username,
+                  })}
+                </p>
               )}
             </>
           )}
-
           {showStepperFlow && (
             <StyledMyFlowArea>
               <Stepper
@@ -412,7 +422,6 @@ const OnboardModal: React.FC<OnboardModalProps> = ({
                 stepData={stepData}
                 existingOnboardInfo={existingOnboardInfo}
                 onStepDataChange={handleStepDataChange}
-                onProcessError={handleProcessError}
                 onCancel={handleCancelFlow}
                 username={username}
                 onboarderUsername={onboarderUsername}
@@ -424,12 +433,14 @@ const OnboardModal: React.FC<OnboardModalProps> = ({
                   handleStepDataChange({ transactionResponse: response })
                 }
                 onTransactionError={handleProcessError}
+                onProcessError={handleProcessError}
               />
             </StyledMyFlowArea>
           )}
         </StyledModalContentBody>
-
-        <StyledCloseButton onClick={handleCancelFlow}>Cerrar</StyledCloseButton>
+        <StyledCloseButton onClick={handleCancelFlow}>
+          {t("onboard_modal.close_button")}
+        </StyledCloseButton>
       </StyledModalContent>
     </Modal>
   );

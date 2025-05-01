@@ -190,5 +190,27 @@
       },
       "no_records_message": "No se encontraron registros de onboarding todavía."
     }
+  },
+  "onboard_modal": {
+    "content_label": "Modal Onboard HSBI",
+    "title": "Onboard HSBI",
+    "user_info": {
+      "username_prefix": "Usuario: ",
+      "onboarder_prefix": "(Onboarder: @"
+    },
+    "post_selection": {
+      "keychain_required": "Hive Keychain es requerido para apadrinar usuarios. Por favor, asegúrese de que está instalado.",
+      "loading_posts": "Cargando publicaciones...",
+      "no_image": "Sin imagen",
+      "post_author_prefix": "por @",
+      "button": {
+        "onboard_here": "On-board aquí",
+        "tooltip": {
+          "keychain_required": "Requiere Hive Keychain"
+        }
+      },
+      "no_recent_posts": "No hay publicaciones recientes para @{{username}}."
+    },
+    "close_button": "Cerrar"
   }
 }

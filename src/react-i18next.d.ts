@@ -177,6 +177,28 @@ interface ResourceType {
         no_records_message: string;
       };
     };
+    onboard_modal: {
+      content_label: string;
+      title: string;
+      user_info: {
+        username_prefix: string;
+        onboarder_prefix: string;
+      };
+      post_selection: {
+        keychain_required: string;
+        loading_posts: string;
+        no_image: string;
+        post_author_prefix: string;
+        button: {
+          onboard_here: string;
+          tooltip: {
+            keychain_required: string;
+          };
+        };
+        no_recent_posts: string;
+      };
+      close_button: string;
+    };
   };
   /*
   Si tuvieras otros archivos JSON de traducción con nombres diferentes a translation.json
