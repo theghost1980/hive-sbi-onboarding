@@ -237,5 +237,52 @@
     "keychain_required": "Hive Keychain is required to sponsor users. Please ensure it is installed.",
     "pay_button": "Pay with Keychain (1 HIVE)",
     "cancel_button": "Cancel"
+  },
+  "onboard_step2": {
+    "default_post_title_prefix": "Untitled Post (",
+    "fetch_posts_error_prefix": "Error fetching posts: ",
+    "post_comment_errors": {
+      "token_expired": "Please log in again, token expired, corrupt, or invalid.",
+      "no_post_selected": "Please select a post before publishing.",
+      "comment_empty": "The comment cannot be empty.",
+      "keychain_unavailable": "Hive Keychain is not available to sign the transaction.",
+      "unknown_error": "Unknown error publishing comment."
+    },
+    "next_button_text": {
+      "next": "Next",
+      "posting": "Posting...",
+      "posted_success": "Posted!",
+      "try_again": "Try Again"
+    },
+    "title": "Add a comment on a post for @{{username}}",
+    "post_selection": {
+      "subtitle": "Select a recent post by @{{username}} to comment on:",
+      "loading": "Loading posts...",
+      "error_prefix": "Error: ",
+      "no_image": "No image",
+      "post_author_prefix": "by @",
+      "select_button": "Select",
+      "no_recent_posts": "No recent posts found for @{{username}}."
+    },
+    "back_button": "Back",
+    "comment_editing": {
+      "subtitle": "Edit Comment",
+      "commenting_on_prefix": "Commenting on:",
+      "markdown_title": "Markdown",
+      "markdown_placeholder": "Write your comment here in Markdown format...",
+      "preview_title": "Preview",
+      "posting_message": "Posting comment...",
+      "success_message": "Comment posted successfully!",
+      "error_prefix": "Error posting: "
+    },
+    "next_button_tooltip": {
+      "keychain_required": "Requires Hive Keychain",
+      "posting": "Posting...",
+      "posted": "Posted",
+      "continue": "Continue"
+    }
+  },
+  "custom_select": {
+    "placeholder": "Choose an Option"
   }
 }

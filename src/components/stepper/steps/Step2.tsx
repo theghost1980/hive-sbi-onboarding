@@ -2,6 +2,7 @@ import DOMPurify from "dompurify";
 import { KeychainHelper } from "keychain-helper";
 import { marked } from "marked";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import backendApi from "../../../api/Backend";
 import { HttpError, post } from "../../../api/RequestsApi";
@@ -96,6 +97,7 @@ const Step2: React.FC<Step2Props> = ({
   onboarderUsername,
   isKeychainAvailable,
 }) => {
+  const { t } = useTranslation();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loadingPosts, setLoadingPosts] = useState<boolean>(false);
   const [errorFetchingPosts, setErrorFetchingPosts] = useState<string | null>(
@@ -136,7 +138,9 @@ const Step2: React.FC<Step2Props> = ({
             const postsData = data.result.map((post: any) => ({
               title:
                 post.title ||
-                `Post sin título (${post.permlink.substring(0, 10)}...)`,
+                `${t(
+                  "onboard_step2.default_post_title_prefix"
+                )}${post.permlink.substring(0, 10)}...)`,
               body: post.body,
               url: `/@${post.author}/${post.permlink}`,
               author: post.author,
@@ -149,10 +153,11 @@ const Step2: React.FC<Step2Props> = ({
           }
         } catch (err: any) {
           console.error("Error fetching posts in Step 2:", err);
-          const errorMessage = `Error al obtener publicaciones: ${
+          const errorMessage = `${t("onboard_step2.fetch_posts_error_prefix")}${
             err instanceof HttpError
               ? err.message
-              : err.message || "Error desconocido"
+              : err.message ||
+                t("onboard_step2.post_comment_errors.unknown_error")
           }`;
           setErrorFetchingPosts(errorMessage);
           onProcessError(errorMessage);
@@ -163,7 +168,14 @@ const Step2: React.FC<Step2Props> = ({
 
       fetchPosts();
     }
-  }, [username, selectedPostForComment, existingOnboardInfo, config]);
+  }, [
+    username,
+    selectedPostForComment,
+    existingOnboardInfo,
+    config,
+    t,
+    onProcessError,
+  ]);
 
   useEffect(() => {
     let post: Post | null = null;
@@ -221,24 +233,20 @@ const Step2: React.FC<Step2Props> = ({
   const handlePostComment = () => {
     const token = localStorage.getItem(JWT_TOKEN_STORAGE_KEY);
     if (!token) {
-      onProcessError(
-        "Por favor, Inicie sesion de nuevo, token expirado, corrupto o vencido."
-      );
+      onProcessError(t("onboard_step2.post_comment_errors.token_expired"));
       return;
     }
     if (!selectedPostForComment) {
-      onProcessError(
-        "Por favor, selecciona una publicación antes de publicar."
-      );
+      onProcessError(t("onboard_step2.post_comment_errors.no_post_selected"));
       return;
     }
     if (!commentMarkdown.trim()) {
-      onProcessError("El comentario no puede estar vacío.");
+      onProcessError(t("onboard_step2.post_comment_errors.comment_empty"));
       return;
     }
     if (!isKeychainAvailable) {
       onProcessError(
-        "Hive Keychain no está disponible para firmar la transacción."
+        t("onboard_step2.post_comment_errors.keychain_unavailable")
       );
       return;
     }
@@ -311,7 +319,7 @@ const Step2: React.FC<Step2Props> = ({
           const errorMessage =
             response?.message ||
             response?.display_msg ||
-            "Error desconocido al publicar el comentario.";
+            t("onboard_step2.post_comment_errors.unknown_error");
           setPostCommentError(errorMessage);
           onProcessError(errorMessage);
           setIsPostingComment(false);
@@ -323,28 +331,32 @@ const Step2: React.FC<Step2Props> = ({
   const showPostList = !selectedPostForComment;
   const showEditorArea = selectedPostForComment !== null;
 
-  let continueButtonText = "Siguiente";
+  let continueButtonText = t("onboard_step2.next_button_text.next");
   if (isPostingComment) {
-    continueButtonText = "Publicando...";
+    continueButtonText = t("onboard_step2.next_button_text.posting");
   } else if (postCommentSuccess) {
-    continueButtonText = "¡Publicado!";
+    continueButtonText = t("onboard_step2.next_button_text.posted_success");
   } else if (postCommentError) {
-    continueButtonText = "Intentar de Nuevo";
+    continueButtonText = t("onboard_step2.next_button_text.try_again");
   }
 
   return (
     <StyledStep2Container>
-      <h3>Agregar comentario en una publicación para @{username}</h3>{" "}
+      <h3>{t("onboard_step2.title", { username: username })}</h3>
       {showPostList && (
         <StyledPostSelectionSection>
-          {" "}
           <h4>
-            Selecciona una publicación reciente de @{username} para comentar:
+            {t("onboard_step2.post_selection.subtitle", {
+              username: username,
+            })}
           </h4>
-          {loadingPosts && <p>Cargando publicaciones...</p>}{" "}
+          {loadingPosts && <p>{t("onboard_step2.post_selection.loading")}</p>}
           {errorFetchingPosts && (
-            <p style={{ color: "red" }}>Error: {errorFetchingPosts}</p>
-          )}{" "}
+            <p style={{ color: "red" }}>
+              {t("onboard_step2.post_selection.error_prefix")}
+              {errorFetchingPosts}
+            </p>
+          )}
           {!loadingPosts && !errorFetchingPosts && posts.length > 0 && (
             <StyledPostList>
               {posts.map((post, index) => (
@@ -356,8 +368,10 @@ const Step2: React.FC<Step2Props> = ({
                         alt={`Thumbnail for ${post.title}`}
                       />
                     ) : (
-                      <div className="no-image-small">No image</div>
-                    )}{" "}
+                      <div className="no-image-small">
+                        {t("onboard_step2.post_selection.no_image")}
+                      </div>
+                    )}
                   </StyledPostThumbnail>
                   <StyledPostContent>
                     <a
@@ -367,75 +381,92 @@ const Step2: React.FC<Step2Props> = ({
                     >
                       <h5>{post.title}</h5>
                     </a>
-                    <p>por @{post.author}</p>{" "}
+                    <p>
+                      {t("onboard_step2.post_selection.post_author_prefix")}@
+                      {post.author}
+                    </p>
                   </StyledPostContent>
                   <StyledItemActionButton
                     onClick={() => handlePostSelected(post)}
                   >
-                    Seleccionar
+                    {t("onboard_step2.post_selection.select_button")}
                   </StyledItemActionButton>
                 </StyledPostItem>
               ))}
             </StyledPostList>
-          )}{" "}
+          )}
           {!loadingPosts && !errorFetchingPosts && posts.length === 0 && (
-            <p>No se encontraron publicaciones recientes para @{username}.</p>
-          )}{" "}
+            <p>
+              {t("onboard_step2.post_selection.no_recent_posts", {
+                username: username,
+              })}
+            </p>
+          )}
           <StyledNavigationButtons justify="flex-start">
-            <StyledPrevButton onClick={onPrevStep}>Volver</StyledPrevButton>
+            <StyledPrevButton onClick={onPrevStep}>
+              {t("onboard_step2.back_button")}
+            </StyledPrevButton>
           </StyledNavigationButtons>
         </StyledPostSelectionSection>
-      )}{" "}
+      )}
       {showEditorArea && (
         <StyledCommentEditingSection>
-          <h4>Editar Comentario</h4>{" "}
+          <h4>{t("onboard_step2.comment_editing.subtitle")}</h4>
           {selectedPostForComment && (
             <p>
-              Comentando en:{" "}
+              {t("onboard_step2.comment_editing.commenting_on_prefix")}
               <a
                 href={`https://peakd.com${selectedPostForComment.url}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 {selectedPostForComment.title || selectedPostForComment.url}
-              </a>{" "}
-              por @{selectedPostForComment.author}{" "}
+              </a>
+              {t("onboard_step2.post_selection.post_author_prefix")}@
+              {selectedPostForComment.author}
             </p>
-          )}{" "}
+          )}
           <StyledCommentEditorPreviewLayout>
             <StyledMarkdownArea>
-              <h5>Markdown</h5>{" "}
+              <h5>{t("onboard_step2.comment_editing.markdown_title")}</h5>
               <StyledCommentMarkdownInput
                 value={commentMarkdown}
                 onChange={handleMarkdownChange}
                 rows={10}
-                placeholder="Escribe tu comentario aquí en formato Markdown..."
+                placeholder={t(
+                  "onboard_step2.comment_editing.markdown_placeholder"
+                )}
                 disabled={isPostingComment || postCommentSuccess}
               />
-            </StyledMarkdownArea>{" "}
+            </StyledMarkdownArea>
             <StyledMarkdownPreviewArea>
-              <h5>Previsualización</h5>{" "}
+              <h5>{t("onboard_step2.comment_editing.preview_title")}</h5>
               <StyledCommentPreview
                 dangerouslySetInnerHTML={{ __html: previewHtml }}
               />
             </StyledMarkdownPreviewArea>
           </StyledCommentEditorPreviewLayout>
           {isPostingComment && (
-            <StyledInfoMessage>Publicando comentario...</StyledInfoMessage>
+            <StyledInfoMessage>
+              {t("onboard_step2.comment_editing.posting_message")}
+            </StyledInfoMessage>
           )}
           {postCommentSuccess && (
             <StyledSuccessMessage>
-              ¡Comentario publicado con éxito!
+              {t("onboard_step2.comment_editing.success_message")}
             </StyledSuccessMessage>
           )}
           {postCommentError && (
             <StyledErrorMessage>
-              Error al publicar: {postCommentError}
+              {t("onboard_step2.comment_editing.error_prefix")}
+              {postCommentError}
             </StyledErrorMessage>
           )}
           <StyledNavigationButtons justify="space-between">
             {!isPostingComment && !postCommentSuccess && (
-              <StyledPrevButton onClick={onPrevStep}>Volver</StyledPrevButton>
+              <StyledPrevButton onClick={onPrevStep}>
+                {t("onboard_step2.back_button")}
+              </StyledPrevButton>
             )}
             <StyledNextButton
               onClick={handlePostComment}
@@ -447,15 +478,15 @@ const Step2: React.FC<Step2Props> = ({
               }
               title={
                 !isKeychainAvailable
-                  ? "Requires Hive Keychain"
+                  ? t("onboard_step2.next_button_tooltip.keychain_required")
                   : isPostingComment
-                  ? "Publicando..."
+                  ? t("onboard_step2.next_button_tooltip.posting")
                   : postCommentSuccess
-                  ? "Publicado"
-                  : "Continuar"
+                  ? t("onboard_step2.next_button_tooltip.posted")
+                  : t("onboard_step2.next_button_tooltip.continue")
               }
             >
-              {continueButtonText}{" "}
+              {continueButtonText}
             </StyledNextButton>
           </StyledNavigationButtons>
         </StyledCommentEditingSection>

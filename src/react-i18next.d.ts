@@ -224,6 +224,53 @@ interface ResourceType {
       pay_button: string;
       cancel_button: string;
     };
+    onboard_step2: {
+      default_post_title_prefix: string;
+      fetch_posts_error_prefix: string;
+      post_comment_errors: {
+        token_expired: string;
+        no_post_selected: string;
+        comment_empty: string;
+        keychain_unavailable: string;
+        unknown_error: string;
+      };
+      next_button_text: {
+        next: string;
+        posting: string;
+        posted_success: string;
+        try_again: string;
+      };
+      title: string;
+      post_selection: {
+        subtitle: string;
+        loading: string;
+        error_prefix: string;
+        no_image: string;
+        post_author_prefix: string;
+        select_button: string;
+        no_recent_posts: string;
+      };
+      back_button: string;
+      comment_editing: {
+        subtitle: string;
+        commenting_on_prefix: string;
+        markdown_title: string;
+        markdown_placeholder: string;
+        preview_title: string;
+        posting_message: string;
+        success_message: string;
+        error_prefix: string;
+      };
+      next_button_tooltip: {
+        keychain_required: string;
+        posting: string;
+        posted: string;
+        continue: string;
+      };
+    };
+    custom_select: {
+      placeholder: string;
+    };
   };
   /*
   Si tuvieras otros archivos JSON de traducción con nombres diferentes a translation.json

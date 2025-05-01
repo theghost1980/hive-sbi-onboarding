@@ -237,5 +237,52 @@
     "keychain_required": "Hive Keychain es requerido para apadrinar usuarios. Por favor, asegúrese de que está instalado.",
     "pay_button": "Pagar con Keychain (1 HIVE)",
     "cancel_button": "Cancelar"
+  },
+  "onboard_step2": {
+    "default_post_title_prefix": "Post sin título (",
+    "fetch_posts_error_prefix": "Error al obtener publicaciones: ",
+    "post_comment_errors": {
+      "token_expired": "Por favor, Inicie sesion de nuevo, token expirado, corrupto o vencido.",
+      "no_post_selected": "Por favor, selecciona una publicación antes de publicar.",
+      "comment_empty": "El comentario no puede estar vacío.",
+      "keychain_unavailable": "Hive Keychain no está disponible para firmar la transacción.",
+      "unknown_error": "Error desconocido al publicar el comentario."
+    },
+    "next_button_text": {
+      "next": "Siguiente",
+      "posting": "Publicando...",
+      "posted_success": "¡Publicado!",
+      "try_again": "Intentar de Nuevo"
+    },
+    "title": "Agregar comentario en una publicación para @{{username}}",
+    "post_selection": {
+      "subtitle": "Selecciona una publicación reciente de @{{username}} para comentar:",
+      "loading": "Cargando publicaciones...",
+      "error_prefix": "Error: ",
+      "no_image": "Sin imagen",
+      "post_author_prefix": "por @",
+      "select_button": "Seleccionar",
+      "no_recent_posts": "No se encontraron publicaciones recientes para @{{username}}."
+    },
+    "back_button": "Volver",
+    "comment_editing": {
+      "subtitle": "Editar Comentario",
+      "commenting_on_prefix": "Comentando en:",
+      "markdown_title": "Markdown",
+      "markdown_placeholder": "Escribe tu comentario aquí en formato Markdown...",
+      "preview_title": "Previsualización",
+      "posting_message": "Publicando comentario...",
+      "success_message": "¡Comentario publicado con éxito!",
+      "error_prefix": "Error al publicar: "
+    },
+    "next_button_tooltip": {
+      "keychain_required": "Requiere Hive Keychain",
+      "posting": "Publicando...",
+      "posted": "Publicado",
+      "continue": "Continuar"
+    }
+  },
+  "custom_select": {
+    "placeholder": "Seleccione una opción"
   }
 }
