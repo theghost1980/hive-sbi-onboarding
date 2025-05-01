@@ -284,5 +284,71 @@
   },
   "custom_select": {
     "placeholder": "Choose an Option"
+  },
+  "onboard_step3": {
+    "title": "Onboarding Summary",
+    "summary_mode": {
+      "editing": "Reviewing existing onboarding record for @{{username}} by @{{onboarderUsername}}.",
+      "new_onboarding": "Reviewing process for onboarding @{{username}} by @{{onboarderUsername}}."
+    },
+    "sections": {
+      "backend_result": {
+        "title": "Backend Record Update Result",
+        "unavailable": "Backend record update result is unavailable.",
+        "response_details": "Response Details:"
+      },
+      "post_selected": {
+        "title": "Post Selected",
+        "commented_on_prefix": "Commented on: ",
+        "by_author_connector": " by @",
+        "view_post_link": "View Post",
+        "not_selected": "No specific post selected in previous steps."
+      },
+      "transfer_result": {
+        "title": "Transfer Transaction Result",
+        "status_prefix": "Status: ",
+        "status": {
+          "success": "Success",
+          "failed": "Failed"
+        },
+        "tx_id_prefix": "Transaction ID: ",
+        "message_prefix": "Message: ",
+        "error_prefix": "Error: ",
+        "details_title": "Transaction Details:",
+        "detail": {
+          "tx_id_prefix": "Tx ID:",
+          "from_prefix": "From:",
+          "to_prefix": "To:",
+          "amount_prefix": "Amount:",
+          "memo_prefix": "Memo:"
+        },
+        "unavailable": "Transfer transaction was not attempted or result is unavailable."
+      },
+      "comment_result": {
+        "title": "Comment Transaction Result",
+        "status_prefix": "Status: ",
+        "status": {
+          "success": "Success",
+          "failed": "Failed"
+        },
+        "comment_permlink_prefix": "Comment Permlink:",
+        "view_comment_link": "View Comment:",
+        "message_prefix": "Message: ",
+        "error_prefix": "Error: ",
+        "unavailable": "Comment was not posted or result is unavailable."
+      },
+      "comment_text": {
+        "title": "Comment Text"
+      }
+    },
+    "buttons": {
+      "back": "Back",
+      "complete": "Complete",
+      "copy_report": "Copy Report"
+    },
+    "copy_status": {
+      "success": "Report Copied!",
+      "failed": "Failed to copy report."
+    }
   }
 }

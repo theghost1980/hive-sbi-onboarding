@@ -271,6 +271,72 @@ interface ResourceType {
     custom_select: {
       placeholder: string;
     };
+    onboard_step3: {
+      title: string;
+      summary_mode: {
+        editing: string; // Es string aunque tenga interpolación
+        new_onboarding: string; // Es string aunque tenga interpolación
+      };
+      sections: {
+        backend_result: {
+          title: string;
+          unavailable: string;
+          response_details: string;
+        };
+        post_selected: {
+          title: string;
+          commented_on_prefix: string;
+          by_author_connector: string;
+          view_post_link: string;
+          not_selected: string;
+        };
+        transfer_result: {
+          title: string;
+          status_prefix: string;
+          status: {
+            success: string;
+            failed: string;
+          };
+          tx_id_prefix: string;
+          message_prefix: string;
+          error_prefix: string;
+          details_title: string;
+          detail: {
+            tx_id_prefix: string;
+            from_prefix: string;
+            to_prefix: string;
+            amount_prefix: string;
+            memo_prefix: string;
+          };
+          unavailable: string;
+        };
+        comment_result: {
+          title: string;
+          status_prefix: string;
+          status: {
+            success: string;
+            failed: string;
+          };
+          comment_permlink_prefix: string;
+          view_comment_link: string;
+          message_prefix: string;
+          error_prefix: string;
+          unavailable: string;
+        };
+        comment_text: {
+          title: string;
+        };
+      };
+      buttons: {
+        back: string;
+        complete: string;
+        copy_report: string;
+      };
+      copy_status: {
+        success: string;
+        failed: string;
+      };
+    };
   };
   /*
   Si tuvieras otros archivos JSON de traducción con nombres diferentes a translation.json

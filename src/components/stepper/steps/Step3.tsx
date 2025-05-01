@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { BackendOnboardingInfo } from "../../../pages/OnboardUser";
 import { StepData } from "../../OnboardModal";
@@ -224,217 +225,325 @@ const Step3: React.FC<Step3Props> = ({
   onboarderUsername,
   isKeychainAvailable,
 }) => {
+  const { t } = useTranslation();
   const isEditMode = !!existingOnboardInfo;
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
 
   const handleCopyReport = async () => {
-    let reportText = `--- Onboarding Summary for @${username} by @${onboarderUsername} ---\n\n`;
+    let reportText = `${t("onboard_step3.report.header", {
+      username: username,
+      onboarderUsername: onboarderUsername,
+    })}\n\n`;
 
-    reportText += `Mode: ${
-      isEditMode ? "Editing existing record" : "New onboarding"
+    reportText += `${t("onboard_step3.report.mode_prefix")}: ${
+      isEditMode
+        ? t("onboard_step3.report.mode.editing")
+        : t("onboard_step3.report.mode.new")
     }\n\n`;
 
-    reportText += `--- Backend Record Update Result ---\n`;
+    reportText += `${t(
+      "onboard_step3.report.sections.backend_result.title"
+    )}\n`;
     if (stepData.beResponse1) {
-      reportText += `Response Details:\n`;
+      reportText += `${t(
+        "onboard_step3.report.sections.backend_result.response_details"
+      )}\n`;
       reportText += `${JSON.stringify(stepData.beResponse1, null, 2)}\n`;
     } else {
-      reportText += `Backend record update result is unavailable.\n`;
+      reportText += `${t(
+        "onboard_step3.report.sections.backend_result.unavailable"
+      )}\n`;
     }
     reportText += `\n`;
 
-    reportText += `--- Post Selected ---\n`;
+    reportText += `${t("onboard_step3.report.sections.post_selected.title")}\n`;
     if (stepData.selectedPost) {
-      reportText += `Commented on: "${stepData.selectedPost.title}" by @${stepData.selectedPost.author}\n`;
-      reportText += `View Post: https://peakd.com${stepData.selectedPost.url}\n`;
+      reportText += `${t(
+        "onboard_step3.report.sections.post_selected.commented_on_prefix"
+      )}"${stepData.selectedPost.title}" ${t(
+        "onboard_step3.report.sections.post_selected.by_author_connector"
+      )}@${stepData.selectedPost.author}\n`;
+      reportText += `${t(
+        "onboard_step3.report.sections.post_selected.view_post_link"
+      )}: https://peakd.com${stepData.selectedPost.url}\n`;
     } else {
-      reportText += `No specific post selected.\n`;
+      reportText += `${t(
+        "onboard_step3.report.sections.post_selected.not_selected"
+      )}\n`;
     }
     reportText += `\n`;
 
-    reportText += `--- Transfer Transaction Result ---\n`;
+    reportText += `${t(
+      "onboard_step3.report.sections.transfer_result.title"
+    )}\n`;
     if (stepData.transactionResponse) {
-      reportText += `Status: ${
-        stepData.transactionResponse.success ? "Success" : "Failed"
+      reportText += `${t(
+        "onboard_step3.report.sections.transfer_result.status_prefix"
+      )}: ${
+        stepData.transactionResponse.success
+          ? t("onboard_step3.sections.transfer_result.status.success")
+          : t("onboard_step3.sections.transfer_result.status.failed")
       }\n`;
       if (stepData.transactionResponse.id)
-        reportText += `Transaction ID: ${stepData.transactionResponse.id}\n`;
+        reportText += `${t(
+          "onboard_step3.report.sections.transfer_result.tx_id_prefix"
+        )}: ${stepData.transactionResponse.id}\n`;
       if (stepData.transactionResponse.message)
-        reportText += `Message: ${stepData.transactionResponse.message}\n`;
+        reportText += `${t(
+          "onboard_step3.report.sections.transfer_result.message_prefix"
+        )}: ${stepData.transactionResponse.message}\n`;
       if (stepData.transactionResponse.error)
-        reportText += `Error: ${JSON.stringify(
-          stepData.transactionResponse.error
-        )}\n`;
+        reportText += `${t(
+          "onboard_step3.report.sections.transfer_result.error_prefix"
+        )}: ${JSON.stringify(stepData.transactionResponse.error)}\n`;
 
       if (
         stepData.transactionResponse.success &&
         stepData.transactionResponse.result &&
         stepData.transactionResponse.data
       ) {
-        reportText += `\nTransaction Details:\n`;
-        reportText += `  Tx ID: ${
+        reportText += `\n${t(
+          "onboard_step3.report.sections.transfer_result.details_title"
+        )}\n`;
+        reportText += ` ${t(
+          "onboard_step3.report.sections.transfer_result.detail.tx_id_prefix"
+        )}: ${
           stepData.transactionResponse.result.tx_id ||
           stepData.transactionResponse.result.id
         }\n`;
-        reportText += `  From: @${stepData.transactionResponse.data.username}\n`;
-        reportText += `  To: @${stepData.transactionResponse.data.to}\n`;
-        reportText += `  Amount: ${stepData.transactionResponse.data.amount} ${stepData.transactionResponse.data.currency}\n`;
+        reportText += ` ${t(
+          "onboard_step3.report.sections.transfer_result.detail.from_prefix"
+        )}@${stepData.transactionResponse.data.username}\n`;
+        reportText += ` ${t(
+          "onboard_step3.report.sections.transfer_result.detail.to_prefix"
+        )}@${stepData.transactionResponse.data.to}\n`;
+        reportText += ` ${t(
+          "onboard_step3.report.sections.transfer_result.detail.amount_prefix"
+        )}: ${stepData.transactionResponse.data.amount} ${
+          stepData.transactionResponse.data.currency
+        }\n`;
         if (stepData.transactionResponse.data.memo)
-          reportText += `  Memo: ${stepData.transactionResponse.data.memo}\n`;
+          reportText += ` ${t(
+            "onboard_step3.report.sections.transfer_result.detail.memo_prefix"
+          )}: ${stepData.transactionResponse.data.memo}\n`;
       }
     } else {
-      reportText += `Transfer transaction was not attempted or result is unavailable.\n`;
+      reportText += `${t(
+        "onboard_step3.report.sections.transfer_result.unavailable"
+      )}\n`;
     }
     reportText += `\n`;
 
-    reportText += `--- Comment Transaction Result ---\n`;
+    reportText += `${t(
+      "onboard_step3.report.sections.comment_result.title"
+    )}\n`;
     if (stepData.commentResponse) {
-      reportText += `Status: ${
-        stepData.commentResponse.success ? "Success" : "Failed"
+      reportText += `${t(
+        "onboard_step3.report.sections.comment_result.status_prefix"
+      )}: ${
+        stepData.commentResponse.success
+          ? t("onboard_step3.sections.comment_result.status.success")
+          : t("onboard_step3.sections.comment_result.status.failed")
       }\n`;
       if (stepData.postedCommentPermlink) {
-        reportText += `Comment Permlink: ${stepData.postedCommentPermlink}\n`;
-        reportText += `View Comment: https://hive.blog/@${onboarderUsername}/${stepData.postedCommentPermlink}\n`;
+        reportText += `${t(
+          "onboard_step3.report.sections.comment_result.comment_permlink_prefix"
+        )}: ${stepData.postedCommentPermlink}\n`;
+        reportText += `${t(
+          "onboard_step3.report.sections.comment_result.view_comment_link"
+        )} https://hive.blog/@${onboarderUsername}/${
+          stepData.postedCommentPermlink
+        }\n`;
       }
       if (stepData.commentResponse.message)
-        reportText += `Message: ${stepData.commentResponse.message}\n`;
+        reportText += `${t(
+          "onboard_step3.report.sections.comment_result.message_prefix"
+        )}: ${stepData.commentResponse.message}\n`;
       if (stepData.commentResponse.error)
-        reportText += `Error: ${JSON.stringify(
-          stepData.commentResponse.error
-        )}\n`;
+        reportText += `${t(
+          "onboard_step3.report.sections.comment_result.error_prefix"
+        )}: ${JSON.stringify(stepData.commentResponse.error)}\n`;
     } else {
-      reportText += `Comment was not posted or result is unavailable.\n`;
+      reportText += `${t(
+        "onboard_step3.report.sections.comment_result.unavailable"
+      )}\n`;
     }
     reportText += `\n`;
 
     if (stepData.generatedComment || stepData.editedComment) {
-      reportText += `--- Comment Text ---\n`;
+      reportText += `${t(
+        "onboard_step3.report.sections.comment_text.title"
+      )}\n`;
       reportText += `${stepData.editedComment || stepData.generatedComment}\n`;
       reportText += `\n`;
     }
 
     try {
       await navigator.clipboard.writeText(reportText);
-      setCopyStatus("Report Copied!");
+      setCopyStatus(t("onboard_step3.copy_status.success"));
       setTimeout(() => setCopyStatus(null), 3000);
     } catch (err) {
       console.error("Failed to copy report:", err);
-      setCopyStatus("Failed to copy report.");
+      setCopyStatus(t("onboard_step3.copy_status.failed"));
       setTimeout(() => setCopyStatus(null), 3000);
     }
   };
 
   return (
     <StyledStep3SummaryContainer>
-      <h2>Onboarding Summary</h2>
+      <h2>{t("onboard_step3.title")}</h2>
       {isEditMode ? (
         <StyledSummaryModeInfo>
-          Reviewing existing onboarding record for @{username} by @
-          {onboarderUsername}.
+          {t("onboard_step3.summary_mode.editing", {
+            username: username,
+            onboarderUsername: onboarderUsername,
+          })}
         </StyledSummaryModeInfo>
       ) : (
         <StyledSummaryModeInfo>
-          Reviewing process for onboarding @{username} by @{onboarderUsername}.
+          {t("onboard_step3.summary_mode.new_onboarding", {
+            username: username,
+            onboarderUsername: onboarderUsername,
+          })}
         </StyledSummaryModeInfo>
       )}
       <StyledSummarySection>
-        <h3>Backend Record Update Result</h3>
+        <h3>{t("onboard_step3.sections.backend_result.title")}</h3>
         {stepData.beResponse1 ? (
           <StyledBackendResponseResult success={stepData.beResponse1.success}>
             <StyledBackendResponseDetails>
-              <p>Response Details:</p>
+              <p>
+                {t("onboard_step3.sections.backend_result.response_details")}
+              </p>
               <pre>{JSON.stringify(stepData.beResponse1, null, 2)}</pre>
             </StyledBackendResponseDetails>
           </StyledBackendResponseResult>
         ) : (
-          <p>Backend record update result is unavailable.</p>
+          <p>{t("onboard_step3.sections.backend_result.unavailable")}</p>
         )}
       </StyledSummarySection>
       <StyledSummarySection>
-        <h3>Post Selected</h3>
+        <h3>{t("onboard_step3.sections.post_selected.title")}</h3>
         {stepData.selectedPost ? (
           <p>
-            Commented on: <strong>{stepData.selectedPost.title}</strong> by @
-            {stepData.selectedPost.author}
-            {" ("}
+            {t("onboard_step3.sections.post_selected.commented_on_prefix")}
+            <strong>{stepData.selectedPost.title}</strong>
+            {t("onboard_step3.sections.post_selected.by_author_connector")}@
+            {stepData.selectedPost.author} {" ("}
             <a
               href={`https://peakd.com${stepData.selectedPost.url}`}
               target="_blank"
               rel="noopener noreferrer"
             >
-              View Post
+              {t("onboard_step3.sections.post_selected.view_post_link")}
             </a>
             {")"}
           </p>
         ) : (
-          <p>No specific post selected in previous steps.</p>
+          <p>{t("onboard_step3.sections.post_selected.not_selected")}</p>
         )}
       </StyledSummarySection>
       <StyledSummarySection>
-        <h3>Transfer Transaction Result</h3>
+        <h3>{t("onboard_step3.sections.transfer_result.title")}</h3>
         {stepData.transactionResponse ? (
           <StyledTransactionResult
             success={stepData.transactionResponse.success}
           >
             <p>
-              Status:{" "}
+              {t("onboard_step3.sections.transfer_result.status_prefix")}
               <strong>
-                {stepData.transactionResponse.success ? "Success" : "Failed"}
+                {stepData.transactionResponse.success
+                  ? t("onboard_step3.sections.transfer_result.status.success")
+                  : t("onboard_step3.sections.transfer_result.status.failed")}
               </strong>
             </p>
             {stepData.transactionResponse.id && (
-              <p>Transaction ID: {stepData.transactionResponse.id}</p>
+              <p>
+                {t("onboard_step3.sections.transfer_result.tx_id_prefix")}:
+                {stepData.transactionResponse.id}
+              </p>
             )}
             {stepData.transactionResponse.message && (
-              <p>Message: {stepData.transactionResponse.message}</p>
+              <p>
+                {t("onboard_step3.sections.transfer_result.message_prefix")}:
+                {stepData.transactionResponse.message}
+              </p>
             )}
             {stepData.transactionResponse.error && (
-              <p>Error: {JSON.stringify(stepData.transactionResponse.error)}</p>
+              <p>
+                {t("onboard_step3.sections.transfer_result.error_prefix")}:
+                {JSON.stringify(stepData.transactionResponse.error)}
+              </p>
             )}
-
             {stepData.transactionResponse.success &&
               stepData.transactionResponse.result &&
               stepData.transactionResponse.data && (
                 <StyledTransactionDetails>
                   <p>
-                    <strong>Transaction Details:</strong>
+                    <strong>
+                      {t(
+                        "onboard_step3.sections.transfer_result.details_title"
+                      )}
+                    </strong>
                   </p>
                   <p>
-                    Tx ID:{" "}
+                    {t(
+                      "onboard_step3.sections.transfer_result.detail.tx_id_prefix"
+                    )}
                     {stepData.transactionResponse.result.tx_id ||
                       stepData.transactionResponse.result.id}
                   </p>
-                  <p>From: @{stepData.transactionResponse.data.username}</p>
-                  <p>To: @{stepData.transactionResponse.data.to}</p>
                   <p>
-                    Amount: {stepData.transactionResponse.data.amount}{" "}
+                    {t(
+                      "onboard_step3.sections.transfer_result.detail.from_prefix"
+                    )}
+                    @{stepData.transactionResponse.data.username}
+                  </p>
+                  <p>
+                    {t(
+                      "onboard_step3.sections.transfer_result.detail.to_prefix"
+                    )}
+                    @{stepData.transactionResponse.data.to}
+                  </p>
+                  <p>
+                    {t(
+                      "onboard_step3.sections.transfer_result.detail.amount_prefix"
+                    )}
+                    {stepData.transactionResponse.data.amount}
                     {stepData.transactionResponse.data.currency}
                   </p>
                   {stepData.transactionResponse.data.memo && (
-                    <p>Memo: {stepData.transactionResponse.data.memo}</p>
+                    <p>
+                      {t(
+                        "onboard_step3.sections.transfer_result.detail.memo_prefix"
+                      )}
+                      : {stepData.transactionResponse.data.memo}
+                    </p>
                   )}
                 </StyledTransactionDetails>
               )}
           </StyledTransactionResult>
         ) : (
-          <p>
-            Transfer transaction was not attempted or result is unavailable.
-          </p>
+          <p> {t("onboard_step3.sections.transfer_result.unavailable")} </p>
         )}
       </StyledSummarySection>
       <StyledSummarySection>
-        <h3>Comment Transaction Result</h3>
+        <h3>{t("onboard_step3.sections.comment_result.title")}</h3>
         {stepData.commentResponse ? (
           <StyledTransactionResult success={stepData.commentResponse.success}>
             <p>
-              Status:{" "}
+              {t("onboard_step3.sections.comment_result.status_prefix")}
               <strong>
-                {stepData.commentResponse.success ? "Success" : "Failed"}
+                {stepData.commentResponse.success
+                  ? t("onboard_step3.sections.comment_result.status.success")
+                  : t("onboard_step3.sections.comment_result.status.failed")}
               </strong>
             </p>
             {stepData.postedCommentPermlink && (
               <p>
-                Comment Permlink:
+                {t(
+                  "onboard_step3.sections.comment_result.comment_permlink_prefix"
+                )}
                 <a
                   href={`https://hive.blog/@${onboarderUsername}/${stepData.postedCommentPermlink}`}
                   target="_blank"
@@ -445,31 +554,39 @@ const Step3: React.FC<Step3Props> = ({
               </p>
             )}
             {stepData.commentResponse.message && (
-              <p>Message: {stepData.commentResponse.message}</p>
+              <p>
+                {t("onboard_step3.sections.comment_result.message_prefix")}:
+                {stepData.commentResponse.message}
+              </p>
             )}
             {stepData.commentResponse.error && (
-              <p>Error: {JSON.stringify(stepData.commentResponse.error)}</p>
+              <p>
+                {t("onboard_step3.sections.comment_result.error_prefix")}:
+                {JSON.stringify(stepData.commentResponse.error)}
+              </p>
             )}
           </StyledTransactionResult>
         ) : (
-          <p>Comment was not posted or result is unavailable.</p>
+          <p>{t("onboard_step3.sections.comment_result.unavailable")}</p>
         )}
       </StyledSummarySection>
       {(stepData.generatedComment || stepData.editedComment) && (
         <StyledSummarySection>
-          <h3>Comment Text</h3>
+          <h3>{t("onboard_step3.sections.comment_text.title")}</h3>
           <StyledCommentTextPreview>
             {stepData.editedComment || stepData.generatedComment}
           </StyledCommentTextPreview>
         </StyledSummarySection>
       )}
       <StyledNavigationButtons justify="center" gap="20px" marginTop="30px">
-        <StyledPrevButton onClick={onPrevStep}>Back</StyledPrevButton>
+        <StyledPrevButton onClick={onPrevStep}>
+          {t("onboard_step3.buttons.back")}
+        </StyledPrevButton>
         <StyledCompleteButton onClick={onComplete}>
-          Complete
+          {t("onboard_step3.buttons.complete")}
         </StyledCompleteButton>
         <StyledCopyReportButton onClick={handleCopyReport}>
-          Copy Report
+          {t("onboard_step3.buttons.copy_report")}
         </StyledCopyReportButton>
       </StyledNavigationButtons>
       {copyStatus && (
