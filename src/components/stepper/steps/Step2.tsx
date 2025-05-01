@@ -2,6 +2,7 @@ import DOMPurify from "dompurify";
 import { KeychainHelper } from "keychain-helper";
 import { marked } from "marked";
 import React, { useEffect, useState } from "react";
+import styled from "styled-components";
 import backendApi from "../../../api/Backend";
 import { HttpError, post } from "../../../api/RequestsApi";
 import { config } from "../../../config/config";
@@ -11,9 +12,21 @@ import { BackendOnboardingInfo } from "../../../pages/OnboardUser";
 import { ImageUtils } from "../../../utils/image.utils";
 import { PermlinkUtils } from "../../../utils/permlink.utils";
 import { Post, StepData } from "../../OnboardModal";
-import "./Step2.css";
-
-// Interfaz de props actualizada para incluir 'config'
+import {
+  StyledCommentEditorPreviewLayout,
+  StyledCommentMarkdownInput,
+  StyledCommentPreview,
+  StyledItemActionButton,
+  StyledMarkdownArea,
+  StyledMarkdownPreviewArea,
+  StyledNavigationButtons,
+  StyledNextButton,
+  StyledPostContent,
+  StyledPostItem,
+  StyledPostList,
+  StyledPostThumbnail,
+  StyledPrevButton,
+} from "../../StyledElements";
 interface Step2Props {
   stepData: StepData; // Datos recolectados de pasos anteriores
   existingOnboardInfo?: BackendOnboardingInfo | null; // Datos para modo edición
@@ -30,6 +43,45 @@ interface Step2Props {
   onboarderUsername: string; // El usuario que hace el comentario (el 'onboarder' loggeado)
   isKeychainAvailable: boolean; // Estado de disponibilidad de Keychain
 }
+
+// Contenedor principal del paso
+const StyledStep2Container = styled.div`
+  /* Estilos de .onboarding-step y .step-2-comment de Step2.css */
+  padding: 20px; /* Ya aplicado en el Stepper, pero lo definimos aquí por si acaso */
+`;
+
+// Sección para seleccionar posts
+const StyledPostSelectionSection = styled.div`
+  /* Estilos de .post-selection-section de Step2.css */
+  /* (Este div no tenía muchos estilos específicos, principalmente es un contenedor) */
+`;
+
+// Sección para editar el comentario
+const StyledCommentEditingSection = styled.div`
+  /* Estilos de .comment-editing-section de Step2.css */
+  /* (Similarmente, este div es principalmente un contenedor) */
+`;
+
+// Algunos estilos en línea que podemos convertir a componentes estilizados si se usan a menudo
+const StyledErrorMessage = styled.p`
+  color: red;
+  text-align: center; /* Ajusta si el estilo en línea no tenía esto */
+  margin: 10px 0; /* Ajusta si el estilo en línea no tenía esto */
+  font-weight: bold; /* Si aplica */
+`;
+
+const StyledSuccessMessage = styled.p`
+  color: green;
+  text-align: center;
+  font-weight: bold;
+  margin: 10px 0;
+`;
+
+const StyledInfoMessage = styled.p`
+  color: blue;
+  text-align: center;
+  margin: 10px 0;
+`;
 
 const Step2: React.FC<Step2Props> = ({
   stepData,
@@ -67,7 +119,7 @@ const Step2: React.FC<Step2Props> = ({
     if (!selectedPostForComment && username) {
       setLoadingPosts(true);
       setErrorFetchingPosts(null);
-      //    onProcessError(null); // Limpiar error general
+      onProcessError("");
 
       const hiveRpcUrl = "https://api.hive.blog";
 
@@ -243,16 +295,6 @@ const Step2: React.FC<Step2Props> = ({
               onboarded,
               comment_permlink: permlink,
             });
-            //TODO cleanup
-            // const responsePutAPI = await editCommentPermlinkOnboardingEntry(
-            //   onboarder,
-            //   onboarded,
-            //   permlink,
-            //   token
-            // );
-            // console.log("editCommentPermlinkOnboardingEntry: ", {
-            //   responsePutAPI,
-            // });
             onStepDataChange({
               commentResponse: response,
               postedCommentPermlink: permlink,
@@ -291,10 +333,10 @@ const Step2: React.FC<Step2Props> = ({
   }
 
   return (
-    <div className="onboarding-step step-2-comment">
+    <StyledStep2Container>
       <h3>Agregar comentario en una publicación para @{username}</h3>{" "}
       {showPostList && (
-        <div className="post-selection-section">
+        <StyledPostSelectionSection>
           {" "}
           <h4>
             Selecciona una publicación reciente de @{username} para comentar:
@@ -304,16 +346,10 @@ const Step2: React.FC<Step2Props> = ({
             <p style={{ color: "red" }}>Error: {errorFetchingPosts}</p>
           )}{" "}
           {!loadingPosts && !errorFetchingPosts && posts.length > 0 && (
-            <ul className="post-list-selectable">
-              {" "}
+            <StyledPostList>
               {posts.map((post, index) => (
-                <li
-                  key={post.permlink || index}
-                  className="post-item-selectable"
-                >
-                  {" "}
-                  <div className="post-thumbnail-small">
-                    {" "}
+                <StyledPostItem key={post.permlink || index}>
+                  <StyledPostThumbnail size="small">
                     {post.imageUrl ? (
                       <img
                         src={post.imageUrl}
@@ -322,9 +358,8 @@ const Step2: React.FC<Step2Props> = ({
                     ) : (
                       <div className="no-image-small">No image</div>
                     )}{" "}
-                  </div>{" "}
-                  <div className="post-content">
-                    {" "}
+                  </StyledPostThumbnail>
+                  <StyledPostContent>
                     <a
                       href={`https://peakd.com${post.url}`}
                       target="_blank"
@@ -333,27 +368,26 @@ const Step2: React.FC<Step2Props> = ({
                       <h5>{post.title}</h5>
                     </a>
                     <p>por @{post.author}</p>{" "}
-                  </div>{" "}
-                  <button
+                  </StyledPostContent>
+                  <StyledItemActionButton
                     onClick={() => handlePostSelected(post)}
-                    className="select-post-button"
                   >
                     Seleccionar
-                  </button>{" "}
-                </li>
-              ))}{" "}
-            </ul>
+                  </StyledItemActionButton>
+                </StyledPostItem>
+              ))}
+            </StyledPostList>
           )}{" "}
           {!loadingPosts && !errorFetchingPosts && posts.length === 0 && (
             <p>No se encontraron publicaciones recientes para @{username}.</p>
           )}{" "}
-          <div className="step-navigation-buttons">
-            <button onClick={onPrevStep}>Volver</button>{" "}
-          </div>{" "}
-        </div>
+          <StyledNavigationButtons justify="flex-start">
+            <StyledPrevButton onClick={onPrevStep}>Volver</StyledPrevButton>
+          </StyledNavigationButtons>
+        </StyledPostSelectionSection>
       )}{" "}
       {showEditorArea && (
-        <div className="comment-editing-section">
+        <StyledCommentEditingSection>
           <h4>Editar Comentario</h4>{" "}
           {selectedPostForComment && (
             <p>
@@ -368,62 +402,42 @@ const Step2: React.FC<Step2Props> = ({
               por @{selectedPostForComment.author}{" "}
             </p>
           )}{" "}
-          <div className="comment-editor-preview-layout">
-            {" "}
-            <div className="markdown-editor-area">
+          <StyledCommentEditorPreviewLayout>
+            <StyledMarkdownArea>
               <h5>Markdown</h5>{" "}
-              <textarea
+              <StyledCommentMarkdownInput
                 value={commentMarkdown}
                 onChange={handleMarkdownChange}
                 rows={10}
-                className="comment-markdown-input"
                 placeholder="Escribe tu comentario aquí en formato Markdown..."
                 disabled={isPostingComment || postCommentSuccess}
-              />{" "}
-            </div>{" "}
-            <div className="markdown-preview-area">
+              />
+            </StyledMarkdownArea>{" "}
+            <StyledMarkdownPreviewArea>
               <h5>Previsualización</h5>{" "}
-              <div
-                className="comment-preview"
+              <StyledCommentPreview
                 dangerouslySetInnerHTML={{ __html: previewHtml }}
-              />{" "}
-            </div>{" "}
-          </div>{" "}
+              />
+            </StyledMarkdownPreviewArea>
+          </StyledCommentEditorPreviewLayout>
           {isPostingComment && (
-            <p style={{ color: "blue", textAlign: "center", margin: "10px 0" }}>
-              Publicando comentario...
-            </p>
-          )}{" "}
+            <StyledInfoMessage>Publicando comentario...</StyledInfoMessage>
+          )}
           {postCommentSuccess && (
-            <p
-              style={{
-                color: "green",
-                textAlign: "center",
-                fontWeight: "bold",
-                margin: "10px 0",
-              }}
-            >
+            <StyledSuccessMessage>
               ¡Comentario publicado con éxito!
-            </p>
-          )}{" "}
+            </StyledSuccessMessage>
+          )}
           {postCommentError && (
-            <p
-              style={{
-                color: "red",
-                textAlign: "center",
-                fontWeight: "bold",
-                margin: "10px 0",
-              }}
-            >
+            <StyledErrorMessage>
               Error al publicar: {postCommentError}
-            </p>
-          )}{" "}
-          <div className="step-navigation-buttons">
-            {" "}
+            </StyledErrorMessage>
+          )}
+          <StyledNavigationButtons justify="space-between">
             {!isPostingComment && !postCommentSuccess && (
-              <button onClick={onPrevStep}>Volver</button>
-            )}{" "}
-            <button
+              <StyledPrevButton onClick={onPrevStep}>Volver</StyledPrevButton>
+            )}
+            <StyledNextButton
               onClick={handlePostComment}
               disabled={
                 !commentMarkdown.trim() ||
@@ -440,14 +454,13 @@ const Step2: React.FC<Step2Props> = ({
                   ? "Publicado"
                   : "Continuar"
               }
-              className="next-step-button"
             >
               {continueButtonText}{" "}
-            </button>{" "}
-          </div>{" "}
-        </div>
-      )}{" "}
-    </div>
+            </StyledNextButton>
+          </StyledNavigationButtons>
+        </StyledCommentEditingSection>
+      )}
+    </StyledStep2Container>
   );
 };
 

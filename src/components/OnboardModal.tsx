@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
+import styled from "styled-components";
 import { BackendOnboardingInfo } from "../pages/OnboardUser";
 import { ImageUtils } from "../utils/image.utils";
 import { KeychainUtils } from "../utils/keychain.utils";
-import "./OnboardModal.css";
 import Stepper from "./stepper/Stepper";
 import Step1 from "./stepper/steps/Step1";
 import Step2 from "./stepper/steps/Step2";
 import Step3 from "./stepper/steps/Step3";
+import {
+  StyledItemActionButton,
+  StyledKeychainRequiredMessage,
+  StyledPostContent,
+  StyledPostItem,
+  StyledPostList,
+  StyledPostThumbnail,
+} from "./StyledElements";
 export interface StepData {
   selectedPost?: Post; // Del Step 1
   onboarder?: string; // Del Step 1
@@ -39,6 +47,121 @@ interface OnboardModalProps {
   startStep?: number;
   existingOnboardInfo?: BackendOnboardingInfo | null;
 }
+
+const StyledModalContent = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 8px;
+  padding: 0;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  max-width: 800px;
+  width: 90%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Mantiene el scroll en el body */
+`;
+
+const StyledModalHeaderBar = styled.div`
+  background-color: #f0f0f0;
+  padding: 15px 20px;
+  border-bottom: 1px solid #ddd;
+  z-index: 10;
+  flex-shrink: 0;
+  text-align: center;
+
+  h2 {
+    margin: 0 0 5px 0;
+    font-size: 1.2em;
+    color: #333;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.85em;
+    color: #555;
+  }
+
+  strong {
+    color: #007bff;
+  }
+`;
+
+const StyledModalContentBody = styled.div`
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 20px;
+  padding-top: 20px; /* Esto parece duplicado, revisaremos después si es necesario */
+
+  .process-error-message {
+    color: #dc3545;
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+
+  .keychain-required-message {
+    color: #ffc107;
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+`;
+
+const StyledCloseButton = styled.button`
+  flex-shrink: 0;
+  display: block;
+  width: 100%;
+  padding: 12px 20px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 0 0 8px 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: auto;
+
+  &:hover {
+    background-color: #5a6268;
+  }
+`;
+
+// ... tus otras definiciones de styled-components ...
+
+const StyledProcessErrorMessage = styled.p`
+  /* Estilos de .process-error-message de OnboardModal.css */
+  color: #dc3545; /* color de peligro */
+  text-align: center;
+  margin-bottom: 15px;
+  font-weight: bold;
+`;
+
+const StyledNoImagePlaceholder = styled.div`
+  /* Estilos de .no-image de OnboardModal.css */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e0e0e0;
+  color: #777;
+  font-size: 0.8em;
+  text-align: center;
+  height: 100%; /* Asegura que ocupe el espacio del thumbnail */
+  width: 100%;
+  border-radius: 4px; /* Si StyledPostThumbnail tiene border-radius */
+`;
+
+const StyledMyFlowArea = styled.div`
+  /* Estilos de .my-flow-area de OnboardModal.css */
+  /* Este div no tenía muchos estilos específicos, a menudo solo es un contenedor para organizar */
+  /* Si tenía padding o margin, añádelos aquí */
+  /* padding: 10px; */
+`;
 
 const OnboardModal: React.FC<OnboardModalProps> = ({
   isOpen,
@@ -208,103 +331,106 @@ const OnboardModal: React.FC<OnboardModalProps> = ({
       overlayClassName="onboard-modal-overlay"
       ariaHideApp={false}
     >
-      <div className="modal-header-bar">
-        <h2>Onboard HSBI</h2>
-        <p>
-          Usuario: <strong>@{username}</strong> (Onboarder: @{onboarderUsername}
-          )
-        </p>
-      </div>
+      <StyledModalContent>
+        <StyledModalHeaderBar>
+          <h2>Onboard HSBI</h2>
+          <p>
+            Usuario: <strong>@{username}</strong> (Onboarder: @
+            {onboarderUsername})
+          </p>
+        </StyledModalHeaderBar>
 
-      <div className="modal-content-body">
-        {processError && (
-          <p className="process-error-message">{processError}</p>
-        )}
+        <StyledModalContentBody>
+          {processError && (
+            <StyledProcessErrorMessage>
+              {processError}
+            </StyledProcessErrorMessage>
+          )}
 
-        {showPostSelectionList && (
-          <>
-            {!isKeychainAvailable && !loadingPosts && !errorFetchingPosts && (
-              <p className="keychain-required-message">
-                Hive Keychain es requerido para apadrinar usuarios. Por favor,
-                asegúrese de que está instalado.
-              </p>
-            )}
-            {loadingPosts && <p>Cargando publicaciones...</p>}
-            {errorFetchingPosts && <p>{errorFetchingPosts}</p>}
+          {showPostSelectionList && (
+            <>
+              {!isKeychainAvailable && !loadingPosts && !errorFetchingPosts && (
+                <StyledKeychainRequiredMessage>
+                  Hive Keychain es requerido para apadrinar usuarios. Por favor,
+                  asegúrese de que está instalado.
+                </StyledKeychainRequiredMessage>
+              )}
+              {loadingPosts && <p>Cargando publicaciones...</p>}
+              {errorFetchingPosts && <p>{errorFetchingPosts}</p>}
 
-            {!loadingPosts && !errorFetchingPosts && posts.length > 0 && (
-              <ul className="post-list">
-                {posts.map((post, index) => (
-                  <li key={post.permlink || index} className="post-item">
-                    <div className="post-thumbnail">
-                      {post.imageUrl ? (
-                        <img
-                          src={post.imageUrl}
-                          alt={`Thumbnail for ${post.title}`}
-                        />
-                      ) : (
-                        <div className="no-image">No image</div>
-                      )}
-                    </div>
+              {!loadingPosts && !errorFetchingPosts && posts.length > 0 && (
+                <StyledPostList>
+                  {posts.map((post, index) => (
+                    <StyledPostItem key={post.permlink || index}>
+                      <StyledPostThumbnail size="large">
+                        {post.imageUrl ? (
+                          <img
+                            src={post.imageUrl}
+                            alt={`Thumbnail for ${post.title}`}
+                          />
+                        ) : (
+                          <StyledNoImagePlaceholder>
+                            No image
+                          </StyledNoImagePlaceholder>
+                        )}
+                      </StyledPostThumbnail>
 
-                    <div className="post-content">
-                      <a
-                        href={`https://peakd.com${post.url}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <StyledPostContent>
+                        <a
+                          href={`https://peakd.com${post.url}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <h3>{post.title}</h3>
+                        </a>
+                        <p>por @{post.author}</p>
+                      </StyledPostContent>
+                      <StyledItemActionButton
+                        onClick={() => handlePostSelected(post)}
+                        disabled={!isKeychainAvailable}
+                        title={
+                          !isKeychainAvailable ? "Requires Hive Keychain" : ""
+                        }
                       >
-                        <h3>{post.title}</h3>
-                      </a>
-                      <p>por @{post.author}</p>
-                    </div>
-                    <button
-                      onClick={() => handlePostSelected(post)}
-                      className="onboard-here-button"
-                      disabled={!isKeychainAvailable}
-                      title={
-                        !isKeychainAvailable ? "Requires Hive Keychain" : ""
-                      }
-                    >
-                      On-board here
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {!loadingPosts && !errorFetchingPosts && posts.length === 0 && (
-              <p>No hay publicaciones recientes para @{username}.</p>
-            )}
-          </>
-        )}
+                        On-board here
+                      </StyledItemActionButton>
+                    </StyledPostItem>
+                  ))}
+                </StyledPostList>
+              )}
+              {!loadingPosts && !errorFetchingPosts && posts.length === 0 && (
+                <p>No hay publicaciones recientes para @{username}.</p>
+              )}
+            </>
+          )}
 
-        {showStepperFlow && (
-          <div className="my-flow-area">
-            <Stepper
-              steps={onboardSteps}
-              initialStep={startStep - 1}
-              stepData={stepData}
-              existingOnboardInfo={existingOnboardInfo}
-              onStepDataChange={handleStepDataChange}
-              onProcessError={handleProcessError}
-              onCancel={handleCancelFlow}
-              username={username}
-              onboarderUsername={onboarderUsername}
-              isKeychainAvailable={isKeychainAvailable}
-              onTransactionInitiated={() =>
-                console.log("Modal: Step1 Transaction Init")
-              }
-              onTransactionComplete={(response: any) =>
-                handleStepDataChange({ transactionResponse: response })
-              }
-              onTransactionError={handleProcessError}
-            />
-          </div>
-        )}
-      </div>
+          {showStepperFlow && (
+            <StyledMyFlowArea>
+              <Stepper
+                steps={onboardSteps}
+                initialStep={startStep - 1}
+                stepData={stepData}
+                existingOnboardInfo={existingOnboardInfo}
+                onStepDataChange={handleStepDataChange}
+                onProcessError={handleProcessError}
+                onCancel={handleCancelFlow}
+                username={username}
+                onboarderUsername={onboarderUsername}
+                isKeychainAvailable={isKeychainAvailable}
+                onTransactionInitiated={() =>
+                  console.log("Modal: Step1 Transaction Init")
+                }
+                onTransactionComplete={(response: any) =>
+                  handleStepDataChange({ transactionResponse: response })
+                }
+                onTransactionError={handleProcessError}
+              />
+            </StyledMyFlowArea>
+          )}
+        </StyledModalContentBody>
 
-      <button onClick={handleCancelFlow} className="close-button">
-        Cerrar
-      </button>
+        <StyledCloseButton onClick={handleCancelFlow}>Cerrar</StyledCloseButton>
+      </StyledModalContent>
     </Modal>
   );
 };

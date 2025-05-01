@@ -1,8 +1,13 @@
 import React, { useState } from "react";
+import styled from "styled-components";
 import { BackendOnboardingInfo } from "../../../pages/OnboardUser";
 import { StepData } from "../../OnboardModal";
-import "./Step3.css";
-
+import {
+  StyledCompleteButton, // Usaremos este para el botón "Complete"
+  StyledCopyReportButton,
+  StyledNavigationButtons,
+  StyledPrevButton,
+} from "../../StyledElements";
 interface Step3Props {
   stepData: StepData;
   existingOnboardInfo?: BackendOnboardingInfo | null;
@@ -19,6 +24,192 @@ interface Step3Props {
   onboarderUsername: string;
   isKeychainAvailable: boolean;
 }
+
+const StyledStep3SummaryContainer = styled.div`
+  /* Estilos de .onboarding-step.step-3-summary de Step3.css */
+  padding: 20px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+
+  h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+`;
+
+const StyledSummaryModeInfo = styled.p`
+  /* Estilos de .summary-mode-info de Step3.css */
+  text-align: center;
+  font-style: italic;
+  margin-bottom: 25px;
+  color: #555;
+`;
+
+const StyledSummarySection = styled.div`
+  /* Estilos de .summary-section de Step3.css */
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px dashed #ccc;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  h3 {
+    color: #0056b3;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+  }
+
+  p {
+    margin: 5px 0;
+    color: #333;
+    font-size: 0.95em;
+  }
+
+  p strong {
+    color: #000;
+  }
+
+  a {
+    color: #007bff;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+`;
+
+// Componentes para resultados de transacción/respuesta (éxito/error)
+interface StyledResultProps {
+  success?: boolean; // Para determinar si aplicar estilos de éxito o error
+}
+
+const StyledTransactionResult = styled.div<StyledResultProps>`
+  /* Estilos de .transaction-result, .transaction-result.success, .transaction-result.error de Step3.css */
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 10px;
+  font-size: 0.9em;
+
+  ${(props) =>
+    props.success
+      ? `
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724; /* color de texto para éxito */
+  `
+      : `
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24; /* color de texto para error */
+  `}
+
+  p {
+    margin: 3px 0;
+    color: inherit; /* Hereda el color del contenedor (éxito/error) */
+  }
+  p strong {
+    color: inherit; /* Hereda el color del contenedor */
+  }
+`;
+
+// Backend response result (similar a transaction, podría refactorizarse si hay más similitud)
+const StyledBackendResponseResult = styled.div<StyledResultProps>`
+  /* Estilos de .backend-response-result, .backend-response-result.success, .backend-response-result.error de Step3.css */
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 10px;
+  font-size: 0.9em;
+
+  ${(props) =>
+    props.success
+      ? `
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724; /* color de texto para éxito */
+  `
+      : `
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24; /* color de texto para error */
+  `}
+
+  p {
+    margin: 3px 0;
+    color: inherit; /* Hereda el color del contenedor */
+  }
+
+  pre {
+    margin: 5px 0;
+    padding: 10px;
+    background-color: #eee;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-size: 0.85em;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    color: #333; /* Un color más oscuro para el código */
+  }
+`;
+
+const StyledTransactionDetails = styled.div`
+  /* Estilos de .transaction-details de Step3.css */
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.2);
+
+  p {
+    margin: 2px 0;
+    font-size: 0.9em;
+    color: inherit;
+  }
+  p strong {
+    color: inherit;
+    font-weight: normal;
+    margin-right: 5px;
+  }
+`;
+
+const StyledBackendResponseDetails = styled.div`
+  /* Estilos de .backend-response-details de Step3.css */
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.2);
+
+  p {
+    margin: 2px 0;
+    font-size: 0.9em;
+    color: inherit;
+  }
+`;
+
+const StyledCommentTextPreview = styled.div`
+  /* Estilos de .comment-text-preview de Step3.css */
+  background-color: #fff;
+  border: 1px solid #eee;
+  padding: 10px;
+  border-radius: 4px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: monospace;
+  font-size: 0.9em;
+  max-height: 150px;
+  overflow-y: auto;
+`;
+
+const StyledCopyStatusMessage = styled.p`
+  /* Estilos de .copy-status-message de Step3.css */
+  text-align: center;
+  margin-top: 10px;
+  font-style: italic;
+  color: #555;
+`;
 
 const Step3: React.FC<Step3Props> = ({
   stepData,
@@ -134,33 +325,32 @@ const Step3: React.FC<Step3Props> = ({
   };
 
   return (
-    <div className="onboarding-step step-3-summary">
+    <StyledStep3SummaryContainer>
       <h2>Onboarding Summary</h2>
-
       {isEditMode ? (
-        <p className="summary-mode-info">
+        <StyledSummaryModeInfo>
           Reviewing existing onboarding record for @{username} by @
           {onboarderUsername}.
-        </p>
+        </StyledSummaryModeInfo>
       ) : (
-        <p className="summary-mode-info">
+        <StyledSummaryModeInfo>
           Reviewing process for onboarding @{username} by @{onboarderUsername}.
-        </p>
+        </StyledSummaryModeInfo>
       )}
-
-      <div className="summary-section">
+      <StyledSummarySection>
         <h3>Backend Record Update Result</h3>
         {stepData.beResponse1 ? (
-          <div className="backend-response-details">
-            <p>Response Details:</p>
-            <pre>{JSON.stringify(stepData.beResponse1, null, 2)}</pre>
-          </div>
+          <StyledBackendResponseResult success={stepData.beResponse1.success}>
+            <StyledBackendResponseDetails>
+              <p>Response Details:</p>
+              <pre>{JSON.stringify(stepData.beResponse1, null, 2)}</pre>
+            </StyledBackendResponseDetails>
+          </StyledBackendResponseResult>
         ) : (
           <p>Backend record update result is unavailable.</p>
         )}
-      </div>
-
-      <div className="summary-section">
+      </StyledSummarySection>
+      <StyledSummarySection>
         <h3>Post Selected</h3>
         {stepData.selectedPost ? (
           <p>
@@ -179,15 +369,12 @@ const Step3: React.FC<Step3Props> = ({
         ) : (
           <p>No specific post selected in previous steps.</p>
         )}
-      </div>
-
-      <div className="summary-section">
+      </StyledSummarySection>
+      <StyledSummarySection>
         <h3>Transfer Transaction Result</h3>
         {stepData.transactionResponse ? (
-          <div
-            className={`transaction-result ${
-              stepData.transactionResponse.success ? "success" : "error"
-            }`}
+          <StyledTransactionResult
+            success={stepData.transactionResponse.success}
           >
             <p>
               Status:{" "}
@@ -208,7 +395,7 @@ const Step3: React.FC<Step3Props> = ({
             {stepData.transactionResponse.success &&
               stepData.transactionResponse.result &&
               stepData.transactionResponse.data && (
-                <div className="transaction-details">
+                <StyledTransactionDetails>
                   <p>
                     <strong>Transaction Details:</strong>
                   </p>
@@ -226,24 +413,19 @@ const Step3: React.FC<Step3Props> = ({
                   {stepData.transactionResponse.data.memo && (
                     <p>Memo: {stepData.transactionResponse.data.memo}</p>
                   )}
-                </div>
+                </StyledTransactionDetails>
               )}
-          </div>
+          </StyledTransactionResult>
         ) : (
           <p>
             Transfer transaction was not attempted or result is unavailable.
           </p>
         )}
-      </div>
-
-      <div className="summary-section">
+      </StyledSummarySection>
+      <StyledSummarySection>
         <h3>Comment Transaction Result</h3>
         {stepData.commentResponse ? (
-          <div
-            className={`transaction-result ${
-              stepData.commentResponse.success ? "success" : "error"
-            }`}
-          >
+          <StyledTransactionResult success={stepData.commentResponse.success}>
             <p>
               Status:{" "}
               <strong>
@@ -268,34 +450,32 @@ const Step3: React.FC<Step3Props> = ({
             {stepData.commentResponse.error && (
               <p>Error: {JSON.stringify(stepData.commentResponse.error)}</p>
             )}
-          </div>
+          </StyledTransactionResult>
         ) : (
           <p>Comment was not posted or result is unavailable.</p>
         )}
-      </div>
-
+      </StyledSummarySection>
       {(stepData.generatedComment || stepData.editedComment) && (
-        <div className="summary-section">
+        <StyledSummarySection>
           <h3>Comment Text</h3>
-          <div className="comment-text-preview">
+          <StyledCommentTextPreview>
             {stepData.editedComment || stepData.generatedComment}
-          </div>
-        </div>
+          </StyledCommentTextPreview>
+        </StyledSummarySection>
       )}
-
-      <div className="step-navigation-buttons">
-        <button onClick={onPrevStep} className="prev-step-button">
-          Back
-        </button>
-        <button onClick={onComplete} className="complete-button">
+      <StyledNavigationButtons justify="center" gap="20px" marginTop="30px">
+        <StyledPrevButton onClick={onPrevStep}>Back</StyledPrevButton>
+        <StyledCompleteButton onClick={onComplete}>
           Complete
-        </button>
-        <button onClick={handleCopyReport} className="copy-report-button">
+        </StyledCompleteButton>
+        <StyledCopyReportButton onClick={handleCopyReport}>
           Copy Report
-        </button>
-      </div>
-      {copyStatus && <p className="copy-status-message">{copyStatus}</p>}
-    </div>
+        </StyledCopyReportButton>
+      </StyledNavigationButtons>
+      {copyStatus && (
+        <StyledCopyStatusMessage>{copyStatus}</StyledCopyStatusMessage>
+      )}
+    </StyledStep3SummaryContainer>
   );
 };
 

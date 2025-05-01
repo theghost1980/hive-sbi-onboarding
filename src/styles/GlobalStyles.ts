@@ -31,28 +31,7 @@ const GlobalStyles = createGlobalStyle`
   }
 
   .onboard-modal {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    right: auto;
-    bottom: auto;
-    margin-right: -50%;
-    transform: translate(-50%, -50%); /* Centra el modal */
-
-    background: #fff;
-    border-radius: 8px;
-    padding: 0; /* Quitamos padding del contenedor principal ya que el body interno lo tiene */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-
-    /* --- Ajustes de Tamaño --- */
-    max-width: 800px; /* Ancho máximo */
-    width: 90%; /* Ancho responsivo */
-    max-height: 80vh; /* Altura máxima (80% del viewport height) */
-    /* ------------------------- */
-
-    display: flex; /* Usamos flexbox para la estructura interna (header, body, footer) */
-    flex-direction: column; /* Apila los elementos verticalmente */
-    overflow: hidden; /* Oculta cualquier contenido que se desborde (para manejar el scroll interno) */
+    /* position: absolute;
   }
   /* --- Fin estilos globales react-modal --- */
 `;

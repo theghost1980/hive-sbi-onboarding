@@ -106,6 +106,7 @@ const Button = styled.button`
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  z-index: 0;
   &:disabled {
     background-color: #ccc;
     cursor: not-allowed;
