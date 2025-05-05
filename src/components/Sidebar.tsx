@@ -142,12 +142,14 @@ const StyledLanguageSwitcher = styled.div`
 `;
 
 const Sidebar = () => {
-  const { t, i18n } = useTranslation();
+  const { t, i18n, ready } = useTranslation();
+
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
   };
 
-  const isSpanish = i18n.language.startsWith("es");
+  const currentLanguage = ready ? i18n.language : i18n.language;
+  const isSpanish = currentLanguage?.startsWith("es") || false;
   const targetLanguage = isSpanish ? "en" : "es";
   const targetLanguageLabel = isSpanish ? "English" : "Español";
 
